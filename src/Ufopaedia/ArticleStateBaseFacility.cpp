@@ -64,7 +64,7 @@ namespace OpenXcom
 
 		// build preview image
 		int tile_size = 32;
-		_image = new Surface(tile_size*2, tile_size*2, 232, 16);
+		_image = new Surface(tile_size * 3, tile_size * 3, 216, 0);
 		add(_image);
 
 		SurfaceSet *graphic = _game->getMod()->getSurfaceSet("BASEBITS.PCK");
@@ -73,9 +73,13 @@ namespace OpenXcom
 		int x_pos, y_pos;
 		int num;
 
-		if (facility->getSize()==1)
+		if (facility->getSize() == 1)
 		{
-			x_offset = y_offset = tile_size/2;
+			x_offset = y_offset = tile_size;
+		}
+		else if (facility->getSize() == 2)
+		{
+			x_offset = y_offset = tile_size / 2;
 		}
 		else
 		{
