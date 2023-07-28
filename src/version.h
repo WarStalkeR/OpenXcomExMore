@@ -18,8 +18,8 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#define OPENXCOM_VERSION_ENGINE "Extended More"
-#define OPENXCOM_VERSION_SHORT "Extended More 7.9.8"
+#define OPENXCOM_VERSION_ENGINE "Extended"
+#define OPENXCOM_VERSION_SHORT "Extended 7.9.8 + More 1.0.0"
 #define OPENXCOM_VERSION_LONG "7.9.8.0"
 #define OPENXCOM_VERSION_NUMBER 7,9,8,0
 
