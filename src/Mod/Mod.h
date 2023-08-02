@@ -241,6 +241,8 @@ private:
 
 	std::string _loseMoney, _loseRating, _loseDefeat;
 	int _ufoGlancingHitThreshold, _ufoBeamWidthParameter;
+	int _accelerationBonusDivisor, _accelerationPenaltyStandoff, _accelerationPenaltyCautious, _accelerationPenaltyCombat, _accelerationPenaltyManeuver;
+	int _accelerationCoefficientStandoff, _accelerationCoefficientCautious, _accelerationCoefficientCombat, _accelerationCoefficientManeuver;
 	int _ufoTractorBeamSizeModifiers[5];
 	int _escortRange, _drawEnemyRadarCircles;
 	bool _escortsJoinFightAgainstHK, _hunterKillerFastRetarget;
@@ -1109,6 +1111,25 @@ public:
 	const std::vector<int>& getRetaliationTriggerOdds() { return _retaliationTriggerOdds; }
 	const std::vector<int>& getRetaliationBaseRegionOdds() { return _retaliationBaseRegionOdds; }
 	const std::vector<int>& getAliensFacingCraftOdds() { return _aliensFacingCraftOdds; }
+
+	/// Gets acceleration divisor used to calculate acceleration bonus in dogfights.
+	int getAccelerationBonusDivisor() const { return _accelerationBonusDivisor; }
+	/// Gets acceleration penalty used in HK Standoff Mode activation formula.
+	int getAccelerationPenaltyStandoff() const { return _accelerationPenaltyStandoff; }
+	/// Gets acceleration penalty used in HK Cautious/Evasion Mode switch formula.
+	int getAccelerationPenaltyCautious() const { return _accelerationPenaltyCautious; }
+	/// Gets acceleration penalty used in HK Standard Mode activation formula.
+	int getAccelerationPenaltyCombat() const { return _accelerationPenaltyCombat; }
+	/// Gets acceleration penalty used to check if HK or player dictates range in Standard Mode.
+	int getAccelerationPenaltyManeuver() const { return _accelerationPenaltyManeuver; }
+	/// Gets acceleration coefficient used in HK Standoff Mode activation formula.
+	int getAccelerationCoefficientStandoff() const { return _accelerationCoefficientStandoff; }
+	/// Gets acceleration coefficient used in HK Cautious/Evasion Mode switch formula.
+	int getAccelerationCoefficientCautious() const { return _accelerationCoefficientCautious; }
+	/// Gets acceleration coefficient used in HK Standard Mode activation formula.
+	int getAccelerationCoefficientCombat() const { return _accelerationCoefficientCombat; }
+	/// Gets acceleration coefficient used to check if HK or player dictates range in Standard Mode.
+	int getAccelerationCoefficientManeuver() const { return _accelerationCoefficientManeuver; }
 
 };
 
