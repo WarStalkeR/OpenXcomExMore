@@ -363,6 +363,8 @@ Mod::Mod() :
 	_manaEnabled(false), _manaBattleUI(false), _manaTrainingPrimary(false), _manaTrainingSecondary(false), _manaReplenishAfterMission(true),
 	_loseMoney("loseGame"), _loseRating("loseGame"), _loseDefeat("loseGame"),
 	_ufoGlancingHitThreshold(0), _ufoBeamWidthParameter(1000),
+	_accelerationBonusDivisor(3), _accelerationPenaltyStandoff(10), _accelerationPenaltyCautious(10), _accelerationPenaltyCombat(10), _accelerationPenaltyManeuver(10),
+	_accelerationCoefficientStandoff(20), _accelerationCoefficientCautious(35), _accelerationCoefficientCombat(50), _accelerationCoefficientManeuver(70),
 	_escortRange(20), _drawEnemyRadarCircles(1), _escortsJoinFightAgainstHK(true), _hunterKillerFastRetarget(true),
 	_crewEmergencyEvacuationSurvivalChance(100), _pilotsEmergencyEvacuationSurvivalChance(100),
 	_soldiersPerRank({-1, -1, 5, 11, 23, 30}),
@@ -3155,6 +3157,15 @@ void Mod::loadFile(const FileMap::FileRecord &filerec, ModScript &parsers)
 	{
 		_flagByKills = doc["flagByKills"].as<std::vector<int> >(_flagByKills);
 	}
+	_accelerationBonusDivisor = doc["accelerationBonusDivisor"].as<int>(_accelerationBonusDivisor);
+	_accelerationPenaltyStandoff = doc["accelerationPenaltyStandoff"].as<int>(_accelerationPenaltyStandoff);
+	_accelerationPenaltyCautious = doc["accelerationPenaltyCautious"].as<int>(_accelerationPenaltyCautious);
+	_accelerationPenaltyCombat = doc["accelerationPenaltyCombat"].as<int>(_accelerationPenaltyCombat);
+	_accelerationPenaltyManeuver = doc["accelerationPenaltyManeuver"].as<int>(_accelerationPenaltyManeuver);
+	_accelerationCoefficientStandoff = doc["accelerationCoefficientStandoff"].as<int>(_accelerationCoefficientStandoff);
+	_accelerationCoefficientCautious = doc["accelerationCoefficientCautious"].as<int>(_accelerationCoefficientCautious);
+	_accelerationCoefficientCombat = doc["accelerationCoefficientCombat"].as<int>(_accelerationCoefficientCombat);
+	_accelerationCoefficientManeuver = doc["accelerationCoefficientManeuver"].as<int>(_accelerationCoefficientManeuver);
 
 
 
