@@ -46,6 +46,7 @@ class Production;
 class Vehicle;
 class Ufo;
 class AlienMission;
+class Position;
 
 enum UfoDetection : int;
 enum BasePlacementErrors : int
@@ -92,10 +93,13 @@ class Base : public Target
 {
 private:
 	static const int BASE_SIZE = 6;
+	static const int GRID_SIZE = 32;
 	const Mod *_mod;
 	std::vector<BaseFacility*> _facilities;
 	std::vector<Soldier*> _soldiers;
 	std::vector<Craft*> _crafts;
+	std::vector<Position> _craftSlots;
+	std::vector<Position*> _occupiedSlots;
 	std::vector<Transfer*> _transfers;
 	ItemContainer *_items;
 	int _scientists, _engineers;
@@ -140,6 +144,14 @@ public:
 	std::vector<Craft*> *getCrafts() {	return &_crafts; }
 	/// Gets the base's crafts.
 	const std::vector<Craft*> *getCrafts() const { return &_crafts; }
+	/// Gets the base's all hangar slots.
+	std::vector<Position> *getCraftSlots() { return &_craftSlots; }
+	/// Gets the base's all hangar slots.
+	const std::vector<Position> *getCraftSlots() const { return &_craftSlots; }
+	/// Gets the base's occupied hangar slots.
+	std::vector<Position*> *getOccupiedSlots() { return &_occupiedSlots; }
+	/// Gets the base's occupied hangar slots.
+	const std::vector<Position*> *getOccupiedSlots() const { return &_occupiedSlots; }
 	/// Gets the base's transfers.
 	std::vector<Transfer*> *getTransfers() { return &_transfers; }
 	/// Gets the base's transfers.
@@ -196,6 +208,10 @@ public:
 	int getUsedHangars() const;
 	/// Gets the base's available hangars.
 	int getAvailableHangars() const;
+	/// Updates all craft slots list.
+	void updateCraftSlots();
+	/// Updates occupied craft slots list.
+	void updateOccupiedSlots();
 	/// Get the number of available space lab (not used by a ResearchProject)
 	int getFreeLaboratories() const;
 	/// Get the number of available space lab (not used by a Production)

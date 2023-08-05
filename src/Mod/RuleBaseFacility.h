@@ -57,6 +57,8 @@ private:
 	int _size, _buildCost, _refundValue, _buildTime, _monthlyCost;
 	std::map<std::string, std::pair<int, int> > _buildCostItems;
 	int _storage, _personnel, _aliens, _crafts, _labs, _workshops, _psiLabs;
+	bool _craftsHidden;
+	std::vector<Position> _craftOptions;
 	int _sightRange, _sightChance;
 	int _radarRange, _radarChance, _defense, _hitRatio, _fireSound, _hitSound, _placeSound;
 	int _ammoNeeded;
@@ -149,6 +151,10 @@ public:
 	int getWorkshops() const;
 	/// Gets the facility's psi-training capacity.
 	int getPsiLaboratories() const;
+	/// Gets if facility's crafts are hidden or not.
+	bool getCraftsHidden() const;
+	/// Gets a list of which tiles are used to place items stored in this facility
+	const std::vector<Position>& getCraftOptions() const;
 	/// Gets the facility's sight range.
 	int getSightRange() const { return _sightRange; }
 	/// Gets the facility's alien base detection chance.
