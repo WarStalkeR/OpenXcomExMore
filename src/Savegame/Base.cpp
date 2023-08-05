@@ -242,6 +242,9 @@ void Base::load(const YAML::Node &node, SavedGame *save, bool newGame, bool newB
 	}
 	_fakeUnderwater = node["fakeUnderwater"].as<bool>(_fakeUnderwater);
 
+	updateCraftSlots();
+	updateOccupiedSlots();
+
 	isOverlappingOrOverflowing(); // don't crash, just report in the log file...
 }
 
@@ -984,6 +987,131 @@ int Base::getAvailableHangars() const
 		}
 	}
 	return total;
+}
+
+/**
+ * Updates craft slots list based on built facilities.
+ */
+void Base::updateCraftSlots()
+{
+	_craftSlots.clear();
+	for (const auto* fac : _facilities)
+	{
+		if (fac->getBuildTime() == 0 && fac->getRules()->getCrafts() > 0)
+		{
+			bool hidesCrafts = fac->getRules()->getCraftsHidden();
+			if (size_t(fac->getRules()->getCrafts()) > fac->getRules()->getCraftOptions().size())
+			{
+				Log(LOG_WARNING) << "Facility " << fac->getRules()->getType() << " has craft capacity of " << fac->getRules()->getCrafts() << ", but slots are defined only for " << fac->getRules()->getCraftOptions().size() << "!";
+			}
+			for (int i = 0; i < fac->getRules()->getCrafts(); ++i)
+			{
+				if (size_t(i) < fac->getRules()->getCraftOptions().size())
+				{
+					const auto refOpts = fac->getRules()->getCraftOptions()[i];
+					int craftSlotSize = refOpts.z;
+					if (hidesCrafts) craftSlotSize = (-1 * craftSlotSize) - 1;
+					_craftSlots.push_back(Position(
+						fac->getX() * GRID_SIZE + (fac->getRules()->getSize() - 1) * GRID_SIZE / 2 + refOpts.x,
+						fac->getY() * GRID_SIZE + (fac->getRules()->getSize() - 1) * GRID_SIZE / 2 + refOpts.y,
+						craftSlotSize));
+				}
+				else
+				{
+					_craftSlots.push_back(Position(
+						fac->getX() * GRID_SIZE + (fac->getRules()->getSize() - 1) * GRID_SIZE / 2,
+						fac->getY() * GRID_SIZE + (fac->getRules()->getSize() - 1) * GRID_SIZE / 2,
+						0));
+				}
+			}
+		}
+	}
+	if (_craftSlots.size() > 0)
+	{
+		for (size_t i = 0; i < _craftSlots.size(); ++i)
+		{
+			Log(LOG_INFO) << "Base: " << _name << ", Hangar Slot: [" << _craftSlots[i].x << "," << _craftSlots[i].y << "," << _craftSlots[i].z << "]";
+		}
+	}
+}
+
+/**
+ * Updates occupied craft slots list based on built facilities and present crafts.
+ */
+void Base::updateOccupiedSlots()
+{
+	_occupiedSlots.clear();
+	_occupiedSlots.resize(_crafts.size(), nullptr);
+	std::vector<bool> slotOccupied(_craftSlots.size(), false);
+	
+	std::vector<Craft*> fixedSizeCrafts, zeroSizeCrafts;
+	for (size_t i = 0; i < _crafts.size(); ++i)
+	{
+		Craft* refCraft = (*(_crafts.begin() + i));
+		if (refCraft->getRules()->getCraftSize() > 0)
+			fixedSizeCrafts.push_back(refCraft);
+		else zeroSizeCrafts.push_back(refCraft);
+	}
+
+	int maxCraftSize = 0;
+	for (Craft* refCraft : _crafts)
+		if (refCraft->getRules()->getCraftSize() > maxCraftSize)
+			maxCraftSize = refCraft->getRules()->getCraftSize();
+
+	for (int cSize = maxCraftSize; cSize >= 0; --cSize)
+	{
+		for (size_t i = 0; i < _crafts.size(); ++i)
+		{
+			bool gotPlace = false;
+			Craft* refCraft = (*(_crafts.begin() + i));
+			if (refCraft->getRules()->getCraftSize() != cSize) continue;
+			Log(LOG_INFO) << "Searching Place for -> Craft: " << refCraft->getType() << ", ID: " << refCraft->getId() << ", Size: " << refCraft->getRules()->getCraftSize();
+			for (size_t j = 0; j < _craftSlots.size(); ++j)
+			{
+				int absoluteSlotSize = _craftSlots[j].z > 0 ? _craftSlots[j].z : std::abs(_craftSlots[j].z + 1);
+				if (absoluteSlotSize == 0 && cSize > 0) continue; // We're ignoring unlimited size slots if craft has size.
+				if (!slotOccupied[j] && absoluteSlotSize >= cSize)
+				{
+					_occupiedSlots[i] = &_craftSlots[j];
+					slotOccupied[j] = true;
+					gotPlace = true;
+					break;
+				}
+			}
+			if (gotPlace) continue; // No suitable slot size? Try to look for infinite one.
+			for (size_t j = 0; j < _craftSlots.size(); ++j)
+			{
+				int absoluteSlotSize = _craftSlots[j].z > 0 ? _craftSlots[j].z : std::abs(_craftSlots[j].z + 1);
+				if (absoluteSlotSize != 0) continue; // We're only interested in infinite size slots.
+				if (!slotOccupied[j])
+				{
+					_occupiedSlots[i] = &_craftSlots[j];
+					slotOccupied[j] = true;
+					gotPlace = true;
+					break;
+				}
+			}
+			if (gotPlace) continue; // Not found infinite either? Just place craft anywhere.
+			Log(LOG_WARNING) << "Craft: " << refCraft->getType() << ", ID: " << refCraft->getId() << " - couldn't find compatible hangar slot. Using first available!";
+			for (size_t j = 0; j < _craftSlots.size(); ++j)
+			{
+				if (!slotOccupied[j])
+				{
+					_occupiedSlots[i] = &_craftSlots[j];
+					slotOccupied[j] = true;
+					break;
+				}
+			}
+		}
+	}
+
+	if (_occupiedSlots.size() > 0)
+	{
+		for (size_t i = 0; i < _occupiedSlots.size(); ++i)
+		{
+			Log(LOG_INFO) << "Base: " << _name << ", Occupied Slot: [" << _occupiedSlots[i]->x << "," << _occupiedSlots[i]->y << "," << _occupiedSlots[i]->z << "], Craft: " << _crafts[i]->getType() << ", ID: " << _crafts[i]->getId();
+		}
+	}
 }
 
 /**
@@ -1914,6 +2042,8 @@ void Base::destroyFacility(BASEFACILITIESITERATOR facility)
 				}
 			);
 		}
+		updateCraftSlots();
+		updateOccupiedSlots();
 	}
 	if ((*facility)->getRules()->getPsiLaboratories() > 0)
 	{
