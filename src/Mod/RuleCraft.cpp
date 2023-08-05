@@ -246,6 +246,16 @@ int RuleCraft::getMarker() const
 }
 
 /**
+ * Gets the craft's hull size
+ * for placing in hangars.
+ * @return The size in integer value.
+ */
+int RuleCraft::getCraftSize() const
+{
+	return _stats.craftSize;
+}
+
+/**
  * Gets the maximum fuel the craft can contain.
  * @return The fuel amount.
  */
