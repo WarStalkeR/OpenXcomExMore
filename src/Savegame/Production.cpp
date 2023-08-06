@@ -150,6 +150,7 @@ productionProgress_e Production::step(Base * b, SavedGame * g, const Mod *m, Lan
 				craft->initFixedWeapons(m);
 				craft->checkup();
 				b->getCrafts()->push_back(craft);
+				b->syncCraftSlots();
 			}
 			else
 			{

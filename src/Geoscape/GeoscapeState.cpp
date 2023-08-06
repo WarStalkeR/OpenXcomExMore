@@ -546,6 +546,7 @@ void GeoscapeState::handle(Action *action)
 						facility->setBuildTime(0);
 						facility->setIfHadPreviousFacility(false);
 					}
+					xbase->syncCraftChanges();
 				}
 			}
 			// "ctrl-3"
@@ -2335,6 +2336,8 @@ void GeoscapeState::time1Day()
 				if (facility->getBuildTime() == 0)
 				{
 					finishedFacilities[facility->getRules()] += 1;
+					if (facility->getRules()->getCrafts() > 0)
+						xbase->syncCraftChanges();
 				}
 			}
 		}
