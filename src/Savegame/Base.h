@@ -212,6 +212,8 @@ public:
 	void updateCraftSlots();
 	/// Updates occupied craft slots list.
 	void updateOccupiedSlots();
+	/// Gets number of unoccupied hangar slots for specific craft size.
+	int getFreeCraftSlots(int craftSize = 0) const;
 	/// Get the number of available space lab (not used by a ResearchProject)
 	int getFreeLaboratories() const;
 	/// Get the number of available space lab (not used by a Production)
