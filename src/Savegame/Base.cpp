@@ -1027,9 +1027,11 @@ void Base::updateCraftSlots()
 	}
 
 	if (_craftSlots.size() > 0)
+	{
 		for (size_t i = 0; i < _craftSlots.size(); ++i)
 			Log(LOG_INFO) << "Base: " << _name << ", Hangar Slot: ["
 			<< _craftSlots[i].x << "," << _craftSlots[i].y << "," << _craftSlots[i].z << "]";
+	}
 }
 
 /**
@@ -1041,24 +1043,46 @@ void Base::syncCraftSlots()
 	_occupiedSlots.resize(_crafts.size(), nullptr);
 	std::vector<bool> slotOccupied(_craftSlots.size(), false);
 
+	int maxSlotSize = 0;
 	int maxCraftSize = 0;
 	for (Craft* refCraft : _crafts)
 		if (refCraft->getRules()->getCraftSize() > maxCraftSize)
 			maxCraftSize = refCraft->getRules()->getCraftSize();
+	for (Position refSlot : _craftSlots)
+		if (refSlot.z > maxSlotSize)
+			maxSlotSize = refSlot.z;
 
 	for (int cSize = maxCraftSize; cSize >= 0; --cSize)
 	{
+		int maxLookup = std::max(0, maxSlotSize - cSize);
 		for (size_t i = 0; i < _crafts.size(); ++i)
 		{
 			bool gotPlace = false;
 			Craft* refCraft = (*(_crafts.begin() + i));
 			if (refCraft->getRules()->getCraftSize() != cSize) continue;
 			Log(LOG_INFO) << "Searching Place for -> Craft: " << refCraft->getType() << ", ID: " << refCraft->getId() << ", Size: " << refCraft->getRules()->getCraftSize();
+			for (int inc = 0; inc <= maxLookup; ++inc)
+			{
+				for (size_t j = 0; j < _craftSlots.size(); ++j)
+				{
+					int absoluteSlotSize = _craftSlots[j].z > 0 ? _craftSlots[j].z : std::abs(_craftSlots[j].z + 1);
+					if (absoluteSlotSize == 0 && cSize > 0) continue; // Ignore zero size slots if craft has size.
+					if (!slotOccupied[j] && absoluteSlotSize == (cSize + inc))
+					{
+						_occupiedSlots[i] = &_craftSlots[j];
+						slotOccupied[j] = true;
+						gotPlace = true;
+						break;
+					}
+				}
+				if (gotPlace) break;
+			}
+			if (gotPlace) continue; // No suitable slot size? Try to look for any bigger one.
 			for (size_t j = 0; j < _craftSlots.size(); ++j)
 			{
 				int absoluteSlotSize = _craftSlots[j].z > 0 ? _craftSlots[j].z : std::abs(_craftSlots[j].z + 1);
-				if (absoluteSlotSize == 0 && cSize > 0) continue; // We're ignoring unlimited size slots if craft has size.
-				if (!slotOccupied[j] && absoluteSlotSize >= cSize)
+				if (absoluteSlotSize == 0 && cSize > 0) continue; // Ignore zero size slots if craft has size.
+				if (!slotOccupied[j] && absoluteSlotSize > cSize) // Redundant, if 'maxLookup' is not limited.
 				{
 					_occupiedSlots[i] = &_craftSlots[j];
 					slotOccupied[j] = true;
@@ -1066,11 +1090,11 @@ void Base::syncCraftSlots()
 					break;
 				}
 			}
-			if (gotPlace) continue; // No suitable slot size? Try to look for infinite one.
+			if (gotPlace) continue; // No suitable slot size? Try to look for zero size one.
 			for (size_t j = 0; j < _craftSlots.size(); ++j)
 			{
 				int absoluteSlotSize = _craftSlots[j].z > 0 ? _craftSlots[j].z : std::abs(_craftSlots[j].z + 1);
-				if (absoluteSlotSize != 0) continue; // We're only interested in infinite size slots.
+				if (absoluteSlotSize != 0) continue; // Ignore non-zero size slots, regardless of craft's size.
 				if (!slotOccupied[j])
 				{
 					_occupiedSlots[i] = &_craftSlots[j];
@@ -1094,10 +1118,12 @@ void Base::syncCraftSlots()
 	}
 
 	if (_occupiedSlots.size() > 0)
+	{
 		for (size_t i = 0; i < _occupiedSlots.size(); ++i)
 			Log(LOG_INFO) << "Base: " << _name << ", Taken Slot: ["
 			<< _occupiedSlots[i]->x << "," << _occupiedSlots[i]->y << "," << _occupiedSlots[i]->z
 			<< "], Craft: " << _crafts[i]->getType() << ", ID: " << _crafts[i]->getId();
+	}
 }
 
 /**
