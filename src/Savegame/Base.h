@@ -208,10 +208,12 @@ public:
 	int getUsedHangars() const;
 	/// Gets the base's available hangars.
 	int getAvailableHangars() const;
-	/// Updates all craft slots list.
+	/// Updates list of all existing craft slots.
 	void updateCraftSlots();
-	/// Updates occupied craft slots list.
-	void updateOccupiedSlots();
+	/// Updates list of occupied craft slots.
+	void syncCraftSlots();
+	/// Runs two functions above in sequential manner.
+	void syncCraftChanges();
 	/// Gets number of unoccupied hangar slots for specific craft size.
 	int getFreeCraftSlots(int craftSize = 0) const;
 	/// Get the number of available space lab (not used by a ResearchProject)

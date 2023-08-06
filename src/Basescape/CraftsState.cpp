@@ -178,7 +178,7 @@ void CraftsState::lstCraftsClick(Action *action)
 			}
 
 			// reload the UI
-			_base->updateOccupiedSlots();
+			_base->syncCraftSlots();
 			init();
 		}
 	}
@@ -196,7 +196,7 @@ void CraftsState::lstCraftsClick(Action *action)
 			}
 
 			// reload the UI
-			_base->updateOccupiedSlots();
+			_base->syncCraftSlots();
 			init();
 		}
 	}
