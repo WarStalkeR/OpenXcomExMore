@@ -1043,15 +1043,6 @@ void Base::updateOccupiedSlots()
 	_occupiedSlots.clear();
 	_occupiedSlots.resize(_crafts.size(), nullptr);
 	std::vector<bool> slotOccupied(_craftSlots.size(), false);
-	
-	std::vector<Craft*> fixedSizeCrafts, zeroSizeCrafts;
-	for (size_t i = 0; i < _crafts.size(); ++i)
-	{
-		Craft* refCraft = (*(_crafts.begin() + i));
-		if (refCraft->getRules()->getCraftSize() > 0)
-			fixedSizeCrafts.push_back(refCraft);
-		else zeroSizeCrafts.push_back(refCraft);
-	}
 
 	int maxCraftSize = 0;
 	for (Craft* refCraft : _crafts)
@@ -1112,6 +1103,31 @@ void Base::updateOccupiedSlots()
 			Log(LOG_INFO) << "Base: " << _name << ", Occupied Slot: [" << _occupiedSlots[i]->x << "," << _occupiedSlots[i]->y << "," << _occupiedSlots[i]->z << "], Craft: " << _crafts[i]->getType() << ", ID: " << _crafts[i]->getId();
 		}
 	}
+}
+
+/**
+ * Gets number of unoccupied hangar slots for specific craft size.
+ * @param craft size to look for slots of relevant size.
+ * @return number of suitable free hangar slots.
+ */
+int Base::getFreeCraftSlots(int craftSize) const
+{
+	int freeSlotsNum = 0;
+	for (size_t i = 0; i < _craftSlots.size(); ++i)
+	{
+		bool isFree = true;
+		for (size_t j = 0; j < _occupiedSlots.size(); ++j)
+		{
+			if (_occupiedSlots[j] == &_craftSlots[i]) isFree = false;
+		}
+		if (isFree)
+		{
+			int absoluteSlotSize = _craftSlots[i].z > 0 ? _craftSlots[i].z : std::abs(_craftSlots[i].z + 1);
+			if (craftSize == 0 || absoluteSlotSize == 0 || absoluteSlotSize >= craftSize)
+				freeSlotsNum++;
+		}
+	}
+	return freeSlotsNum;
 }
 
 /**
