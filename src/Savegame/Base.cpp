@@ -241,9 +241,7 @@ void Base::load(const YAML::Node &node, SavedGame *save, bool newGame, bool newB
 	}
 	_fakeUnderwater = node["fakeUnderwater"].as<bool>(_fakeUnderwater);
 
-	updateCraftSlots();
-	updateOccupiedSlots();
-
+	syncCraftChanges();
 	isOverlappingOrOverflowing(); // don't crash, just report in the log file...
 }
 
@@ -989,11 +987,12 @@ int Base::getAvailableHangars() const
 }
 
 /**
- * Updates craft slots list based on built facilities.
+ * Updates list of all existing craft slots based on built facilities.
  */
 void Base::updateCraftSlots()
 {
 	_craftSlots.clear();
+
 	for (const auto* fac : _facilities)
 	{
 		if (fac->getBuildTime() == 0 && fac->getRules()->getCrafts() > 0)
@@ -1009,7 +1008,8 @@ void Base::updateCraftSlots()
 				{
 					const auto refOpts = fac->getRules()->getCraftOptions()[i];
 					int craftSlotSize = refOpts.z;
-					if (hidesCrafts) craftSlotSize = (-1 * craftSlotSize) - 1;
+					if (hidesCrafts && craftSlotSize > 0)
+						craftSlotSize = (-1 * craftSlotSize) - 1;
 					_craftSlots.push_back(Position(
 						fac->getX() * GRID_SIZE + (fac->getRules()->getSize() - 1) * GRID_SIZE / 2 + refOpts.x,
 						fac->getY() * GRID_SIZE + (fac->getRules()->getSize() - 1) * GRID_SIZE / 2 + refOpts.y,
@@ -1025,19 +1025,17 @@ void Base::updateCraftSlots()
 			}
 		}
 	}
+
 	if (_craftSlots.size() > 0)
-	{
 		for (size_t i = 0; i < _craftSlots.size(); ++i)
-		{
-			Log(LOG_INFO) << "Base: " << _name << ", Hangar Slot: [" << _craftSlots[i].x << "," << _craftSlots[i].y << "," << _craftSlots[i].z << "]";
-		}
-	}
+			Log(LOG_INFO) << "Base: " << _name << ", Hangar Slot: ["
+			<< _craftSlots[i].x << "," << _craftSlots[i].y << "," << _craftSlots[i].z << "]";
 }
 
 /**
- * Updates occupied craft slots list based on built facilities and present crafts.
+ * Updates list of occupied craft slots based on built facilities and present crafts.
  */
-void Base::updateOccupiedSlots()
+void Base::syncCraftSlots()
 {
 	_occupiedSlots.clear();
 	_occupiedSlots.resize(_crafts.size(), nullptr);
@@ -1096,12 +1094,19 @@ void Base::updateOccupiedSlots()
 	}
 
 	if (_occupiedSlots.size() > 0)
-	{
 		for (size_t i = 0; i < _occupiedSlots.size(); ++i)
-		{
-			Log(LOG_INFO) << "Base: " << _name << ", Occupied Slot: [" << _occupiedSlots[i]->x << "," << _occupiedSlots[i]->y << "," << _occupiedSlots[i]->z << "], Craft: " << _crafts[i]->getType() << ", ID: " << _crafts[i]->getId();
-		}
-	}
+			Log(LOG_INFO) << "Base: " << _name << ", Taken Slot: ["
+			<< _occupiedSlots[i]->x << "," << _occupiedSlots[i]->y << "," << _occupiedSlots[i]->z
+			<< "], Craft: " << _crafts[i]->getType() << ", ID: " << _crafts[i]->getId();
+}
+
+/**
+ * Runs updateCraftSlots() and syncCraftSlots() in sequential manner.
+ */
+void Base::syncCraftChanges()
+{
+	updateCraftSlots();
+	syncCraftSlots();
 }
 
 /**
@@ -1112,6 +1117,7 @@ void Base::updateOccupiedSlots()
 int Base::getFreeCraftSlots(int craftSize) const
 {
 	int freeSlotsNum = 0;
+
 	for (size_t i = 0; i < _craftSlots.size(); ++i)
 	{
 		bool isFree = true;
@@ -1126,6 +1132,17 @@ int Base::getFreeCraftSlots(int craftSize) const
 				freeSlotsNum++;
 		}
 	}
+
+	for (const auto* transfer : _transfers)
+		if (transfer->getType() == TRANSFER_CRAFT && transfer->getCraft()->getRules()->getCraftSize() >= craftSize)
+			freeSlotsNum -= transfer->getQuantity();
+
+	for (const auto* prod : _productions)
+		if (prod->getRules()->getProducedCraft() && prod->getRules()->getProducedCraft()->getCraftSize() >= craftSize)
+			freeSlotsNum -= (prod->getAmountTotal() - prod->getAmountProduced());
+
+	Log(LOG_INFO) << "Base: " << _name << " requested number of free slots for size " << craftSize << ". Response: " << freeSlotsNum;
+
 	return freeSlotsNum;
 }
 
@@ -2057,8 +2074,6 @@ void Base::destroyFacility(BASEFACILITIESITERATOR facility)
 				}
 			);
 		}
-		updateCraftSlots();
-		updateOccupiedSlots();
 	}
 	if ((*facility)->getRules()->getPsiLaboratories() > 0)
 	{
@@ -2185,6 +2200,7 @@ void Base::destroyFacility(BASEFACILITIESITERATOR facility)
 	_destroyedFacilitiesCache[(*facility)->getRules()] += 1;
 	delete *facility;
 	_facilities.erase(facility);
+	syncCraftChanges();
 }
 
 /**
