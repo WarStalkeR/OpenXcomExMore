@@ -993,6 +993,7 @@ int Base::getAvailableHangars() const
 void Base::updateCraftSlots()
 {
 	_craftSlots.clear();
+	if (getAvailableHangars() <= 0) return;
 
 	for (const auto* fac : _facilities)
 	{
@@ -1041,34 +1042,43 @@ void Base::updateCraftSlots()
 void Base::syncCraftSlots()
 {
 	_occupiedSlots.clear();
+	if (_crafts.size() <= 0) return;
+
 	_occupiedSlots.resize(_crafts.size(), nullptr);
 	std::vector<bool> slotOccupied(_craftSlots.size(), false);
 
-	int maxSlotSize = 0;
-	int maxCraftSize = 0;
+	std::vector<int> slotSizes;
+	std::vector<int> craftSizes;
 	for (Craft* refCraft : _crafts)
-		if (refCraft->getRules()->getCraftSize() > maxCraftSize)
-			maxCraftSize = refCraft->getRules()->getCraftSize();
-	for (Position refSlot : _craftSlots)
-		if (refSlot.z > maxSlotSize)
-			maxSlotSize = refSlot.z;
-
-	for (int cSize = maxCraftSize; cSize >= 0; --cSize)
 	{
-		int maxLookup = std::max(0, maxSlotSize - cSize);
+		int refCraftSize = refCraft->getRules()->getCraftSize();
+		if (std::find(craftSizes.begin(), craftSizes.end(), refCraftSize) == craftSizes.end())
+			craftSizes.push_back(refCraftSize);
+	}
+	for (Position refSlot : _craftSlots)
+	{
+		int trueSlotSize = refSlot.z > 0 ? refSlot.z : std::abs(refSlot.z + 1);
+		if (std::find(slotSizes.begin(), slotSizes.end(), trueSlotSize) == slotSizes.end())
+			slotSizes.push_back(trueSlotSize);
+	}
+	std::sort(craftSizes.begin(), craftSizes.end(), std::greater<int>()); // Bigger crafts first.
+	std::sort(slotSizes.begin(), slotSizes.end()); // Smallest slots first.
+
+	for (int craftSize : craftSizes)
+	{
 		for (size_t i = 0; i < _crafts.size(); ++i)
 		{
 			bool gotPlace = false;
 			Craft* refCraft = (*(_crafts.begin() + i));
-			if (refCraft->getRules()->getCraftSize() != cSize) continue;
-			Log(LOG_INFO) << "Searching Place for -> Craft: " << refCraft->getType() << ", ID: " << refCraft->getId() << ", Size: " << refCraft->getRules()->getCraftSize();
-			for (int inc = 0; inc <= maxLookup; ++inc)
+			if (refCraft->getRules()->getCraftSize() != craftSize) continue; // Mixing sizes works bad.
+			for (int slotSize : slotSizes)
 			{
-				for (size_t j = 0; j < _craftSlots.size(); ++j)
+				if (slotSize < craftSize) continue; // Ignore, if slot is smaller than craft.
+				for (size_t j = 0; j < _craftSlots.size(); ++j) // We need slot index.
 				{
-					int absoluteSlotSize = _craftSlots[j].z > 0 ? _craftSlots[j].z : std::abs(_craftSlots[j].z + 1);
-					if (absoluteSlotSize == 0 && cSize > 0) continue; // Ignore zero size slots if craft has size.
-					if (!slotOccupied[j] && absoluteSlotSize == (cSize + inc))
+					int trueSlotSize = _craftSlots[j].z > 0 ? _craftSlots[j].z : std::abs(_craftSlots[j].z + 1);
+					if (trueSlotSize == 0 && craftSize > 0) continue; // Ignore zero size slots if craft has size.
+					if (!slotOccupied[j] && trueSlotSize == slotSize) // Gradually check for bigger empty slots.
 					{
 						_occupiedSlots[i] = &_craftSlots[j];
 						slotOccupied[j] = true;
@@ -1078,24 +1088,11 @@ void Base::syncCraftSlots()
 				}
 				if (gotPlace) break;
 			}
-			if (gotPlace) continue; // No suitable slot size? Try to look for any bigger one.
-			for (size_t j = 0; j < _craftSlots.size(); ++j)
-			{
-				int absoluteSlotSize = _craftSlots[j].z > 0 ? _craftSlots[j].z : std::abs(_craftSlots[j].z + 1);
-				if (absoluteSlotSize == 0 && cSize > 0) continue; // Ignore zero size slots if craft has size.
-				if (!slotOccupied[j] && absoluteSlotSize > cSize) // Redundant, if 'maxLookup' is not limited.
-				{
-					_occupiedSlots[i] = &_craftSlots[j];
-					slotOccupied[j] = true;
-					gotPlace = true;
-					break;
-				}
-			}
 			if (gotPlace) continue; // No suitable slot size? Try to look for zero size one.
 			for (size_t j = 0; j < _craftSlots.size(); ++j)
 			{
-				int absoluteSlotSize = _craftSlots[j].z > 0 ? _craftSlots[j].z : std::abs(_craftSlots[j].z + 1);
-				if (absoluteSlotSize != 0) continue; // Ignore non-zero size slots, regardless of craft's size.
+				int trueSlotSize = _craftSlots[j].z > 0 ? _craftSlots[j].z : std::abs(_craftSlots[j].z + 1);
+				if (trueSlotSize != 0) continue; // Ignore non-zero size slots and disregard craft's size.
 				if (!slotOccupied[j])
 				{
 					_occupiedSlots[i] = &_craftSlots[j];
@@ -1104,7 +1101,7 @@ void Base::syncCraftSlots()
 					break;
 				}
 			}
-			if (gotPlace) continue; // Not found infinite either? Just place craft anywhere.
+			if (gotPlace) continue; // Not found zero slot either? Just place craft anywhere.
 			Log(LOG_WARNING) << "Craft: " << refCraft->getType() << ", ID: " << refCraft->getId() << " - couldn't find compatible hangar slot. Using first available!";
 			for (size_t j = 0; j < _craftSlots.size(); ++j)
 			{
@@ -1138,8 +1135,8 @@ void Base::syncCraftChanges()
 
 /**
  * Gets number of unoccupied hangar slots for specific craft size.
- * @param craft size to look for slots of relevant size.
- * @return number of suitable free hangar slots.
+ * @param Craft size to look for slots of relevant size.
+ * @return Number of suitable free hangar slots.
  */
 int Base::getFreeCraftSlots(int craftSize) const
 {
