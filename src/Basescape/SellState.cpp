@@ -685,6 +685,7 @@ void SellState::btnOkClick(Action *)
 			case TRANSFER_CRAFT:
 				tmpCraft = (Craft*)transferRow.rule;
 				_base->removeCraft(tmpCraft, true);
+				_base->syncCraftSlots();
 				delete tmpCraft;
 				break;
 			case TRANSFER_SCIENTIST:
