@@ -307,6 +307,7 @@ void Production::startItem(Base * b, SavedGame * g, const Mod *m) const
 			{
 				Craft *craft = c;
 				b->removeCraft(craft, true);
+				b->syncCraftSlots();
 				delete craft;
 				break;
 			}
