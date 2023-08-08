@@ -1049,6 +1049,7 @@ void Base::syncCraftSlots()
 
 	std::vector<int> slotSizes;
 	std::vector<int> craftSizes;
+	std::vector<int> absSlotSizes;
 	for (Craft* refCraft : _crafts)
 	{
 		int refCraftSize = refCraft->getRules()->getCraftSize();
@@ -1060,6 +1061,7 @@ void Base::syncCraftSlots()
 		int trueSlotSize = refSlot.z >= 0 ? refSlot.z : std::abs(refSlot.z + 1);
 		if (std::find(slotSizes.begin(), slotSizes.end(), trueSlotSize) == slotSizes.end())
 			slotSizes.push_back(trueSlotSize);
+		absSlotSizes.push_back(trueSlotSize);
 	}
 	std::sort(craftSizes.begin(), craftSizes.end(), std::greater<int>()); // Bigger crafts first.
 	std::sort(slotSizes.begin(), slotSizes.end()); // Smallest slots first.
@@ -1076,9 +1078,8 @@ void Base::syncCraftSlots()
 				if (slotSize < craftSize) continue; // Ignore, if slot is smaller than craft.
 				for (size_t j = 0; j < _craftSlots.size(); ++j) // We need slot index.
 				{
-					int trueSlotSize = _craftSlots[j].z >= 0 ? _craftSlots[j].z : std::abs(_craftSlots[j].z + 1);
-					if (trueSlotSize == 0 && craftSize > 0) continue; // Ignore zero size slots if craft has size.
-					if (!slotOccupied[j] && trueSlotSize == slotSize) // Gradually check for bigger empty slots.
+					if (absSlotSizes[j] == 0 && craftSize > 0) continue; // Ignore zero size slots if craft has size.
+					if (!slotOccupied[j] && absSlotSizes[j] == slotSize) // Gradually check for bigger empty slots.
 					{
 						_occupiedSlots[i] = &_craftSlots[j];
 						slotOccupied[j] = true;
@@ -1091,8 +1092,7 @@ void Base::syncCraftSlots()
 			if (gotPlace) continue; // No suitable slot size? Try to look for zero size one.
 			for (size_t j = 0; j < _craftSlots.size(); ++j)
 			{
-				int trueSlotSize = _craftSlots[j].z >= 0 ? _craftSlots[j].z : std::abs(_craftSlots[j].z + 1);
-				if (trueSlotSize != 0) continue; // Ignore non-zero size slots and disregard craft's size.
+				if (absSlotSizes[j] != 0) continue; // Ignore non-zero size slots and disregard craft's size.
 				if (!slotOccupied[j])
 				{
 					_occupiedSlots[i] = &_craftSlots[j];
