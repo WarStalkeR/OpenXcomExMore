@@ -1010,7 +1010,7 @@ void Base::updateCraftSlots()
 				{
 					const auto refOpts = fac->getRules()->getCraftOptions()[i];
 					int craftSlotSize = refOpts.z;
-					if (hidesCrafts && craftSlotSize > 0)
+					if (hidesCrafts && craftSlotSize >= 0)
 						craftSlotSize = (-1 * craftSlotSize) - 1;
 					_craftSlots.push_back(Position(
 						fac->getX() * GRID_SIZE + (fac->getRules()->getSize() - 1) * GRID_SIZE / 2 + refOpts.x,
@@ -1057,7 +1057,7 @@ void Base::syncCraftSlots()
 	}
 	for (Position refSlot : _craftSlots)
 	{
-		int trueSlotSize = refSlot.z > 0 ? refSlot.z : std::abs(refSlot.z + 1);
+		int trueSlotSize = refSlot.z >= 0 ? refSlot.z : std::abs(refSlot.z + 1);
 		if (std::find(slotSizes.begin(), slotSizes.end(), trueSlotSize) == slotSizes.end())
 			slotSizes.push_back(trueSlotSize);
 	}
@@ -1076,7 +1076,7 @@ void Base::syncCraftSlots()
 				if (slotSize < craftSize) continue; // Ignore, if slot is smaller than craft.
 				for (size_t j = 0; j < _craftSlots.size(); ++j) // We need slot index.
 				{
-					int trueSlotSize = _craftSlots[j].z > 0 ? _craftSlots[j].z : std::abs(_craftSlots[j].z + 1);
+					int trueSlotSize = _craftSlots[j].z >= 0 ? _craftSlots[j].z : std::abs(_craftSlots[j].z + 1);
 					if (trueSlotSize == 0 && craftSize > 0) continue; // Ignore zero size slots if craft has size.
 					if (!slotOccupied[j] && trueSlotSize == slotSize) // Gradually check for bigger empty slots.
 					{
@@ -1091,7 +1091,7 @@ void Base::syncCraftSlots()
 			if (gotPlace) continue; // No suitable slot size? Try to look for zero size one.
 			for (size_t j = 0; j < _craftSlots.size(); ++j)
 			{
-				int trueSlotSize = _craftSlots[j].z > 0 ? _craftSlots[j].z : std::abs(_craftSlots[j].z + 1);
+				int trueSlotSize = _craftSlots[j].z >= 0 ? _craftSlots[j].z : std::abs(_craftSlots[j].z + 1);
 				if (trueSlotSize != 0) continue; // Ignore non-zero size slots and disregard craft's size.
 				if (!slotOccupied[j])
 				{
@@ -1151,8 +1151,8 @@ int Base::getFreeCraftSlots(int craftSize) const
 		}
 		if (isFree)
 		{
-			int absoluteSlotSize = _craftSlots[i].z > 0 ? _craftSlots[i].z : std::abs(_craftSlots[i].z + 1);
-			if (craftSize == 0 || absoluteSlotSize == 0 || absoluteSlotSize >= craftSize)
+			int trueSlotSize = _craftSlots[i].z >= 0 ? _craftSlots[i].z : std::abs(_craftSlots[i].z + 1);
+			if (craftSize == 0 || trueSlotSize == 0 || trueSlotSize >= craftSize)
 				freeSlotsNum++;
 		}
 	}
