@@ -1143,6 +1143,7 @@ void GeoscapeState::time5Seconds()
 				_game->getSavedGame()->stopHuntingXcomCraft(xcraft); // craft destroyed in dogfight
 				Craft *craft = *craftIt;
 				craftIt = xbase->removeCraft(craft, false);
+				xbase->syncCraftSlots();
 				delete craft;
 				continue;
 			}
