@@ -3086,6 +3086,19 @@ void StatsForNerdsState::initFacilityList()
 	addInteger(ss, facilityRule->getAliens(), "aliens");
 	addInteger(ss, facilityRule->getPrisonType(), "prisonType");
 	addInteger(ss, facilityRule->getCrafts(), "crafts");
+
+	if (facilityRule->getCraftOptions().size() > 0)
+	{
+		std::vector<int> craftSlotSizes;
+		for (Position refSlot : facilityRule->getCraftOptions())
+		{
+			int trueSlotSize = refSlot.z >= 0 ? refSlot.z : std::abs(refSlot.z + 1);
+			craftSlotSizes.push_back(trueSlotSize);
+		}
+		std::sort(craftSlotSizes.begin(), craftSlotSizes.end());
+		addVectorOfIntegers(ss, craftSlotSizes, "craftSlotSizes");
+	}
+
 	addInteger(ss, facilityRule->getLaboratories(), "labs");
 	addInteger(ss, facilityRule->getWorkshops(), "workshops");
 	addInteger(ss, facilityRule->getPsiLaboratories(), "psiLabs");
@@ -3199,6 +3212,7 @@ void StatsForNerdsState::initCraftList()
 	addInteger(ss, craftRule->getSellCost(), "costSell", 0, true);
 	addInteger(ss, craftRule->getTransferTime(), "transferTime", 24);
 
+	addInteger(ss, craftRule->getCraftSize(), "craftSize");
 	addInteger(ss, craftRule->getMaxUnits(), "soldiers");
 	addInteger(ss, craftRule->getPilots(), "pilots");
 	addInteger(ss, craftRule->getMaxVehiclesAndLargeSoldiers(), "vehicles");

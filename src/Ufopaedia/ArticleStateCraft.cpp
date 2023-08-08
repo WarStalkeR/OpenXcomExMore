@@ -84,6 +84,7 @@ namespace OpenXcom
 		_txtStats->setSecondaryColor(Palette::blockOffset(15)+4);
 
 		std::ostringstream ss;
+		ss << tr("STR_CRAFT_SIZE_UC").arg(craft->getCraftSize()) << '\n';
 		ss << tr("STR_MAXIMUM_SPEED_UC").arg(Unicode::formatNumber(craft->getMaxSpeed())) << '\n';
 		ss << tr("STR_ACCELERATION").arg(craft->getAcceleration()) << '\n';
 		int range;
