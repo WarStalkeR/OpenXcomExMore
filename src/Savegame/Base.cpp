@@ -1031,7 +1031,7 @@ void Base::updateCraftSlots()
 	if (_craftSlots.size() > 0)
 	{
 		for (size_t i = 0; i < _craftSlots.size(); ++i)
-			Log(LOG_INFO) << "Base: " << _name << ", Hangar Slot: ["
+			Log(LOG_DEBUG) << "Base: " << _name << ", Hangar Slot: ["
 			<< _craftSlots[i].x << "," << _craftSlots[i].y << "," << _craftSlots[i].z << "]";
 	}
 }
@@ -1118,7 +1118,7 @@ void Base::syncCraftSlots()
 	if (_occupiedSlots.size() > 0)
 	{
 		for (size_t i = 0; i < _occupiedSlots.size(); ++i)
-			Log(LOG_INFO) << "Base: " << _name << ", Taken Slot: ["
+			Log(LOG_DEBUG) << "Base: " << _name << ", Taken Slot: ["
 			<< _occupiedSlots[i]->x << "," << _occupiedSlots[i]->y << "," << _occupiedSlots[i]->z
 			<< "], Craft: " << _crafts[i]->getType() << ", ID: " << _crafts[i]->getId();
 	}
@@ -1165,7 +1165,7 @@ int Base::getFreeCraftSlots(int craftSize) const
 		if (prod->getRules()->getProducedCraft() && prod->getRules()->getProducedCraft()->getCraftSize() >= craftSize)
 			freeSlotsNum -= (prod->getAmountTotal() - prod->getAmountProduced());
 
-	Log(LOG_INFO) << "Base: " << _name << " requested number of free slots for size " << craftSize << ". Response: " << freeSlotsNum;
+	Log(LOG_DEBUG) << "Base: " << _name << " requested number of free slots for size " << craftSize << ". Response: " << freeSlotsNum;
 
 	return freeSlotsNum;
 }

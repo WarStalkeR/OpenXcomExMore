@@ -78,6 +78,7 @@ void create()
 
 	_info.push_back(OptionInfo("maxFrameSkip", &maxFrameSkip, 0));
 	_info.push_back(OptionInfo("traceAI", &traceAI, false));
+	_info.push_back(OptionInfo("debugLogging", &debugLogging, false));
 	_info.push_back(OptionInfo("verboseLogging", &verboseLogging, false));
 	_info.push_back(OptionInfo("StereoSound", &StereoSound, true));
 	//_info.push_back(OptionInfo("baseXResolution", &baseXResolution, Screen::ORIGINAL_WIDTH));
@@ -639,6 +640,9 @@ bool init()
 #else
 	Logger::reportingLevel() = LOG_INFO;
 #endif
+
+	if (Options::debugLogging)
+		Logger::reportingLevel() = LOG_DEBUG;
 
 	if (Options::verboseLogging)
 		Logger::reportingLevel() = LOG_VERBOSE;
