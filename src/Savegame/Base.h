@@ -85,6 +85,28 @@ struct BaseSumDailyRecovery
 	float SickBayAbsoluteBonus = 0.0f;
 };
 
+struct CraftSlot
+{
+	/// Pointer to the craft which is housed in the slot.
+	Craft* craft = nullptr;
+	/// Flag if craft is hidden or rendered in the base at this position.
+	bool hidden = false;
+	/// Size of the slot where the craft will be housed.
+	int size = 0;
+	/// Horizontal offset for rendering craft in the base.
+	int x = 0;
+	/// Vertical offset for rendering craft in the base.
+	int y = 0;
+	/// Constructor that allows to create new craft slots.
+	CraftSlot(Craft* craftPtr, bool isCraftHidden, int slotSize, int xOffset, int yOffset) {
+		craft = craftPtr;
+		hidden = isCraftHidden;
+		size = slotSize;
+		x = xOffset;
+		y = yOffset;
+	}
+};
+
 /**
  * Represents a player base on the globe.
  * Bases can contain facilities, personnel, crafts and equipment.
@@ -98,8 +120,7 @@ private:
 	std::vector<BaseFacility*> _facilities;
 	std::vector<Soldier*> _soldiers;
 	std::vector<Craft*> _crafts;
-	std::vector<Position> _craftSlots;
-	std::vector<Position*> _occupiedSlots;
+	std::vector<CraftSlot> _craftSlots;
 	std::vector<Transfer*> _transfers;
 	ItemContainer *_items;
 	int _scientists, _engineers;
@@ -145,13 +166,9 @@ public:
 	/// Gets the base's crafts.
 	const std::vector<Craft*> *getCrafts() const { return &_crafts; }
 	/// Gets the base's all hangar slots.
-	std::vector<Position> *getCraftSlots() { return &_craftSlots; }
+	std::vector<CraftSlot> *getCraftSlots() { return &_craftSlots; }
 	/// Gets the base's all hangar slots.
-	const std::vector<Position> *getCraftSlots() const { return &_craftSlots; }
-	/// Gets the base's occupied hangar slots.
-	std::vector<Position*> *getOccupiedSlots() { return &_occupiedSlots; }
-	/// Gets the base's occupied hangar slots.
-	const std::vector<Position*> *getOccupiedSlots() const { return &_occupiedSlots; }
+	const std::vector<CraftSlot> *getCraftSlots() const { return &_craftSlots; }
 	/// Gets the base's transfers.
 	std::vector<Transfer*> *getTransfers() { return &_transfers; }
 	/// Gets the base's transfers.

@@ -3090,9 +3090,11 @@ void StatsForNerdsState::initFacilityList()
 	if (facilityRule->getCraftOptions().size() > 0)
 	{
 		std::vector<int> craftSlotSizes;
-		for (Position refSlot : facilityRule->getCraftOptions())
+		for (size_t i = 0; i < facilityRule->getCraftOptions().size(); ++i)
 		{
-			int trueSlotSize = refSlot.z >= 0 ? refSlot.z : std::abs(refSlot.z + 1);
+			if ((int)i > (facilityRule->getCrafts() - 1)) break;
+			int refSize = facilityRule->getCraftOptions().at(i).z;
+			int trueSlotSize = refSize >= 0 ? refSize : std::abs(refSize + 1);
 			craftSlotSizes.push_back(trueSlotSize);
 		}
 		std::sort(craftSlotSizes.begin(), craftSlotSizes.end());
