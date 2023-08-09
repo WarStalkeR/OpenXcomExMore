@@ -464,8 +464,7 @@ void BaseView::draw()
 		}
 	}
 
-	auto craftIt = _base->getCrafts()->begin();
-	auto craftSlotIt = _base->getOccupiedSlots()->begin();
+	auto craftSlotIt = _base->getCraftSlots()->begin();
 
 	for (const auto* fac : *_base->getFacilities())
 	{
@@ -558,16 +557,15 @@ void BaseView::draw()
 		{
 			for (int i = 0; i < fac->getRules()->getCrafts(); ++i)
 			{
-				if (craftIt != _base->getCrafts()->end() && craftSlotIt != _base->getOccupiedSlots()->end())
+				if (craftSlotIt != _base->getCraftSlots()->end())
 				{
-					if ((*craftIt)->getStatus() != "STR_OUT" && (*craftSlotIt)->z >= 0)
+					if (craftSlotIt->craft != nullptr && !craftSlotIt->hidden && craftSlotIt->craft->getStatus() != "STR_OUT")
 					{
-						Surface* frame = _texture->getFrame((*craftIt)->getSkinSprite() + 33);
-						frame->blitNShade(this, (*craftSlotIt)->x, (*craftSlotIt)->y);
-						fac->setCraftForDrawing(*craftIt);
+						Surface* frame = _texture->getFrame(craftSlotIt->craft->getSkinSprite() + 33);
+						frame->blitNShade(this, craftSlotIt->x, craftSlotIt->y);
+						fac->setCraftForDrawing(craftSlotIt->craft);
 					}
 					++craftSlotIt;
-					++craftIt;
 				}
 			}
 		}

@@ -1009,20 +1009,16 @@ void Base::updateCraftSlots()
 				if (size_t(i) < fac->getRules()->getCraftOptions().size())
 				{
 					const auto refOpts = fac->getRules()->getCraftOptions()[i];
-					int craftSlotSize = refOpts.z;
-					if (hidesCrafts && craftSlotSize >= 0)
-						craftSlotSize = (-1 * craftSlotSize) - 1;
-					_craftSlots.push_back(Position(
+					int trueSlotSize = refOpts.z >= 0 ? refOpts.z : std::abs(refOpts.z + 1);
+					_craftSlots.push_back(CraftSlot(nullptr, refOpts.z < 0 || hidesCrafts, trueSlotSize,
 						fac->getX() * GRID_SIZE + (fac->getRules()->getSize() - 1) * GRID_SIZE / 2 + refOpts.x,
-						fac->getY() * GRID_SIZE + (fac->getRules()->getSize() - 1) * GRID_SIZE / 2 + refOpts.y,
-						craftSlotSize));
+						fac->getY() * GRID_SIZE + (fac->getRules()->getSize() - 1) * GRID_SIZE / 2 + refOpts.y));
 				}
 				else
 				{
-					_craftSlots.push_back(Position(
+					_craftSlots.push_back(CraftSlot(nullptr, false, 0,
 						fac->getX() * GRID_SIZE + (fac->getRules()->getSize() - 1) * GRID_SIZE / 2,
-						fac->getY() * GRID_SIZE + (fac->getRules()->getSize() - 1) * GRID_SIZE / 2,
-						0));
+						fac->getY() * GRID_SIZE + (fac->getRules()->getSize() - 1) * GRID_SIZE / 2));
 				}
 			}
 		}
@@ -1031,8 +1027,8 @@ void Base::updateCraftSlots()
 	if (_craftSlots.size() > 0)
 	{
 		for (size_t i = 0; i < _craftSlots.size(); ++i)
-			Log(LOG_DEBUG) << "Base: " << _name << ", Hangar Slot: ["
-			<< _craftSlots[i].x << "," << _craftSlots[i].y << "," << _craftSlots[i].z << "]";
+			Log(LOG_DEBUG) << "Base: " << _name << ", Hangar Slot #" << i << ", Offset: ["
+			<< _craftSlots[i].x << "," << _craftSlots[i].y << "], Size: " << _craftSlots[i].size;
 	}
 }
 
@@ -1041,27 +1037,24 @@ void Base::updateCraftSlots()
  */
 void Base::syncCraftSlots()
 {
-	_occupiedSlots.clear();
+	std::for_each(_craftSlots.begin(), _craftSlots.end(), [](CraftSlot& slot)
+		{ slot.craft = nullptr; });
 	if (_crafts.size() <= 0) return;
-
-	_occupiedSlots.resize(_crafts.size(), nullptr);
-	std::vector<bool> slotOccupied(_craftSlots.size(), false);
 
 	std::vector<int> slotSizes;
 	std::vector<int> craftSizes;
-	std::vector<int> absSlotSizes;
 	for (Craft* refCraft : _crafts)
 	{
 		int refCraftSize = refCraft->getRules()->getCraftSize();
-		if (std::find(craftSizes.begin(), craftSizes.end(), refCraftSize) == craftSizes.end())
-			craftSizes.push_back(refCraftSize);
+		if (std::find(craftSizes.begin(), craftSizes.end(),
+			refCraft->getRules()->getCraftSize()) == craftSizes.end())
+			craftSizes.push_back(refCraft->getRules()->getCraftSize());
 	}
-	for (Position refSlot : _craftSlots)
+	for (CraftSlot refSlot : _craftSlots)
 	{
-		int trueSlotSize = refSlot.z >= 0 ? refSlot.z : std::abs(refSlot.z + 1);
-		if (std::find(slotSizes.begin(), slotSizes.end(), trueSlotSize) == slotSizes.end())
-			slotSizes.push_back(trueSlotSize);
-		absSlotSizes.push_back(trueSlotSize);
+		int refSlotSize = refSlot.size;
+		if (std::find(slotSizes.begin(), slotSizes.end(), refSlotSize) == slotSizes.end())
+			slotSizes.push_back(refSlotSize);
 	}
 	std::sort(craftSizes.begin(), craftSizes.end(), std::greater<int>()); // Bigger crafts first.
 	std::sort(slotSizes.begin(), slotSizes.end()); // Smallest slots first.
@@ -1071,18 +1064,16 @@ void Base::syncCraftSlots()
 		for (size_t i = 0; i < _crafts.size(); ++i)
 		{
 			bool gotPlace = false;
-			Craft* refCraft = (*(_crafts.begin() + i));
-			if (refCraft->getRules()->getCraftSize() != craftSize) continue; // Mixing sizes works bad.
+			if (_crafts[i]->getRules()->getCraftSize() != craftSize) continue; // Mixing sizes works bad.
 			for (int slotSize : slotSizes)
 			{
 				if (slotSize < craftSize) continue; // Ignore, if slot is smaller than craft.
 				for (size_t j = 0; j < _craftSlots.size(); ++j) // We need slot index.
 				{
-					if (absSlotSizes[j] == 0 && craftSize > 0) continue; // Ignore zero size slots if craft has size.
-					if (!slotOccupied[j] && absSlotSizes[j] == slotSize) // Gradually check for bigger empty slots.
+					if (_craftSlots[j].size == 0 && craftSize > 0) continue; // Ignore zero size slots if craft has size.
+					if (_craftSlots[j].craft == nullptr && _craftSlots[j].size == slotSize) // Gradually check for bigger empty slots.
 					{
-						_occupiedSlots[i] = &_craftSlots[j];
-						slotOccupied[j] = true;
+						_craftSlots[j].craft = _crafts[i];
 						gotPlace = true;
 						break;
 					}
@@ -1092,35 +1083,34 @@ void Base::syncCraftSlots()
 			if (gotPlace) continue; // No suitable slot size? Try to look for zero size one.
 			for (size_t j = 0; j < _craftSlots.size(); ++j)
 			{
-				if (absSlotSizes[j] != 0) continue; // Ignore non-zero size slots and disregard craft's size.
-				if (!slotOccupied[j])
+				if (_craftSlots[j].size != 0) continue; // Ignore non-zero size slots and disregard craft's size.
+				if (_craftSlots[j].craft == nullptr)
 				{
-					_occupiedSlots[i] = &_craftSlots[j];
-					slotOccupied[j] = true;
+					_craftSlots[j].craft = _crafts[i];
 					gotPlace = true;
 					break;
 				}
 			}
 			if (gotPlace) continue; // Not found zero slot either? Just place craft anywhere.
-			Log(LOG_WARNING) << "Craft: " << refCraft->getType() << ", ID: " << refCraft->getId() << " - couldn't find compatible hangar slot. Using first available!";
+			Log(LOG_WARNING) << "Craft: " << _crafts[i]->getType() << ", ID: " << _crafts[i]->getId() << " - couldn't find compatible hangar slot. Using first available!";
 			for (size_t j = 0; j < _craftSlots.size(); ++j)
 			{
-				if (!slotOccupied[j])
+				if (_craftSlots[j].craft == nullptr)
 				{
-					_occupiedSlots[i] = &_craftSlots[j];
-					slotOccupied[j] = true;
+					_craftSlots[j].craft = _crafts[i];
 					break;
 				}
 			}
 		}
 	}
 
-	if (_occupiedSlots.size() > 0)
+	if (_craftSlots.size() > 0)
 	{
-		for (size_t i = 0; i < _occupiedSlots.size(); ++i)
-			Log(LOG_DEBUG) << "Base: " << _name << ", Taken Slot: ["
-			<< _occupiedSlots[i]->x << "," << _occupiedSlots[i]->y << "," << _occupiedSlots[i]->z
-			<< "], Craft: " << _crafts[i]->getType() << ", ID: " << _crafts[i]->getId();
+		for (size_t i = 0; i < _craftSlots.size(); ++i)
+			if (_craftSlots[i].craft != nullptr)
+				Log(LOG_DEBUG) << "Base: " << _name << ", Used Slot #" << i << ", Offset: ["
+				<< _craftSlots[i].x << "," << _craftSlots[i].y << "], Size: " << _craftSlots[i].size
+				<< ", Craft: " << _craftSlots[i].craft->getType() << "-" << _craftSlots[i].craft->getId();
 	}
 }
 
@@ -1143,19 +1133,8 @@ int Base::getFreeCraftSlots(int craftSize) const
 	int freeSlotsNum = 0;
 
 	for (size_t i = 0; i < _craftSlots.size(); ++i)
-	{
-		bool isFree = true;
-		for (size_t j = 0; j < _occupiedSlots.size(); ++j)
-		{
-			if (_occupiedSlots[j] == &_craftSlots[i]) isFree = false;
-		}
-		if (isFree)
-		{
-			int trueSlotSize = _craftSlots[i].z >= 0 ? _craftSlots[i].z : std::abs(_craftSlots[i].z + 1);
-			if (craftSize == 0 || trueSlotSize == 0 || trueSlotSize >= craftSize)
-				freeSlotsNum++;
-		}
-	}
+		if (_craftSlots[i].craft == nullptr && (craftSize == 0 || _craftSlots[i].size == 0 || _craftSlots[i].size >= craftSize))
+			freeSlotsNum++;
 
 	for (const auto* transfer : _transfers)
 		if (transfer->getType() == TRANSFER_CRAFT && transfer->getCraft()->getRules()->getCraftSize() >= craftSize)
