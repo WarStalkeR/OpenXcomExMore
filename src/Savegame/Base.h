@@ -46,7 +46,6 @@ class Production;
 class Vehicle;
 class Ufo;
 class AlienMission;
-class Position;
 
 enum UfoDetection : int;
 enum BasePlacementErrors : int
