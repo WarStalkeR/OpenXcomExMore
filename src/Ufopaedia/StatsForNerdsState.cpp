@@ -3728,6 +3728,7 @@ void StatsForNerdsState::initCraftWeaponList()
 
 	addHeading("stats");
 	{
+		addInteger(ss, craftWeaponRule->getBonusStats().craftSize, "craftSize");
 		addInteger(ss, craftWeaponRule->getBonusStats().damageMax, "damageMax");
 		addInteger(ss, craftWeaponRule->getBonusStats().armor, "armor");
 		addIntegerPercent(ss, craftWeaponRule->getBonusStats().avoidBonus, "avoidBonus");

@@ -34,6 +34,8 @@
 #include "../Savegame/Base.h"
 #include "../Savegame/SavedGame.h"
 #include "../Ufopaedia/Ufopaedia.h"
+#include "../Menu/ErrorMessageState.h"
+#include "../Mod/RuleInterface.h"
 
 namespace OpenXcom
 {
@@ -163,30 +165,64 @@ void CraftWeaponsState::btnCancelClick(Action *)
  */
 void CraftWeaponsState::lstWeaponsClick(Action *)
 {
-	CraftWeapon *current = _craft->getWeapons()->at(_weapon);
-	// Remove current weapon
-	if (current != 0)
-	{
-		_base->getStorageItems()->addItem(current->getRules()->getLauncherItem());
-		_base->getStorageItems()->addItem(current->getRules()->getClipItem(), current->getClipsLoaded());
-		_craft->addCraftStats(-current->getRules()->getBonusStats());
-		// Make sure any extra shield is removed from craft too when the shield capacity decreases (exploit protection)
-		_craft->setShield(_craft->getShield());
-		delete current;
-		_craft->getWeapons()->at(_weapon) = 0;
-	}
-
-	// Equip new weapon
+	bool allowChange = true;
+	bool sizeChanged = false;
+	const Craft* refCraft = _craft;
+	const RuleCraftWeapon* refWeapon = nullptr;
 	if (_weapons[_lstWeapons->getSelectedRow()] != 0)
+		refWeapon = _weapons[_lstWeapons->getSelectedRow()];
+
+	if (refWeapon != nullptr && refWeapon->getBonusStats().craftSize != 0)
 	{
-		CraftWeapon *sel = new CraftWeapon(_weapons[_lstWeapons->getSelectedRow()], 0);
-		_craft->addCraftStats(sel->getRules()->getBonusStats());
-		_base->getStorageItems()->removeItem(sel->getRules()->getLauncherItem());
-		_craft->getWeapons()->at(_weapon) = sel;
+		sizeChanged = true; // Craft size changed, hangar slots sync needed
+		int newSize = _craft->getCraftStats().craftSize + refWeapon->getBonusStats().craftSize;
+		auto craftSlotIt = std::find_if(_base->getCraftSlots()->begin(),
+			_base->getCraftSlots()->end(), [refCraft](const CraftSlot& refSlot) {
+			return refSlot.craft == refCraft;
+		});
+		if (!((craftSlotIt != _base->getCraftSlots()->end() &&
+			craftSlotIt->size >= newSize) ||
+				_base->getFreeCraftSlots(newSize) > 0))
+			allowChange = false;
 	}
 
+	if (allowChange)
+	{
+		CraftWeapon *current = _craft->getWeapons()->at(_weapon);
+		// Remove current weapon
+		if (current != 0)
+		{
+			_base->getStorageItems()->addItem(current->getRules()->getLauncherItem());
+			_base->getStorageItems()->addItem(current->getRules()->getClipItem(), current->getClipsLoaded());
+			_craft->addCraftStats(-current->getRules()->getBonusStats());
+			// Make sure any extra shield is removed from craft too when the shield capacity decreases (exploit protection)
+			_craft->setShield(_craft->getShield());
+			delete current;
+			_craft->getWeapons()->at(_weapon) = 0;
+		}
+
+		// Equip new weapon
+		if (_weapons[_lstWeapons->getSelectedRow()] != 0)
+		{
+			CraftWeapon *sel = new CraftWeapon(_weapons[_lstWeapons->getSelectedRow()], 0);
+			_craft->addCraftStats(sel->getRules()->getBonusStats());
+			_base->getStorageItems()->removeItem(sel->getRules()->getLauncherItem());
+			_craft->getWeapons()->at(_weapon) = sel;
+		}
+	}
+
+	if (sizeChanged)
+		_base->syncCraftSlots();
 	_craft->checkup();
 	_game->popState();
+
+	if (!allowChange)
+	{
+		RuleInterface* menuInterface = _game->getMod()->getInterface("craftWeapons");
+		_game->pushState(new ErrorMessageState(tr("STR_NO_FREE_HANGARS_FOR_REFIT"),
+			_palette, menuInterface->getElement("window")->color, "BACK14.SCR",
+			menuInterface->getElement("palette")->color));
+	}
 }
 
 /**
