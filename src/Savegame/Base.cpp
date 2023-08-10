@@ -1042,29 +1042,28 @@ void Base::syncCraftSlots()
 
 	std::vector<int> slotSizes;
 	std::vector<int> craftSizes;
-	for (Craft* refCraft : _crafts)
+	for (const Craft* refCraft : _crafts)
 	{
-		int refCraftSize = refCraft->getRules()->getCraftSize();
-		if (std::find(craftSizes.begin(), craftSizes.end(),
-			refCraft->getRules()->getCraftSize()) == craftSizes.end())
-			craftSizes.push_back(refCraft->getRules()->getCraftSize());
+		const int& refCraftSize = refCraft->getRules()->getCraftSize();
+		if (std::find(craftSizes.begin(), craftSizes.end(), refCraftSize) == craftSizes.end())
+			craftSizes.push_back(refCraftSize);
 	}
-	for (CraftSlot refSlot : _craftSlots)
+	for (const CraftSlot& refSlot : _craftSlots)
 	{
-		int refSlotSize = refSlot.size;
+		const int& refSlotSize = refSlot.size;
 		if (std::find(slotSizes.begin(), slotSizes.end(), refSlotSize) == slotSizes.end())
 			slotSizes.push_back(refSlotSize);
 	}
 	std::sort(craftSizes.begin(), craftSizes.end(), std::greater<int>()); // Bigger crafts first.
 	std::sort(slotSizes.begin(), slotSizes.end()); // Smallest slots first.
 
-	for (int craftSize : craftSizes)
+	for (const int& craftSize : craftSizes)
 	{
 		for (size_t i = 0; i < _crafts.size(); ++i)
 		{
 			bool gotPlace = false;
 			if (_crafts[i]->getRules()->getCraftSize() != craftSize) continue; // Mixing sizes works bad.
-			for (int slotSize : slotSizes)
+			for (const int& slotSize : slotSizes)
 			{
 				if (slotSize < craftSize) continue; // Ignore, if slot is smaller than craft.
 				for (size_t j = 0; j < _craftSlots.size(); ++j) // We need slot index.
@@ -1132,7 +1131,7 @@ int Base::getFreeCraftSlots(int craftSize) const
 	int freeSlotsNum = 0;
 
 	for (size_t i = 0; i < _craftSlots.size(); ++i)
-		if (_craftSlots[i].craft == nullptr && (craftSize == 0 || _craftSlots[i].size == 0 || _craftSlots[i].size >= craftSize))
+		if (_craftSlots[i].craft == nullptr && (craftSize <= 0 || _craftSlots[i].size == 0 || _craftSlots[i].size >= craftSize))
 			freeSlotsNum++;
 
 	for (const auto* transfer : _transfers)
