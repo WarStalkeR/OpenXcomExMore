@@ -2898,6 +2898,8 @@ void GeoscapeState::globeClick(Action *action)
 								<< ", MISSION: " << randomMission.getType();
 							AlienMission* refMission = new AlienMission(randomMission);
 							Ufo* refUfo = new Ufo(&randomUfo, _game->getSavedGame()->getId("STR_UFO_UNIQUE"));
+							_game->getSavedGame()->getAlienMissions().push_back(refMission);
+							_game->getSavedGame()->getUfos()->push_back(refUfo);
 							refMission->setRace(randomRace);
 							refBase->setupDefenses(refMission);
 							refUfo->setMissionInfo(refMission, &baseTrajectory);
