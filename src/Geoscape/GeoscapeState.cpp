@@ -2849,9 +2849,68 @@ void GeoscapeState::globeClick(Action *action)
 		std::vector<Target*> v = _globe->getTargets(mouseX, mouseY, false, 0);
 		if (!v.empty())
 		{
-			// Pass empty vector
-			std::vector<Craft*> crafts;
-			_game->pushState(new MultipleTargetsState(v, crafts, this, true));
+			if (Options::debug && (_game->isShiftPressed() || _game->isCtrlPressed()))
+			{
+				// Debug trigger base defense or missile strike.
+				bool isMissileStrike = _game->isCtrlPressed();
+				for (auto* refTarget : v)
+				{
+					Base* refBase = dynamic_cast<Base*>(refTarget);
+					if (refBase != 0)
+					{
+						std::vector<std::string> ufoList;
+						const auto& ufoAll = _game->getMod()->getUfosList();
+						for (const auto& ufoId : ufoAll)
+						{
+							const auto& refUfo = _game->getMod()->getUfo(ufoId);
+							if (isMissileStrike)
+							{
+								if (refUfo->getMissilePower() != 0)
+									ufoList.push_back(ufoId);
+							}
+							else
+							{
+								if (!refUfo->isUnmanned() && refUfo->getMissilePower() == 0)
+									ufoList.push_back(ufoId);
+							}
+						}
+						if (ufoList.size() > 0)
+						{
+							const auto& raceList = _game->getMod()->getAlienRacesList();
+							const auto& missionList = _game->getMod()->getAlienMissionList();
+							const auto& randomUfo = *_game->getMod()->getUfo(ufoList.at(RNG::generate(0, ufoList.size() - 1)));
+							const auto& baseTrajectory = *_game->getMod()->getUfoTrajectory(UfoTrajectory::RETALIATION_ASSAULT_RUN, true);
+							const auto& randomMission = *_game->getMod()->getAlienMission(missionList.at(RNG::generate(0, missionList.size() - 1)));
+							const auto& randomRace = raceList.at(RNG::generate(0, raceList.size() - 1));
+							if (isMissileStrike)
+								Log(LOG_DEBUG) << "Missile Strike Triggered! ID: " << randomUfo.getType()
+								<< ", RACE: " << _game->getMod()->getAlienRace(randomRace)->getId()
+								<< ", POWER: " << randomUfo.getMissilePower();
+							else
+								Log(LOG_DEBUG) << "Base Defense Triggered! ID: " << randomUfo.getType()
+								<< ", RACE: " << _game->getMod()->getAlienRace(randomRace)->getId()
+								<< ", MISSION: " << randomMission.getType();
+							AlienMission* refMission = new AlienMission(randomMission);
+							Ufo* refUfo = new Ufo(&randomUfo, _game->getSavedGame()->getId("STR_UFO_UNIQUE"));
+							refMission->setRace(randomRace);
+							refBase->setupDefenses(refMission);
+							refUfo->setMissionInfo(refMission, &baseTrajectory);
+							refUfo->setAltitude(baseTrajectory.getAltitude(0));
+							refUfo->setLongitude(refBase->getLongitude());
+							refUfo->setLatitude(refBase->getLatitude());
+							refUfo->setSpeed(0);
+							popup(new BaseDefenseState(refBase, refUfo, this));
+						}
+						break;
+					}
+				}
+			}
+			else
+			{
+				// Pass empty vector
+				std::vector<Craft*> crafts;
+				_game->pushState(new MultipleTargetsState(v, crafts, this, true));
+			}
 		}
 	}
 
