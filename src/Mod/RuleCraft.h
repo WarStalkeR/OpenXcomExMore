@@ -184,6 +184,7 @@ private:
 	int _repairRate, _refuelRate, _transferTime, _score;
 	RuleTerrain *_battlescapeTerrainData;
 	int _maxSkinIndex;
+	int _bigOffsetX, _bigOffsetY;
 	bool _keepCraftAfterFailedMission, _allowLanding, _spacecraft, _notifyWhenRefueled, _autoPatrol, _undetectable;
 	int _listOrder, _maxItems, _maxAltitude;
 	double _maxStorageSpace;
@@ -224,6 +225,10 @@ public:
 	int getMarker() const;
 	/// Gets the craft's hull size.
 	int getCraftSize() const;
+	/// Gets the craft's sprite horizontal offset.
+	int getBigOffsetX() const { return _bigOffsetX; }
+	/// Gets the craft's sprite vertical offset.
+	int getBigOffsetY() const { return _bigOffsetY; }
 	/// Gets the craft's maximum fuel.
 	int getMaxFuel() const;
 	/// Gets the craft's maximum damage.
