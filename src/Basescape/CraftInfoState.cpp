@@ -112,7 +112,19 @@ CraftInfoState::CraftInfoState(Base *base, size_t craftId) : _base(base), _craft
 		_txtWName[i] = new Text(95, 16, x - d, y);
 		_txtWAmmo[i] = new Text(75, 24, x, y + 16);
 	}
-	_sprite = new InteractiveSurface(32, 40, 144, 56);
+	const RuleCraft* craftRule = _craft->getRules();
+	if (craftRule->getBigOffsetX() != 0 || craftRule->getBigOffsetY() != 0)
+	{
+		_sprite = new InteractiveSurface(
+			32 + std::abs(craftRule->getBigOffsetX()) * 2,
+			40 + std::abs(craftRule->getBigOffsetY()) * 2,
+			144 + craftRule->getBigOffsetX(),
+			56 + craftRule->getBigOffsetY());
+	}
+	else
+	{
+		_sprite = new InteractiveSurface(32, 40, 144, 56);
+	}
 	for (int i = 0; i < _weaponNum; ++i)
 	{
 		const int x = i % 2 ? 184 : 121;
