@@ -371,7 +371,7 @@ Mod::Mod() :
 	_pilotAccuracyZeroPoint(55), _pilotAccuracyRange(40), _pilotReactionsZeroPoint(55), _pilotReactionsRange(60),
 	_performanceBonusFactor(0), _enableNewResearchSorting(false), _displayCustomCategories(0), _shareAmmoCategories(false), _showDogfightDistanceInKm(false), _showFullNameInAlienInventory(false),
 	_alienInventoryOffsetX(80), _alienInventoryOffsetBigUnit(32),
-	_hidePediaInfoButton(false), _extraNerdyPediaInfoType(0),
+	_hidePediaInfoButton(false), _extraNerdyPediaInfoType(0), _pediaCraftClassStrCutoff(0), _pediaFacilityColOffset(0),
 	_giveScoreAlsoForResearchedArtifacts(false), _statisticalBulletConservation(false), _stunningImprovesMorale(false),
 	_tuRecoveryWakeUpNewTurn(100), _shortRadarRange(0), _buildTimeReductionScaling(100),
 	_defeatScore(0), _defeatFunds(0), _difficultyDemigod(false), _startingTime(6, 1, 1, 1999, 12, 0, 0), _startingDifficulty(0),
@@ -3129,6 +3129,7 @@ void Mod::loadFile(const FileMap::FileRecord &filerec, ModScript &parsers)
 	_pediaReplaceCraftFuelWithRangeType = doc["pediaReplaceCraftFuelWithRangeType"].as<int>(_pediaReplaceCraftFuelWithRangeType);
 	_missionRatings = doc["missionRatings"].as<std::map<int, std::string> >(_missionRatings);
 	_monthlyRatings = doc["monthlyRatings"].as<std::map<int, std::string> >(_monthlyRatings);
+	_craftClasses = doc["craftClasses"].as<std::map<int, std::string> >(_craftClasses);
 	loadUnorderedNamesToNames("mod", _fixedUserOptions, doc["fixedUserOptions"]);
 	loadUnorderedNamesToNames("mod", _recommendedUserOptions, doc["recommendedUserOptions"]);
 	loadUnorderedNames("mod", _hiddenMovementBackgrounds, doc["hiddenMovementBackgrounds"]);
@@ -3166,6 +3167,8 @@ void Mod::loadFile(const FileMap::FileRecord &filerec, ModScript &parsers)
 	_accelerationCoefficientCautious = doc["accelerationCoefficientCautious"].as<int>(_accelerationCoefficientCautious);
 	_accelerationCoefficientCombat = doc["accelerationCoefficientCombat"].as<int>(_accelerationCoefficientCombat);
 	_accelerationCoefficientManeuver = doc["accelerationCoefficientManeuver"].as<int>(_accelerationCoefficientManeuver);
+	_pediaCraftClassStrCutoff = doc["pediaCraftClassStrCutoff"].as<int>(_pediaCraftClassStrCutoff);
+	_pediaFacilityColOffset = doc["pediaFacilityColOffset"].as<int>(_pediaFacilityColOffset);
 
 
 
@@ -5055,6 +5058,10 @@ const std::map<int, std::string> *Mod::getMissionRatings() const
 const std::map<int, std::string> *Mod::getMonthlyRatings() const
 {
 	return &_monthlyRatings;
+}
+const std::map<int, std::string> *Mod::getCraftClasses() const
+{
+	return &_craftClasses;
 }
 
 const std::vector<std::string> &Mod::getHiddenMovementBackgrounds() const
