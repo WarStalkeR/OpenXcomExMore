@@ -1007,17 +1007,17 @@ void Base::updateCraftSlots()
 			{
 				if (size_t(i) < fac->getRules()->getCraftOptions().size())
 				{
-					const auto refOpts = fac->getRules()->getCraftOptions()[i];
+					const auto& refOpts = fac->getRules()->getCraftOptions()[i];
 					int trueSlotSize = refOpts.z >= 0 ? refOpts.z : std::abs(refOpts.z + 1);
 					_craftSlots.push_back(CraftSlot(nullptr, refOpts.z < 0 || hidesCrafts, trueSlotSize,
 						fac->getX() * GRID_SIZE + (fac->getRules()->getSize() - 1) * GRID_SIZE / 2 + refOpts.x,
 						fac->getY() * GRID_SIZE + (fac->getRules()->getSize() - 1) * GRID_SIZE / 2 + refOpts.y));
 				}
-				else
+				else // Default craft offsets for a single slot hangar.
 				{
 					_craftSlots.push_back(CraftSlot(nullptr, false, 0,
-						fac->getX() * GRID_SIZE + (fac->getRules()->getSize() - 1) * GRID_SIZE / 2,
-						fac->getY() * GRID_SIZE + (fac->getRules()->getSize() - 1) * GRID_SIZE / 2));
+						fac->getX() * GRID_SIZE + (fac->getRules()->getSize() - 1) * GRID_SIZE / 2 + 2,
+						fac->getY() * GRID_SIZE + (fac->getRules()->getSize() - 1) * GRID_SIZE / 2 - 4));
 				}
 			}
 		}

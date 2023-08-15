@@ -256,7 +256,7 @@ private:
 	bool _shareAmmoCategories, _showDogfightDistanceInKm, _showFullNameInAlienInventory;
 	int _alienInventoryOffsetX, _alienInventoryOffsetBigUnit;
 	bool _hidePediaInfoButton;
-	int _extraNerdyPediaInfoType;
+	int _extraNerdyPediaInfoType, _pediaCraftClassStrCutoff, _pediaFacilityColOffset;
 	bool _giveScoreAlsoForResearchedArtifacts, _statisticalBulletConservation, _stunningImprovesMorale;
 	int _tuRecoveryWakeUpNewTurn;
 	int _shortRadarRange;
@@ -276,7 +276,7 @@ private:
 	GameTime _startingTime;
 	int _startingDifficulty;
 	int _baseDefenseMapFromLocation;
-	std::map<int, std::string> _missionRatings, _monthlyRatings;
+	std::map<int, std::string> _missionRatings, _monthlyRatings, _craftClasses;
 	std::map<std::string, std::string> _fixedUserOptions, _recommendedUserOptions;
 	std::vector<std::string> _hiddenMovementBackgrounds;
 	std::vector<std::string> _baseNamesFirst, _baseNamesMiddle, _baseNamesLast;
@@ -1081,6 +1081,7 @@ public:
 	RuleBaseFacility *getDestroyedFacility() const;
 	const std::map<int, std::string> *getMissionRatings() const;
 	const std::map<int, std::string> *getMonthlyRatings() const;
+	const std::map<int, std::string> *getCraftClasses() const;
 	const std::map<std::string, std::string> &getFixedUserOptions() const { return _fixedUserOptions; }
 	const std::map<std::string, std::string> &getRecommendedUserOptions() const { return _recommendedUserOptions; }
 	const std::vector<std::string> &getHiddenMovementBackgrounds() const;
@@ -1126,6 +1127,10 @@ public:
 	int getAccelerationCoefficientCombat() const { return _accelerationCoefficientCombat; }
 	/// Gets acceleration coefficient used to check if HK or player dictates range in Standard Mode.
 	int getAccelerationCoefficientManeuver() const { return _accelerationCoefficientManeuver; }
+	/// Gets number of characters that will be shown in Ufopedia for custom craft classes.
+	int getPediaCraftClassStrCutoff() const { return _pediaCraftClassStrCutoff; }
+	/// Gets pixels that facility stats column in the Ufopedia will be moved to the left.
+	int getPediaFacilityColOffset() const { return _pediaFacilityColOffset; }
 
 };
 
