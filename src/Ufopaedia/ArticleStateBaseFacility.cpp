@@ -31,6 +31,7 @@
 #include "../Interface/Text.h"
 #include "../Interface/TextButton.h"
 #include "../Interface/TextList.h"
+#include "../Battlescape/Position.h"
 
 namespace OpenXcom
 {
@@ -120,8 +121,9 @@ namespace OpenXcom
 		_lstInfo = new TextList(200, 42, 10, 42);
 		add(_lstInfo);
 
+		const auto& colOffset = _game->getMod()->getPediaFacilityColOffset();
 		_lstInfo->setColor(Palette::blockOffset(13)+10);
-		_lstInfo->setColumns(2, 140, 60);
+		_lstInfo->setColumns(2, 140 - colOffset, 60 + colOffset);
 		_lstInfo->setDot(true);
 
 		_lstInfo->addRow(2, tr("STR_CONSTRUCTION_TIME").c_str(), tr("STR_DAY", facility->getBuildTime()).c_str());
@@ -136,6 +138,66 @@ namespace OpenXcom
 		ss << Unicode::formatFunding(facility->getMonthlyCost());
 		_lstInfo->addRow(2, tr("STR_MAINTENANCE_COST").c_str(), ss.str().c_str());
 		_lstInfo->setCellColor(2, 1, Palette::blockOffset(13)+0);
+
+		if (facility->getCrafts() > 0)
+		{
+			ss.str("");ss.clear();
+			std::map<int, int> craftHangarsBare;
+			std::map<std::string, int> craftHangars;
+			const auto& hangarOptions = facility->getCraftOptions();
+			const auto* craftClassMap = _game->getMod()->getCraftClasses();
+			const auto& craftClassCut = _game->getMod()->getPediaCraftClassStrCutoff();
+			bool doBareCalculation = craftClassMap->empty();
+			for (const auto& refSlot : hangarOptions)
+			{
+				int temp = INT_MIN;
+				std::string craftClass = "";
+				int slotSize = refSlot.z >= 0 ? refSlot.z : std::abs(refSlot.z + 1);
+				if (!doBareCalculation)
+				{
+					for (const auto& [intSize, strClass] : *craftClassMap)
+					{
+						if (intSize > temp && slotSize >= intSize)
+						{
+							craftClass = tr(strClass);
+							temp = intSize;
+						}
+					}
+					if (slotSize == 0) craftClass = tr("STR_CRAFT_SLOT_ANY");
+					if (craftClassCut > 0 && int(craftClass.length()) > craftClassCut)
+						craftClass = craftClass.substr(0, craftClassCut);
+					auto craftHangarIt = craftHangars.find(craftClass);
+					if (craftHangarIt != craftHangars.end()) ++(craftHangarIt->second);
+					else craftHangars.emplace(craftClass, 1);
+				}
+				else
+				{
+					auto craftHangarsBareIt = craftHangarsBare.find(slotSize);
+					if (craftHangarsBareIt != craftHangarsBare.end()) ++(craftHangarsBareIt->second);
+					else craftHangarsBare.emplace(slotSize, 1);
+				}
+			}
+			if (!doBareCalculation)
+			{
+				for (const auto& [strClass, intNum] : craftHangars)
+				{
+					if (!ss.str().empty()) ss << ", ";
+					if (intNum > 1) ss << intNum << "*";
+					ss << strClass;
+				}
+			}
+			else
+			{
+				for (const auto& [intClass, intNum] : craftHangarsBare)
+				{
+					if (!ss.str().empty()) ss << ", ";
+					if (intNum > 1) ss << intNum << "*";
+					ss << intClass;
+				}
+			}
+			_lstInfo->addRow(2, tr("STR_HANGAR_CRAFT_CAP").c_str(), ss.str().c_str());
+			_lstInfo->setCellColor(3, 1, Palette::blockOffset(13) + 0);
+		}
 
 		if (facility->getDefenseValue() > 0)
 		{
