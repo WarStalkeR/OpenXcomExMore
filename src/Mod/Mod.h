@@ -256,7 +256,7 @@ private:
 	bool _shareAmmoCategories, _showDogfightDistanceInKm, _showFullNameInAlienInventory;
 	int _alienInventoryOffsetX, _alienInventoryOffsetBigUnit;
 	bool _hidePediaInfoButton;
-	int _extraNerdyPediaInfoType, _pediaCraftClassStrCutoff, _pediaFacilityColOffset;
+	int _extraNerdyPediaInfoType, _pediaFacilityColOffset;
 	bool _giveScoreAlsoForResearchedArtifacts, _statisticalBulletConservation, _stunningImprovesMorale;
 	int _tuRecoveryWakeUpNewTurn;
 	int _shortRadarRange;
@@ -1131,8 +1131,6 @@ public:
 	int getAccelerationCoefficientCombat() const { return _accelerationCoefficientCombat; }
 	/// Gets acceleration coefficient used to check if HK or player dictates range in Standard Mode.
 	int getAccelerationCoefficientManeuver() const { return _accelerationCoefficientManeuver; }
-	/// Gets number of characters that will be shown in Ufopedia for custom craft classes.
-	int getPediaCraftClassStrCutoff() const { return _pediaCraftClassStrCutoff; }
 	/// Gets pixels that facility stats column in the Ufopedia will be moved to the left.
 	int getPediaFacilityColOffset() const { return _pediaFacilityColOffset; }
 
