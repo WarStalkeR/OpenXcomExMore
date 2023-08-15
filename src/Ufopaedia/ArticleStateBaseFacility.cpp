@@ -146,7 +146,6 @@ namespace OpenXcom
 			std::map<std::string, int> craftHangars;
 			const auto& hangarOptions = facility->getCraftOptions();
 			const auto* craftClassMap = _game->getMod()->getCraftClasses();
-			const auto& craftClassCut = _game->getMod()->getPediaCraftClassStrCutoff();
 			bool doBareCalculation = craftClassMap->empty();
 			for (const auto& refSlot : hangarOptions)
 			{
@@ -159,13 +158,10 @@ namespace OpenXcom
 					{
 						if (intSize > temp && slotSize >= intSize)
 						{
-							craftClass = tr(strClass);
+							craftClass = tr(strClass + "_UC");
 							temp = intSize;
 						}
 					}
-					if (slotSize == 0) craftClass = tr("STR_CRAFT_SLOT_ANY");
-					if (craftClassCut > 0 && int(craftClass.length()) > craftClassCut)
-						craftClass = craftClass.substr(0, craftClassCut);
 					auto craftHangarIt = craftHangars.find(craftClass);
 					if (craftHangarIt != craftHangars.end()) ++(craftHangarIt->second);
 					else craftHangars.emplace(craftClass, 1);
@@ -182,7 +178,7 @@ namespace OpenXcom
 				for (const auto& [strClass, intNum] : craftHangars)
 				{
 					if (!ss.str().empty()) ss << ", ";
-					if (intNum > 1) ss << intNum << "*";
+					ss << intNum << "*";
 					ss << strClass;
 				}
 			}
@@ -191,7 +187,7 @@ namespace OpenXcom
 				for (const auto& [intClass, intNum] : craftHangarsBare)
 				{
 					if (!ss.str().empty()) ss << ", ";
-					if (intNum > 1) ss << intNum << "*";
+					ss << intNum << "*";
 					ss << intClass;
 				}
 			}
