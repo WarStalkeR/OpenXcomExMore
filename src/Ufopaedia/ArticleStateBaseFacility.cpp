@@ -142,54 +142,22 @@ namespace OpenXcom
 		if (facility->getCrafts() > 0)
 		{
 			ss.str("");ss.clear();
-			std::map<int, int> craftHangarsBare;
 			std::map<std::string, int> craftHangars;
 			const auto& hangarOptions = facility->getCraftOptions();
-			const auto* craftClassMap = _game->getMod()->getCraftClasses();
-			bool doBareCalculation = craftClassMap->empty();
 			for (const auto& refSlot : hangarOptions)
 			{
-				int temp = INT_MIN;
-				std::string craftClass = "";
 				int slotSize = refSlot.z >= 0 ? refSlot.z : std::abs(refSlot.z + 1);
-				if (!doBareCalculation)
-				{
-					for (const auto& [intSize, strClass] : *craftClassMap)
-					{
-						if (intSize > temp && slotSize >= intSize)
-						{
-							craftClass = tr(strClass + "_UC");
-							temp = intSize;
-						}
-					}
-					auto craftHangarIt = craftHangars.find(craftClass);
-					if (craftHangarIt != craftHangars.end()) ++(craftHangarIt->second);
-					else craftHangars.emplace(craftClass, 1);
-				}
-				else
-				{
-					auto craftHangarsBareIt = craftHangarsBare.find(slotSize);
-					if (craftHangarsBareIt != craftHangarsBare.end()) ++(craftHangarsBareIt->second);
-					else craftHangarsBare.emplace(slotSize, 1);
-				}
+				const std::string craftClass = _game->getMod()->getCraftClassFromSize(slotSize);
+				const std::string slotClass = craftClass.empty() ? std::to_string(slotSize) : tr(craftClass + "_UC").c_str();
+				auto craftHangarIt = craftHangars.find(slotClass);
+				if (craftHangarIt != craftHangars.end()) ++(craftHangarIt->second);
+				else craftHangars.emplace(slotClass, 1);
 			}
-			if (!doBareCalculation)
+			for (const auto& [strClass, intNum] : craftHangars)
 			{
-				for (const auto& [strClass, intNum] : craftHangars)
-				{
-					if (!ss.str().empty()) ss << ", ";
-					ss << intNum << "*";
-					ss << strClass;
-				}
-			}
-			else
-			{
-				for (const auto& [intClass, intNum] : craftHangarsBare)
-				{
-					if (!ss.str().empty()) ss << ", ";
-					ss << intNum << "*";
-					ss << intClass;
-				}
+				if (!ss.str().empty()) ss << ", ";
+				ss << intNum << "*";
+				ss << strClass;
 			}
 			_lstInfo->addRow(2, tr("STR_HANGAR_CRAFT_CAP").c_str(), ss.str().c_str());
 			_lstInfo->setCellColor(3, 1, Palette::blockOffset(13) + 0);
