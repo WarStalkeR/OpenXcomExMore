@@ -3744,6 +3744,8 @@ void StatsForNerdsState::initCraftWeaponList()
 		addInteger(ss, craftWeaponRule->getBonusStats().shieldRecharge, "shieldRecharge");
 		addInteger(ss, craftWeaponRule->getBonusStats().shieldRechargeInGeoscape, "shieldRechargeInGeoscape");
 		addInteger(ss, craftWeaponRule->getBonusStats().shieldBleedThrough, "shieldBleedThrough");
+		addInteger(ss, craftWeaponRule->getBonusStats().soldiers, "soldiers");
+		addInteger(ss, craftWeaponRule->getBonusStats().vehicles, "vehicles");
 		endHeading();
 	}
 

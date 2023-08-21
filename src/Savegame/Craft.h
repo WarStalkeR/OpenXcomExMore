@@ -173,6 +173,8 @@ public:
 	void addCraftStats(const RuleCraftStats& s);
 	/// Gets the craft's stats.
 	const RuleCraftStats& getCraftStats() const;
+	/// Gets the craft's hull size.
+	int getCraftSize() const;
 	/// Gets the craft's max amount of fuel.
 	int getFuelMax() const;
 	/// Gets the craft's amount of fuel.
@@ -215,6 +217,11 @@ public:
 	int getFuelLimit() const;
 	/// Gets the craft's minimum fuel limit to go to a base.
 	int getFuelLimit(Base *base) const;
+
+	/// Gets the craft's maximum unit capacity (soldiers and vehicles, small and large).
+	int getMaxUnits() const;
+	/// Gets the craft's maximum vehicle capacity (incl. 2x2 soldiers).
+	int getMaxVehiclesAndLargeSoldiers() const;
 
 	double getBaseRange() const;
 	/// Returns the craft to its base.

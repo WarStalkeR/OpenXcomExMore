@@ -337,7 +337,7 @@ void ConfirmDestinationState::btnTransferClick(Action *)
 	std::string errorMessage;
 	
 	Base *targetBase = dynamic_cast<Base*>(_target);
-	if ((targetBase->getFreeCraftSlots(_crafts.front()->getRules()->getCraftSize())) <= 0) // don't know how you'd get less than 0 available hangars, but want to handle that just in case
+	if ((targetBase->getFreeCraftSlots(_crafts.front()->getCraftSize())) <= 0) // don't know how you'd get less than 0 available hangars, but want to handle that just in case
 	{
 		errorMessage = tr("STR_NO_FREE_HANGARS_FOR_TRANSFER");
 	}
