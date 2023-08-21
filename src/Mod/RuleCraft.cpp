@@ -34,7 +34,7 @@ const std::string RuleCraft::DEFAULT_CRAFT_DEPLOYMENT_PREVIEW = "STR_CRAFT_DEPLO
  * @param type String defining the type.
  */
 RuleCraft::RuleCraft(const std::string &type, int listOrder) :
-	_type(type), _sprite(-1), _marker(-1), _weapons(0), _soldiers(0), _pilots(0), _vehicles(0),
+	_type(type), _sprite(-1), _marker(-1), _weapons(0), _pilots(0),
 	_maxSmallSoldiers(-1), _maxLargeSoldiers(-1), _maxSmallVehicles(-1), _maxLargeVehicles(-1),
 	_maxSmallUnits(-1), _maxLargeUnits(-1), _maxSoldiers(-1), _maxVehicles(-1),
 	_monthlyBuyLimit(0), _costBuy(0), _costRent(0), _costSell(0), _repairRate(1), _refuelRate(1),
@@ -109,9 +109,7 @@ void RuleCraft::load(const YAML::Node &node, Mod *mod, const ModScript &parsers)
 		_marker = mod->getOffset(node["marker"].as<int>(_marker), 8);
 	}
 	_weapons = node["weapons"].as<int>(_weapons);
-	_soldiers = node["soldiers"].as<int>(_soldiers);
 	_pilots = node["pilots"].as<int>(_pilots);
-	_vehicles = node["vehicles"].as<int>(_vehicles);
 	_maxSmallSoldiers = node["maxSmallSoldiers"].as<int>(_maxSmallSoldiers);
 	_maxLargeSoldiers = node["maxLargeSoldiers"].as<int>(_maxLargeSoldiers);
 	_maxSmallVehicles = node["maxSmallVehicles"].as<int>(_maxSmallVehicles);
@@ -313,7 +311,7 @@ int RuleCraft::getWeapons() const
  */
 int RuleCraft::getMaxUnits() const
 {
-	return _soldiers;
+	return _stats.soldiers;
 }
 
 /**
@@ -332,7 +330,7 @@ int RuleCraft::getPilots() const
  */
 int RuleCraft::getMaxVehiclesAndLargeSoldiers() const
 {
-	return _vehicles;
+	return _stats.vehicles;
 }
 
 /**

@@ -38,14 +38,15 @@ class ScriptParserBase;
  */
 struct RuleCraftStats
 {
-	int craftSize, fuelMax, damageMax, speedMax, accel, radarRange, radarChance, sightRange, hitBonus, avoidBonus, powerBonus, armor, shieldCapacity, shieldRecharge, shieldRechargeInGeoscape, shieldBleedThrough;
+	int craftSize, fuelMax, damageMax, speedMax, accel, radarRange, radarChance, sightRange, hitBonus, avoidBonus, powerBonus, armor, shieldCapacity, shieldRecharge, shieldRechargeInGeoscape, shieldBleedThrough, soldiers, vehicles;
 
 	/// Default constructor.
 	RuleCraftStats() :
 		craftSize(0), fuelMax(0), damageMax(0), speedMax(0), accel(0),
 		radarRange(0), radarChance(0), sightRange(0),
 		hitBonus(0), avoidBonus(0), powerBonus(0), armor(0),
-		shieldCapacity(0), shieldRecharge(0), shieldRechargeInGeoscape(0), shieldBleedThrough(0)
+		shieldCapacity(0), shieldRecharge(0), shieldRechargeInGeoscape(0), shieldBleedThrough(0),
+		soldiers(0), vehicles(0)
 	{
 
 	}
@@ -68,6 +69,8 @@ struct RuleCraftStats
 		shieldRecharge += r.shieldRecharge;
 		shieldRechargeInGeoscape += r.shieldRechargeInGeoscape;
 		shieldBleedThrough += r.shieldBleedThrough;
+		soldiers += r.soldiers;
+		vehicles += r.vehicles;
 		return *this;
 	}
 	/// Subtract different stats.
@@ -89,6 +92,8 @@ struct RuleCraftStats
 		shieldRecharge -= r.shieldRecharge;
 		shieldRechargeInGeoscape -= r.shieldRechargeInGeoscape;
 		shieldBleedThrough -= r.shieldBleedThrough;
+		soldiers -= r.soldiers;
+		vehicles -= r.vehicles;
 		return *this;
 	}
 	/// Gets negative values of stats.
@@ -117,6 +122,8 @@ struct RuleCraftStats
 		shieldRecharge = node["shieldRecharge"].as<int>(shieldRecharge);
 		shieldRechargeInGeoscape = node["shieldRechargeInGeoscape"].as<int>(shieldRechargeInGeoscape);
 		shieldBleedThrough = node["shieldBleedThrough"].as<int>(shieldBleedThrough);
+		soldiers = node["soldiers"].as<int>(soldiers);
+		vehicles = node["vehicles"].as<int>(vehicles);
 	}
 
 	template<auto Stat, typename TBind>
@@ -138,6 +145,8 @@ struct RuleCraftStats
 		b.template addField<Stat, &RuleCraftStats::shieldRecharge>(prefix + "getShieldRecharge");
 		b.template addField<Stat, &RuleCraftStats::shieldRechargeInGeoscape>(prefix + "getShieldRechargeInGeoscape");
 		b.template addField<Stat, &RuleCraftStats::shieldBleedThrough>(prefix + "getShieldBleedThrough");
+		b.template addField<Stat, &RuleCraftStats::soldiers>(prefix + "getMaxUnits");
+		b.template addField<Stat, &RuleCraftStats::vehicles>(prefix + "getMaxVehiclesAndLargeSoldiers");
 	}
 };
 
@@ -172,7 +181,7 @@ private:
 	std::string _requiresBuyCountry;
 	int _sprite, _marker;
 	std::vector<int> _skinSprites;
-	int _weapons, _soldiers, _pilots, _vehicles;
+	int _weapons, _pilots;
 	int _maxSmallSoldiers, _maxLargeSoldiers, _maxSmallVehicles, _maxLargeVehicles;
 	int _maxSmallUnits, _maxLargeUnits, _maxSoldiers, _maxVehicles;
 	int _monthlyBuyLimit;
