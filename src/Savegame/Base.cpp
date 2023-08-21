@@ -1044,7 +1044,7 @@ void Base::syncCraftSlots()
 	std::vector<int> craftSizes;
 	for (const Craft* refCraft : _crafts)
 	{
-		const int& refCraftSize = refCraft->getRules()->getCraftSize();
+		const int& refCraftSize = refCraft->getCraftSize();
 		if (std::find(craftSizes.begin(), craftSizes.end(), refCraftSize) == craftSizes.end())
 			craftSizes.push_back(refCraftSize);
 	}
@@ -1062,7 +1062,7 @@ void Base::syncCraftSlots()
 		for (size_t i = 0; i < _crafts.size(); ++i)
 		{
 			bool gotPlace = false;
-			if (_crafts[i]->getRules()->getCraftSize() != craftSize) continue; // Mixing sizes works bad.
+			if (_crafts[i]->getCraftSize() != craftSize) continue; // Mixing sizes works bad.
 			for (const int& slotSize : slotSizes)
 			{
 				if (slotSize < craftSize) continue; // Ignore, if slot is smaller than craft.
@@ -1135,7 +1135,7 @@ int Base::getFreeCraftSlots(int craftSize) const
 			freeSlotsNum++;
 
 	for (const auto* transfer : _transfers)
-		if (transfer->getType() == TRANSFER_CRAFT && transfer->getCraft()->getRules()->getCraftSize() >= craftSize)
+		if (transfer->getType() == TRANSFER_CRAFT && transfer->getCraft()->getCraftSize() >= craftSize)
 			freeSlotsNum -= transfer->getQuantity();
 
 	for (const auto* prod : _productions)
