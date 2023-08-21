@@ -114,8 +114,8 @@ void RuleCraft::load(const YAML::Node &node, Mod *mod, const ModScript &parsers)
 	_maxLargeSoldiers = node["maxLargeSoldiers"].as<int>(_maxLargeSoldiers);
 	_maxSmallVehicles = node["maxSmallVehicles"].as<int>(_maxSmallVehicles);
 	_maxLargeVehicles = node["maxLargeVehicles"].as<int>(_maxLargeVehicles);
-	_maxSmallUnits = node["maxSmallUnits"].as<int>(_maxSmallUnits);
-	_maxLargeUnits = node["maxLargeUnits"].as<int>(_maxLargeUnits);
+	_maxSmallUnits = node["maxSmallUnits"].as<int>(_stats.soldiers);
+	_maxLargeUnits = node["maxLargeUnits"].as<int>(_stats.vehicles);
 	_maxSoldiers = node["maxSoldiers"].as<int>(_maxSoldiers);
 	_maxVehicles = node["maxVehicles"].as<int>(_maxVehicles);
 	_monthlyBuyLimit = node["monthlyBuyLimit"].as<int>(_monthlyBuyLimit);

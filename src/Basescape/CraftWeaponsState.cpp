@@ -177,7 +177,7 @@ void CraftWeaponsState::lstWeaponsClick(Action *)
 	if (refWeapon != nullptr && refWeapon->getBonusStats().craftSize != 0)
 	{
 		sizeChanged = true; // Craft size changed, hangar slots sync needed
-		int refCraftSize = _craft->getCraftStats().craftSize;
+		int refCraftSize = _craft->getCraftSize();
 		int refWeaponSize = refWeapon->getBonusStats().craftSize;
 		int newCraftSize = refCraftSize + refWeaponSize;
 		classChanged = _game->getMod()->getCraftClassFromSize(newCraftSize) !=
