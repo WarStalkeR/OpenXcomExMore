@@ -245,7 +245,7 @@ private:
 	int _accelerationCoefficientStandoff, _accelerationCoefficientCautious, _accelerationCoefficientCombat, _accelerationCoefficientManeuver;
 	int _ufoTractorBeamSizeModifiers[5];
 	int _escortRange, _drawEnemyRadarCircles;
-	bool _escortsJoinFightAgainstHK, _hunterKillerFastRetarget;
+	bool _escortsJoinFightAgainstHK, _hunterKillerFastRetarget, _craftsCanChangeClass;
 	int _crewEmergencyEvacuationSurvivalChance, _pilotsEmergencyEvacuationSurvivalChance;
 	std::array<int, (size_t)(RANK_COMMANDER + 1)> _soldiersPerRank;
 	int _pilotAccuracyZeroPoint, _pilotAccuracyRange, _pilotReactionsZeroPoint, _pilotReactionsRange;
@@ -1113,6 +1113,8 @@ public:
 	const std::vector<int>& getRetaliationBaseRegionOdds() { return _retaliationBaseRegionOdds; }
 	const std::vector<int>& getAliensFacingCraftOdds() { return _aliensFacingCraftOdds; }
 
+	/// Receives craft size as integer and returns relevant craft class string.
+	const std::string getCraftClassFromSize(const int& craftSize) const;
 	/// Gets acceleration divisor used to calculate acceleration bonus in dogfights.
 	int getAccelerationBonusDivisor() const { return _accelerationBonusDivisor; }
 	/// Gets acceleration penalty used in HK Standoff Mode activation formula.
@@ -1133,6 +1135,8 @@ public:
 	int getAccelerationCoefficientManeuver() const { return _accelerationCoefficientManeuver; }
 	/// Gets pixels that facility stats column in the Ufopedia will be moved to the left.
 	int getPediaFacilityColOffset() const { return _pediaFacilityColOffset; }
+	/// Crafts can change their class due to change in their size (through systems/weapons)?
+	bool getCraftsCanChangeClass() const { return _craftsCanChangeClass; }
 
 };
 
