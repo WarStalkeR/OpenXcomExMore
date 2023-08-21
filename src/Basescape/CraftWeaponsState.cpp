@@ -167,6 +167,8 @@ void CraftWeaponsState::lstWeaponsClick(Action *)
 {
 	bool allowChange = true;
 	bool sizeChanged = false;
+	bool classChanged = false;
+	bool classChangeAllowed = _game->getMod()->getCraftsCanChangeClass();
 	const Craft* refCraft = _craft;
 	const RuleCraftWeapon* refWeapon = nullptr;
 	if (_weapons[_lstWeapons->getSelectedRow()] != 0)
@@ -175,14 +177,20 @@ void CraftWeaponsState::lstWeaponsClick(Action *)
 	if (refWeapon != nullptr && refWeapon->getBonusStats().craftSize != 0)
 	{
 		sizeChanged = true; // Craft size changed, hangar slots sync needed
-		int newSize = _craft->getCraftStats().craftSize + refWeapon->getBonusStats().craftSize;
+		int refCraftSize = _craft->getCraftStats().craftSize;
+		int refWeaponSize = refWeapon->getBonusStats().craftSize;
+		int newCraftSize = refCraftSize + refWeaponSize;
+		classChanged = _game->getMod()->getCraftClassFromSize(newCraftSize) !=
+			_game->getMod()->getCraftClassFromSize(refCraftSize);
 		auto craftSlotIt = std::find_if(_base->getCraftSlots()->begin(),
 			_base->getCraftSlots()->end(), [refCraft](const CraftSlot& refSlot) {
 			return refSlot.craft == refCraft;
 		});
 		if (!((craftSlotIt != _base->getCraftSlots()->end() &&
-			craftSlotIt->size >= newSize) ||
-				_base->getFreeCraftSlots(newSize) > 0))
+			(craftSlotIt->size == 0 || craftSlotIt->size >= newCraftSize)) ||
+				_base->getFreeCraftSlots(newCraftSize) > 0))
+			allowChange = false;
+		if (classChanged && !classChangeAllowed)
 			allowChange = false;
 	}
 
@@ -218,9 +226,11 @@ void CraftWeaponsState::lstWeaponsClick(Action *)
 
 	if (!allowChange)
 	{
+		const std::string errorMessage = classChanged && !classChangeAllowed ?
+			"STR_NO_CRAFT_CLASS_CHANGE" : "STR_NO_FREE_HANGARS_FOR_REFIT";
 		RuleInterface* menuInterface = _game->getMod()->getInterface("craftWeapons");
-		_game->pushState(new ErrorMessageState(tr("STR_NO_FREE_HANGARS_FOR_REFIT"),
-			_palette, menuInterface->getElement("window")->color, "BACK14.SCR",
+		_game->pushState(new ErrorMessageState(tr(errorMessage), _palette,
+			menuInterface->getElement("window")->color, "BACK14.SCR",
 			menuInterface->getElement("palette")->color));
 	}
 }

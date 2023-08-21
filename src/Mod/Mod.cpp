@@ -365,7 +365,7 @@ Mod::Mod() :
 	_ufoGlancingHitThreshold(0), _ufoBeamWidthParameter(1000),
 	_accelerationBonusDivisor(3), _accelerationPenaltyStandoff(10), _accelerationPenaltyCautious(10), _accelerationPenaltyCombat(10), _accelerationPenaltyManeuver(10),
 	_accelerationCoefficientStandoff(20), _accelerationCoefficientCautious(35), _accelerationCoefficientCombat(50), _accelerationCoefficientManeuver(70),
-	_escortRange(20), _drawEnemyRadarCircles(1), _escortsJoinFightAgainstHK(true), _hunterKillerFastRetarget(true),
+	_escortRange(20), _drawEnemyRadarCircles(1), _escortsJoinFightAgainstHK(true), _hunterKillerFastRetarget(true), _craftsCanChangeClass(false),
 	_crewEmergencyEvacuationSurvivalChance(100), _pilotsEmergencyEvacuationSurvivalChance(100),
 	_soldiersPerRank({-1, -1, 5, 11, 23, 30}),
 	_pilotAccuracyZeroPoint(55), _pilotAccuracyRange(40), _pilotReactionsZeroPoint(55), _pilotReactionsRange(60),
@@ -3169,6 +3169,7 @@ void Mod::loadFile(const FileMap::FileRecord &filerec, ModScript &parsers)
 	_accelerationCoefficientCombat = doc["accelerationCoefficientCombat"].as<int>(_accelerationCoefficientCombat);
 	_accelerationCoefficientManeuver = doc["accelerationCoefficientManeuver"].as<int>(_accelerationCoefficientManeuver);
 	_pediaFacilityColOffset = doc["pediaFacilityColOffset"].as<int>(_pediaFacilityColOffset);
+	_craftsCanChangeClass = doc["craftsCanChangeClass"].as<bool>(_craftsCanChangeClass);
 
 
 
@@ -5062,6 +5063,25 @@ const std::map<int, std::string> *Mod::getMonthlyRatings() const
 const std::map<int, std::string> *Mod::getCraftClasses() const
 {
 	return &_craftClasses;
+}
+
+const std::string Mod::getCraftClassFromSize(const int& craftSize) const
+{
+	if (getCraftClasses()->empty())
+		return "";
+
+	int temp = INT_MIN;
+	std::string craftClass = "";
+	const auto* craftClassMap = getCraftClasses();
+	for (const auto& [intSize, strClass] : *craftClassMap)
+	{
+		if (intSize > temp && craftSize >= intSize)
+		{
+			craftClass = strClass;
+			temp = intSize;
+		}
+	}
+	return craftClass;
 }
 
 const std::vector<std::string> &Mod::getHiddenMovementBackgrounds() const
