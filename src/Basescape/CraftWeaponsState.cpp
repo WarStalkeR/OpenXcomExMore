@@ -168,35 +168,58 @@ void CraftWeaponsState::lstWeaponsClick(Action *)
 	bool allowChange = true;
 	bool sizeChanged = false;
 	bool classChanged = false;
+	bool unitCapChanged = false;
 	bool classChangeAllowed = _game->getMod()->getCraftsCanChangeClass();
 	const Craft* refCraft = _craft;
 	const RuleCraftWeapon* refWeapon = nullptr;
+	const RuleCraftWeapon* currWeapon = nullptr;
+	CraftWeapon* current = _craft->getWeapons()->at(_weapon);
 	if (_weapons[_lstWeapons->getSelectedRow()] != 0)
 		refWeapon = _weapons[_lstWeapons->getSelectedRow()];
+	if (current != 0) currWeapon = current->getRules();
 
-	if (refWeapon != nullptr && refWeapon->getBonusStats().craftSize != 0)
+	if ((refWeapon != nullptr && refWeapon->getBonusStats().craftSize != 0) ||
+		(currWeapon != nullptr && currWeapon->getBonusStats().craftSize != 0))
 	{
-		sizeChanged = true; // Craft size changed, hangar slots sync needed
 		int refCraftSize = _craft->getCraftSize();
-		int refWeaponSize = refWeapon->getBonusStats().craftSize;
-		int newCraftSize = refCraftSize + refWeaponSize;
-		classChanged = _game->getMod()->getCraftClassFromSize(newCraftSize) !=
-			_game->getMod()->getCraftClassFromSize(refCraftSize);
-		auto craftSlotIt = std::find_if(_base->getCraftSlots()->begin(),
-			_base->getCraftSlots()->end(), [refCraft](const CraftSlot& refSlot) {
-			return refSlot.craft == refCraft;
-		});
-		if (!((craftSlotIt != _base->getCraftSlots()->end() &&
-			(craftSlotIt->size == 0 || craftSlotIt->size >= newCraftSize)) ||
-				_base->getFreeCraftSlots(newCraftSize) > 0))
-			allowChange = false;
-		if (classChanged && !classChangeAllowed)
-			allowChange = false;
+		int refWeaponSize = refWeapon != nullptr ? refWeapon->getBonusStats().craftSize : 0;
+		int currWeaponSize = currWeapon != nullptr ? currWeapon->getBonusStats().craftSize : 0;
+		sizeChanged = (refWeaponSize - currWeaponSize) != 0;
+		if (sizeChanged) // Craft size changed, hangar slots sync needed
+		{
+			int newCraftSize = refCraftSize + refWeaponSize - currWeaponSize;
+			classChanged = _game->getMod()->getCraftClassFromSize(newCraftSize) !=
+				_game->getMod()->getCraftClassFromSize(refCraftSize);
+			auto craftSlotIt = std::find_if(_base->getCraftSlots()->begin(),
+				_base->getCraftSlots()->end(), [refCraft](const CraftSlot& refSlot) {
+				return refSlot.craft == refCraft;
+			});
+			if (!((craftSlotIt != _base->getCraftSlots()->end() &&
+				(craftSlotIt->size == 0 || craftSlotIt->size >= newCraftSize)) ||
+					_base->getFreeCraftSlots(newCraftSize) > 0))
+				allowChange = false;
+			if (classChanged && !classChangeAllowed)
+				allowChange = false;
+		}
+	}
+
+	if (allowChange &&
+		((refWeapon != nullptr && refWeapon->getBonusStats().soldiers != 0) ||
+		(currWeapon != nullptr && currWeapon->getBonusStats().soldiers != 0)))
+	{
+		int refUnitCapBonus = refWeapon != nullptr ? refWeapon->getBonusStats().soldiers : 0;
+		int currUnitCapBonus = currWeapon != nullptr ? currWeapon->getBonusStats().soldiers : 0;
+		unitCapChanged = (refUnitCapBonus - currUnitCapBonus) != 0;
+		if (unitCapChanged) // Unit capacity changed, verify that change is allowed
+		{
+			if ((_craft->getMaxUnits() - _craft->getSpaceUsed() +
+				refUnitCapBonus - currUnitCapBonus) < 0)
+				allowChange = false;
+		}
 	}
 
 	if (allowChange)
 	{
-		CraftWeapon *current = _craft->getWeapons()->at(_weapon);
 		// Remove current weapon
 		if (current != 0)
 		{
@@ -226,8 +249,11 @@ void CraftWeaponsState::lstWeaponsClick(Action *)
 
 	if (!allowChange)
 	{
-		const std::string errorMessage = classChanged && !classChangeAllowed ?
-			"STR_NO_CRAFT_CLASS_CHANGE" : "STR_NO_FREE_HANGARS_FOR_REFIT";
+		std::string errorMessage = "STR_NO_FREE_HANGARS_FOR_REFIT";
+		if (classChanged && !classChangeAllowed)
+			errorMessage = "STR_NO_CRAFT_CLASS_CHANGE";
+		else if (unitCapChanged)
+			errorMessage = "STR_NO_CARGO_SPACE_FOR_REFIT";
 		RuleInterface* menuInterface = _game->getMod()->getInterface("craftWeapons");
 		_game->pushState(new ErrorMessageState(tr(errorMessage), _palette,
 			menuInterface->getElement("window")->color, "BACK14.SCR",
