@@ -1461,7 +1461,7 @@ bool Craft::isDestroyed() const
  */
 int Craft::getSpaceAvailable() const
 {
-	return getMaxUnits() - getSpaceUsed();
+	return std::min(getMaxUnits(), _rules->getMaxUnitsLimit()) - getSpaceUsed();
 }
 
 /**

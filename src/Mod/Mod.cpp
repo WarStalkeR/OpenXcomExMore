@@ -2203,6 +2203,7 @@ void Mod::loadAll()
 	afterLoadHelper("skills", this, _skills, &RuleSkill::afterLoad);
 	afterLoadHelper("craftWeapons", this, _craftWeapons, &RuleCraftWeapon::afterLoad);
 	afterLoadHelper("countries", this, _countries, &RuleCountry::afterLoad);
+	afterLoadHelper("crafts", this, _crafts, &RuleCraft::afterLoad);
 
 	for (auto& a : _armors)
 	{

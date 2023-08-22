@@ -183,7 +183,7 @@ private:
 	std::vector<int> _skinSprites;
 	int _weapons, _pilots;
 	int _maxSmallSoldiers, _maxLargeSoldiers, _maxSmallVehicles, _maxLargeVehicles;
-	int _maxSmallUnits, _maxLargeUnits, _maxSoldiers, _maxVehicles;
+	int _maxSmallUnits, _maxLargeUnits, _maxSoldiers, _maxVehicles, _maxUnitsLimit;
 	int _monthlyBuyLimit;
 	int _costBuy, _costRent, _costSell;
 	char _weaponTypes[WeaponMax][WeaponTypeMax];
@@ -218,7 +218,9 @@ public:
 	/// Cleans up the craft ruleset.
 	~RuleCraft();
 	/// Loads craft data from YAML.
-	void load(const YAML::Node& node, Mod *mod, const ModScript &parsers);
+	void load(const YAML::Node& node, Mod* mod, const ModScript& parsers);
+	/// Cross link with other rules.
+	void afterLoad(const Mod* mod);
 	/// Gets the craft's type.
 	const std::string &getType() const;
 	/// Gets the craft's requirements.
@@ -270,6 +272,8 @@ public:
 	int getMaxSoldiers() const { return _maxSoldiers; }
 	/// Gets the craft's maximum supported number of vehicles (small + large).
 	int getMaxVehicles() const { return _maxVehicles; }
+	/// Gets the craft's unit capacity limit (soldiers and vehicles, small and large).
+	int getMaxUnitsLimit() const { return _maxUnitsLimit; }
 	/// Gets the craft's monthly buy limit.
 	int getMonthlyBuyLimit() const { return _monthlyBuyLimit; }
 	/// Gets the craft's cost.
