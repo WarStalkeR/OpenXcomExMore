@@ -133,7 +133,9 @@ InterceptState::InterceptState(Globe *globe, bool useCustomSound, Base *base, Ta
 
 	_txtStatus->setText(tr("STR_STATUS"));
 
-	_txtBase->setText(tr("STR_BASE"));
+	if (target != nullptr && _game->isAltPressed())
+		_txtBase->setText(tr("STR_DISTANCE_KM"));
+	else _txtBase->setText(tr("STR_BASE"));
 
 	if (Options::oxceInterceptGuiMaintenanceTimeHidden > 0)
 	{
@@ -307,7 +309,11 @@ InterceptState::InterceptState(Globe *globe, bool useCustomSound, Base *base, Ta
 				ss << 0;
 			}
 			_crafts.push_back(xcraft);
-			_lstCrafts->addRow(4, xcraft->getName(_game->getLanguage()).c_str(), ssStatus.str().c_str(), xbase->getName().c_str(), ss.str().c_str());
+			std::ostringstream ssDistOrBase;
+			if (target != nullptr && _game->isAltPressed())
+				ssDistOrBase << Unicode::formatNumber((int64_t)(xcraft->getDistance(target) * EARTH_RADIUS_KM));
+			else ssDistOrBase << xbase->getName().c_str();
+			_lstCrafts->addRow(4, xcraft->getName(_game->getLanguage()).c_str(), ssStatus.str().c_str(), ssDistOrBase.str().c_str(), ss.str().c_str());
 			if (hasEnoughPilots && status == "STR_READY")
 			{
 				_lstCrafts->setCellColor(row, 1, _lstCrafts->getSecondaryColor());
