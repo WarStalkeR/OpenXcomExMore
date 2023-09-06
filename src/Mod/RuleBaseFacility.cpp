@@ -293,9 +293,8 @@ int RuleBaseFacility::getSpriteFacility() const
 }
 
 /**
- * Gets the ID of the sprite used to draw the
- * facility's contents inside the base shape.
- * @return The sprite ID.
+ * Is sprite over shape behavior retained for bigger facility?
+ * @return True if retained.
  */
 bool RuleBaseFacility::getSpriteEnabled() const
 {

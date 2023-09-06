@@ -108,7 +108,7 @@ public:
 	int getSpriteShape() const;
 	/// Gets the facility's content sprite.
 	int getSpriteFacility() const;
-	/// Enable dedicated sprite for bigger facilities?
+	/// Retain sprite over shape behavior for bigger facility?
 	bool getSpriteEnabled() const;
 	/// Should there be connectors leading to this facility?
 	bool connectorsDisabled() const { return _connectorsDisabled; }
