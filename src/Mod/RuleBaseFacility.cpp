@@ -298,7 +298,7 @@ int RuleBaseFacility::getSpriteFacility() const
  */
 bool RuleBaseFacility::getSpriteEnabled() const
 {
-	return _spriteEnabled;
+	return getSize() == 1 || _spriteEnabled;
 }
 
 /**
