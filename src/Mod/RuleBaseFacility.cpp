@@ -293,21 +293,21 @@ int RuleBaseFacility::getSpriteFacility() const
 }
 
 /**
- * Is sprite over shape behavior retained for bigger facility?
- * @return True if retained.
- */
-bool RuleBaseFacility::getSpriteEnabled() const
-{
-	return getSize() == 1 || _spriteEnabled;
-}
-
-/**
  * Gets the size of the facility on the base grid.
  * @return The length in grid squares.
  */
 int RuleBaseFacility::getSize() const
 {
 	return _size;
+}
+
+/**
+ * Is sprite over shape behavior retained for bigger facility?
+ * @return True if retained.
+ */
+bool RuleBaseFacility::getSpriteEnabled() const
+{
+	return getSize() == 1 || _spriteEnabled;
 }
 
 /**
