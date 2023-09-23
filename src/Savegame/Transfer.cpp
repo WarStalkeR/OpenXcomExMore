@@ -174,7 +174,7 @@ Craft *Transfer::getCraft()
  * Gets the craft being transferred.
  * @return a Pointer to craft.
  */
-Craft* Transfer::getCraft() const
+Craft *Transfer::getCraft() const
 {
 	return _craft;
 }
