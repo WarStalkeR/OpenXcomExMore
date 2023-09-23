@@ -34,8 +34,11 @@ class RuleResearch;
 class RuleManufacture;
 class RuleBaseFacility;
 class RuleCraft;
+class RuleArcScript;
+class RuleEventScript;
+class RuleMissionScript;
 
-enum TTVMode { TTV_NONE, TTV_RESEARCH, TTV_MANUFACTURING, TTV_FACILITIES, TTV_ITEMS, TTV_CRAFTS };
+enum TTVMode { TTV_NONE, TTV_RESEARCH, TTV_MANUFACTURING, TTV_FACILITIES, TTV_ITEMS, TTV_CRAFTS, TTV_ARCS, TTV_EVENTS, TTV_MISSIONS };
 
 /**
  * TechTreeViewer screen, where you can browse the Tech Tree.
@@ -56,18 +59,23 @@ private:
 	std::unordered_set<std::string> _disabledResearch;
 	std::unordered_set<std::string> _alreadyAvailableResearch, _alreadyAvailableManufacture, _alreadyAvailableFacilities, _alreadyAvailableCrafts;
 	std::unordered_set<std::string> _protectedItems, _alreadyAvailableItems;
+	std::unordered_set<std::string> _listArcScripts, _listEventScripts, _listMissionScripts;
 	void initLists();
 	void handleResearchData();
 	void handleManufactureData();
 	void handleFacilityData();
 	void handleItemData();
 	void handleCraftData();
+	void handleArcScript();
+	void handleEventScript();
+	void handleMissionScript();
 	void onSelectLeftTopic(Action *action);
 	void onSelectRightTopic(Action *action);
 	void onSelectFullTopic(Action *action);
 public:
 	/// Creates the Tech Tree Viewer state.
-	TechTreeViewerState(const RuleResearch *r = 0, const RuleManufacture *m = 0, const RuleBaseFacility *f = 0, const RuleCraft *c = 0);
+	TechTreeViewerState(const RuleResearch *r = 0, const RuleManufacture *m = 0, const RuleBaseFacility *f = 0, const RuleCraft *c = 0,
+		const RuleArcScript *as = 0, const RuleEventScript *es = 0, const RuleMissionScript *ms = 0);
 	/// Cleans up the Tech Tree Viewer state.
 	~TechTreeViewerState();
 	/// Initializes the state.
