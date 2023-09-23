@@ -48,7 +48,7 @@ namespace OpenXcom
 /**
  * Initializes all the elements on the UI.
  */
-TechTreeViewerState::TechTreeViewerState(const RuleResearch *r, const RuleManufacture *m, const RuleBaseFacility *f, const RuleCraft *c)
+TechTreeViewerState::TechTreeViewerState(const RuleResearch *r, const RuleManufacture *m, const RuleBaseFacility *f, const RuleCraft *c, const RuleArcScript *as, const RuleEventScript *es, const RuleMissionScript *ms)
 {
 	if (r != 0)
 	{
@@ -69,6 +69,21 @@ TechTreeViewerState::TechTreeViewerState(const RuleResearch *r, const RuleManufa
 	{
 		_selectedTopic = c->getType();
 		_selectedFlag = TTV_CRAFTS;
+	}
+	else if (as != 0)
+	{
+		_selectedTopic = as->getType();
+		_selectedFlag = TTV_ARCS;
+	}
+	else if (es != 0)
+	{
+		_selectedTopic = es->getType();
+		_selectedFlag = TTV_EVENTS;
+	}
+	else if (ms != 0)
+	{
+		_selectedTopic = ms->getType();
+		_selectedFlag = TTV_MISSIONS;
 	}
 
 	// Create objects
@@ -231,6 +246,33 @@ TechTreeViewerState::TechTreeViewerState(const RuleResearch *r, const RuleManufa
 		}
 	}
 
+	RuleArcScript *arcScriptRule = 0;
+	for (auto& arcScript : *_game->getMod()->getArcScriptList())
+	{
+		if (Options::debug)
+		{
+			_listArcScripts.insert(arcScript);
+		}
+	}
+
+	RuleEventScript *eventScriptRule = 0;
+	for (auto& eventScript : *_game->getMod()->getEventScriptList())
+	{
+		if (Options::debug)
+		{
+			_listEventScripts.insert(eventScript);
+		}
+	}
+
+	RuleMissionScript *missionScriptRule = 0;
+	for (auto& missionScript : *_game->getMod()->getMissionScriptList())
+	{
+		if (Options::debug)
+		{
+			_listMissionScripts.insert(missionScript);
+		}
+	}
+
 	_txtProgress->setAlign(ALIGN_RIGHT);
 	_txtProgress->setText(tr("STR_RESEARCH_PROGRESS").arg(discoveredSum * 100 / totalSum));
 }
@@ -313,6 +355,18 @@ void TechTreeViewerState::initLists()
 		{
 			ss << tr("STR_C_FLAG");
 		}
+		else if (_selectedFlag == TTV_ARCS)
+		{
+			ss << tr("STR_AS_FLAG");
+		}
+		else if (_selectedFlag == TTV_EVENTS)
+		{
+			ss << tr("STR_ES_FLAG");
+		}
+		else if (_selectedFlag == TTV_MISSIONS)
+		{
+			ss << tr("STR_MS_FLAG");
+		}
 		_txtSelectedTopic->setText(tr("STR_TOPIC").arg(ss.str()));
 		_txtCostIndicator->setText("");
 	}
@@ -352,6 +406,18 @@ void TechTreeViewerState::initLists()
 	else if (_selectedFlag == TTV_CRAFTS)
 	{
 		handleCraftData();
+	}
+	else if (_selectedFlag == TTV_ARCS)
+	{
+		handleArcScript();
+	}
+	else if (_selectedFlag == TTV_EVENTS)
+	{
+		handleEventScript();
+	}
+	else if (_selectedFlag == TTV_MISSIONS)
+	{
+		handleMissionScript();
 	}
 }
 
@@ -1886,6 +1952,81 @@ void TechTreeViewerState::handleCraftData()
 		_leftFlags.push_back(TTV_NONE);
 		++row;
 	}
+}
+
+/**
+ * Handles, renders and organizes Arc script data.
+ */
+void TechTreeViewerState::handleArcScript()
+{
+	int row = 0;
+	RuleArcScript *rule = _game->getMod()->getArcScript(_selectedTopic);
+	if (rule == 0)
+		return;
+}
+
+/**
+ * Handles, renders and organizes Event script data.
+ */
+void TechTreeViewerState::handleEventScript()
+{
+	int row = 0;
+	RuleEventScript *rule = _game->getMod()->getEventScript(_selectedTopic);
+	if (rule == 0)
+		return;
+
+	row = 0; // Right UI Panel Switch
+
+	// 8. Event Weights
+	const auto& eventWeights = rule->getEventWeights();
+	if (eventWeights.size() > 0)
+	{
+		_lstRight->addRow(1, tr("STR_EVENT_WEIGHTS").c_str());
+		_lstRight->setRowColor(row, _blue);
+		_rightTopics.push_back("-");
+		_rightFlags.push_back(TTV_NONE);
+		row++;
+		for (auto& eventSet : eventWeights)
+		{
+			if (eventSet.second->getChoices().size() > 0)
+			{
+				std::ostringstream name;
+				name << "  ";
+				if (eventSet.first == 0) name << tr("STR_EVENT_AT_START");
+				else name << tr("STR_EVENT_AT_MONTH").arg(eventSet.first);
+				_lstRight->addRow(1, name.str().c_str());
+				_lstRight->setRowColor(row, _white);
+				_rightTopics.push_back("-");
+				_rightFlags.push_back(TTV_NONE);
+				row++;
+				const auto& choiceColor = (size_t)_game->getSavedGame()->getMonthsPassed() >= eventSet.first ? _purple : _pink;
+				for (auto& eventChoice : eventSet.second->getChoices())
+				{
+					std::ostringstream name;
+					name << "    ";
+					name << tr(eventChoice.first);
+					name << ": ";
+					name << eventChoice.second;
+					_lstRight->addRow(1, name.str().c_str());
+					_lstRight->setRowColor(row, choiceColor);
+					_rightTopics.push_back("-");
+					_rightFlags.push_back(TTV_NONE);
+					row++;
+				}
+			}
+		}
+	}
+}
+
+/**
+ * Handles, renders and organizes Mission script data.
+ */
+void TechTreeViewerState::handleMissionScript()
+{
+	int row = 0;
+	RuleMissionScript *rule = _game->getMod()->getMissionScript(_selectedTopic);
+	if (rule == 0)
+		return;
 }
 
 /**
