@@ -57,6 +57,11 @@ private:
 	std::unordered_set<std::string> _alreadyAvailableResearch, _alreadyAvailableManufacture, _alreadyAvailableFacilities, _alreadyAvailableCrafts;
 	std::unordered_set<std::string> _protectedItems, _alreadyAvailableItems;
 	void initLists();
+	void handleResearchData();
+	void handleManufactureData();
+	void handleFacilityData();
+	void handleItemData();
+	void handleCraftData();
 	void onSelectLeftTopic(Action *action);
 	void onSelectRightTopic(Action *action);
 	void onSelectFullTopic(Action *action);
