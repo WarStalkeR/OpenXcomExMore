@@ -39,6 +39,7 @@ class RuleEventScript;
 class RuleMissionScript;
 
 enum TTVMode { TTV_NONE, TTV_RESEARCH, TTV_MANUFACTURING, TTV_FACILITIES, TTV_ITEMS, TTV_CRAFTS, TTV_ARCS, TTV_EVENTS, TTV_MISSIONS };
+enum GameDifficulty : int;
 
 /**
  * TechTreeViewer screen, where you can browse the Tech Tree.
@@ -60,6 +61,9 @@ private:
 	std::unordered_set<std::string> _alreadyAvailableResearch, _alreadyAvailableManufacture, _alreadyAvailableFacilities, _alreadyAvailableCrafts;
 	std::unordered_set<std::string> _protectedItems, _alreadyAvailableItems;
 	std::unordered_set<std::string> _listArcScripts, _listEventScripts, _listMissionScripts;
+	int _currMonth, _currScore;
+	GameDifficulty _currDiff;
+	int64_t _currFunds;
 	void initLists();
 	void handleResearchData();
 	void handleManufactureData();
@@ -69,6 +73,10 @@ private:
 	void handleArcScript();
 	void handleEventScript();
 	void handleMissionScript();
+	bool isPossibleArc(const RuleArcScript* ruleArc);
+	bool isPossibleEvent(const RuleEventScript* ruleEvent);
+	bool isPossibleMission(const RuleMissionScript* ruleMission);
+	void strTrunc(std::ostringstream& refStream, const std::string& origString);
 	void onSelectLeftTopic(Action *action);
 	void onSelectRightTopic(Action *action);
 	void onSelectFullTopic(Action *action);

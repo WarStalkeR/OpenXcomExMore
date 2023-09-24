@@ -308,76 +308,85 @@ void TechTreeSelectState::initLists()
 		++row;
 	}
 
-	_firstArcScriptIndex = row;
-
-	for (auto& arcScript : *_game->getMod()->getArcScriptList())
+	if (Options::oxceTechTreeDataView)
 	{
-		std::string arcName = tr(arcScript);
-		Unicode::upperCase(arcName);
-		if (searchString == "ASCRIPT")
+		_firstArcScriptIndex = row;
+
+		for (auto& arcScript : *_game->getMod()->getArcScriptList())
 		{
-			// Force Add
-		}
-		else if (arcName.find(searchString) == std::string::npos)
-		{
-			continue;
+			std::string arcName = tr(arcScript);
+			Unicode::upperCase(arcName);
+			if (searchString == "ASCRIPT")
+			{
+				// Force Add
+			}
+			else if (arcName.find(searchString) == std::string::npos)
+			{
+				continue;
+			}
+
+			_availableTopics.push_back(arcScript);
+			std::ostringstream ss;
+			ss << tr(arcScript);
+			ss << tr("STR_AS_FLAG");
+			_lstTopics->addRow(1, ss.str().c_str());
+			_lstTopics->setRowColor(row, _lstTopics->getSecondaryColor());
+			++row;
 		}
 
-		_availableTopics.push_back(arcScript);
-		std::ostringstream ss;
-		ss << tr(arcScript);
-		ss << tr("STR_AS_FLAG");
-		_lstTopics->addRow(1, ss.str().c_str());
-		_lstTopics->setRowColor(row, _lstTopics->getSecondaryColor());
-		++row;
+		_firstEventScriptIndex = row;
+
+		for (auto& eventScript : *_game->getMod()->getEventScriptList())
+		{
+			std::string eventName = tr(eventScript);
+			Unicode::upperCase(eventName);
+			if (searchString == "ESCRIPT")
+			{
+				// Force Add
+			}
+			else if (eventName.find(searchString) == std::string::npos)
+			{
+				continue;
+			}
+
+			_availableTopics.push_back(eventScript);
+			std::ostringstream ss;
+			ss << tr(eventScript);
+			ss << tr("STR_ES_FLAG");
+			_lstTopics->addRow(1, ss.str().c_str());
+			_lstTopics->setRowColor(row, _lstTopics->getSecondaryColor());
+			++row;
+		}
+
+		_firstMissionScriptIndex = row;
+
+		for (auto& missionScript : *_game->getMod()->getMissionScriptList())
+		{
+			std::string missionName = tr(missionScript);
+			Unicode::upperCase(missionName);
+			if (searchString == "MSCRIPT")
+			{
+				// Force Add
+			}
+			else if (missionName.find(searchString) == std::string::npos)
+			{
+				continue;
+			}
+
+			_availableTopics.push_back(missionScript);
+			std::ostringstream ss;
+			ss << tr(missionScript);
+			ss << tr("STR_MS_FLAG");
+			_lstTopics->addRow(1, ss.str().c_str());
+			_lstTopics->setRowColor(row, _lstTopics->getSecondaryColor());
+			++row;
+		}
 	}
-
-	_firstEventScriptIndex = row;
-
-	for (auto& eventScript : *_game->getMod()->getEventScriptList())
+	else
 	{
-		std::string eventName = tr(eventScript);
-		Unicode::upperCase(eventName);
-		if (searchString == "ESCRIPT")
-		{
-			// Force Add
-		}
-		else if (eventName.find(searchString) == std::string::npos)
-		{
-			continue;
-		}
-
-		_availableTopics.push_back(eventScript);
-		std::ostringstream ss;
-		ss << tr(eventScript);
-		ss << tr("STR_ES_FLAG");
-		_lstTopics->addRow(1, ss.str().c_str());
-		_lstTopics->setRowColor(row, _lstTopics->getSecondaryColor());
-		++row;
-	}
-
-	_firstMissionScriptIndex = row;
-
-	for (auto& missionScript : *_game->getMod()->getMissionScriptList())
-	{
-		std::string missionName = tr(missionScript);
-		Unicode::upperCase(missionName);
-		if (searchString == "MSCRIPT")
-		{
-			// Force Add
-		}
-		else if (missionName.find(searchString) == std::string::npos)
-		{
-			continue;
-		}
-
-		_availableTopics.push_back(missionScript);
-		std::ostringstream ss;
-		ss << tr(missionScript);
-		ss << tr("STR_MS_FLAG");
-		_lstTopics->addRow(1, ss.str().c_str());
-		_lstTopics->setRowColor(row, _lstTopics->getSecondaryColor());
-		++row;
+		_firstArcScriptIndex = 0;
+		_firstEventScriptIndex = 0;
+		_firstMissionScriptIndex = 0;
 	}
 }
 

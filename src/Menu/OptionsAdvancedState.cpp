@@ -300,6 +300,11 @@ void OptionsAdvancedState::lstOptionsClick(Action *action)
 			min = 0;
 			max = 15;
 		}
+		else if (i == &Options::oxceDataViewStringTrunc)
+		{
+			min = 0;
+			max = 50;
+		}
 		else if (i == &Options::oxceNightVisionColor)
 		{
 			// UFO: 1-15, TFTD: 2-16 except 8 and 10
