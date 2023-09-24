@@ -121,12 +121,20 @@ TechTreeViewerState::TechTreeViewerState(const RuleResearch *r, const RuleManufa
 
 	centerAllSurfaces();
 
+	// Set up reference values
+	_currMonth = _game->getSavedGame()->getMonthsPassed();
+	_currScore = _game->getSavedGame()->getCurrentScore(_currMonth);
+	_currDiff = _game->getSavedGame()->getDifficulty();
+	_currFunds = _game->getSavedGame()->getFunds();
+
 	// Set up objects
 	setWindowBackground(_window, "techTreeViewer");
 
 	_txtTitle->setBig();
 	_txtTitle->setAlign(ALIGN_CENTER);
-	_txtTitle->setText(tr("STR_TECH_TREE_VIEWER"));
+	if (Options::oxceTechTreeDataView)
+		_txtTitle->setText(tr("STR_GAME_DATA_VIEWER"));
+	else _txtTitle->setText(tr("STR_TECH_TREE_VIEWER"));
 
 	_txtSelectedTopic->setText(tr("STR_TOPIC").arg(""));
 
@@ -246,30 +254,36 @@ TechTreeViewerState::TechTreeViewerState(const RuleResearch *r, const RuleManufa
 		}
 	}
 
-	RuleArcScript *arcScriptRule = 0;
-	for (auto& arcScript : *_game->getMod()->getArcScriptList())
+	if (Options::oxceTechTreeDataView)
 	{
-		if (Options::debug)
+		const RuleArcScript *arcScriptRule = 0;
+		for (auto& arcScript : *_game->getMod()->getArcScriptList())
 		{
-			_listArcScripts.insert(arcScript);
+			arcScriptRule = _game->getMod()->getArcScript(arcScript);
+			if (Options::debug || isPossibleArc(arcScriptRule))
+			{
+				_listArcScripts.insert(arcScript);
+			}
 		}
-	}
 
-	RuleEventScript *eventScriptRule = 0;
-	for (auto& eventScript : *_game->getMod()->getEventScriptList())
-	{
-		if (Options::debug)
+		const RuleEventScript *eventScriptRule = 0;
+		for (auto& eventScript : *_game->getMod()->getEventScriptList())
 		{
-			_listEventScripts.insert(eventScript);
+			eventScriptRule = _game->getMod()->getEventScript(eventScript);
+			if (Options::debug || isPossibleEvent(eventScriptRule))
+			{
+				_listEventScripts.insert(eventScript);
+			}
 		}
-	}
 
-	RuleMissionScript *missionScriptRule = 0;
-	for (auto& missionScript : *_game->getMod()->getMissionScriptList())
-	{
-		if (Options::debug)
+		const RuleMissionScript *missionScriptRule = 0;
+		for (auto& missionScript : *_game->getMod()->getMissionScriptList())
 		{
-			_listMissionScripts.insert(missionScript);
+			missionScriptRule = _game->getMod()->getMissionScript(missionScript);
+			if (Options::debug || isPossibleMission(missionScriptRule))
+			{
+				_listMissionScripts.insert(missionScript);
+			}
 		}
 	}
 
@@ -1960,7 +1974,7 @@ void TechTreeViewerState::handleCraftData()
 void TechTreeViewerState::handleArcScript()
 {
 	int row = 0;
-	RuleArcScript *rule = _game->getMod()->getArcScript(_selectedTopic);
+	const RuleArcScript *rule = _game->getMod()->getArcScript(_selectedTopic);
 	if (rule == 0)
 		return;
 }
@@ -1971,7 +1985,7 @@ void TechTreeViewerState::handleArcScript()
 void TechTreeViewerState::handleEventScript()
 {
 	int row = 0;
-	RuleEventScript *rule = _game->getMod()->getEventScript(_selectedTopic);
+	const RuleEventScript *rule = _game->getMod()->getEventScript(_selectedTopic);
 	if (rule == 0)
 		return;
 
@@ -1990,6 +2004,7 @@ void TechTreeViewerState::handleEventScript()
 		{
 			if (eventSet.second->getChoices().size() > 0)
 			{
+				bool isValidTime = _currMonth >= eventSet.first;
 				std::ostringstream name;
 				name << "  ";
 				if (eventSet.first == 0) name << tr("STR_EVENT_AT_START");
@@ -1999,12 +2014,12 @@ void TechTreeViewerState::handleEventScript()
 				_rightTopics.push_back("-");
 				_rightFlags.push_back(TTV_NONE);
 				row++;
-				const auto& choiceColor = (size_t)_game->getSavedGame()->getMonthsPassed() >= eventSet.first ? _purple : _pink;
+				const auto& choiceColor = isValidTime ? _purple : _pink;
 				for (auto& eventChoice : eventSet.second->getChoices())
 				{
 					std::ostringstream name;
 					name << "    ";
-					name << tr(eventChoice.first);
+					strTrunc(name, eventChoice.first);
 					name << ": ";
 					name << eventChoice.second;
 					_lstRight->addRow(1, name.str().c_str());
@@ -2024,9 +2039,71 @@ void TechTreeViewerState::handleEventScript()
 void TechTreeViewerState::handleMissionScript()
 {
 	int row = 0;
-	RuleMissionScript *rule = _game->getMod()->getMissionScript(_selectedTopic);
+	const RuleMissionScript *rule = _game->getMod()->getMissionScript(_selectedTopic);
 	if (rule == 0)
 		return;
+}
+
+/**
+ * Returns true, if at least one of the Arc triggers is valid.
+ * @param string name of the Arc Script.
+ */
+bool TechTreeViewerState::isPossibleArc(const RuleArcScript* ruleArc)
+{
+	if ((ruleArc->getFirstMonth() <= _currMonth &&
+		(ruleArc->getLastMonth() >= _currMonth ||
+		 ruleArc->getLastMonth() == -1)) &&
+		(ruleArc->getMinDifficulty() <= _currDiff &&
+		 ruleArc->getMaxDifficulty() >= _currDiff))
+		return true;
+	return false;
+}
+
+/**
+ * Returns true, if at least one of the Event triggers is valid.
+ * @param string name of the Event Script.
+ */
+bool TechTreeViewerState::isPossibleEvent(const RuleEventScript* ruleEvent)
+{
+	if ((ruleEvent->getFirstMonth() <= _currMonth &&
+		(ruleEvent->getLastMonth() >= _currMonth ||
+		ruleEvent->getLastMonth() == -1)) &&
+		(ruleEvent->getMinDifficulty() <= _currDiff &&
+		 ruleEvent->getMaxDifficulty() >= _currDiff))
+		return true;
+	return false;
+}
+
+/**
+ * Returns true, if at least one of the Event triggers is valid.
+ * @param string name of the Event Script.
+ */
+bool TechTreeViewerState::isPossibleMission(const RuleMissionScript* ruleMission)
+{
+	if ((ruleMission->getFirstMonth() <= _currMonth &&
+		(ruleMission->getLastMonth() >= _currMonth ||
+		 ruleMission->getLastMonth() == -1)) &&
+		(ruleMission->getMinDifficulty() <= _currDiff))
+		return true;
+	return false;
+}
+
+/**
+ * Appends to stream reverse-truncated string based on option value.
+ * @param stream reference, where to new value will be pushed.
+ * @param string original string reference.
+ */
+void TechTreeViewerState::strTrunc(std::ostringstream& refStream, const std::string& origString)
+{
+	size_t length = Options::oxceDataViewStringTrunc;
+	if (length == 0 || origString.size() <= length)
+	{
+		refStream << origString;
+	}
+	else
+	{
+		refStream << origString.substr(origString.size() - length);
+	}
 }
 
 /**
