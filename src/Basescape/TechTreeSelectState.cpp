@@ -327,7 +327,7 @@ void TechTreeSelectState::initLists()
 
 			_availableTopics.push_back(arcScript);
 			std::ostringstream ss;
-			ss << tr(arcScript);
+			ss << _parent->cleanStr(tr(arcScript));
 			ss << tr("STR_AS_FLAG");
 			_lstTopics->addRow(1, ss.str().c_str());
 			_lstTopics->setRowColor(row, _lstTopics->getSecondaryColor());
@@ -351,7 +351,7 @@ void TechTreeSelectState::initLists()
 
 			_availableTopics.push_back(eventScript);
 			std::ostringstream ss;
-			ss << tr(eventScript);
+			ss << _parent->cleanStr(tr(eventScript));
 			ss << tr("STR_ES_FLAG");
 			_lstTopics->addRow(1, ss.str().c_str());
 			_lstTopics->setRowColor(row, _lstTopics->getSecondaryColor());
@@ -375,7 +375,7 @@ void TechTreeSelectState::initLists()
 
 			_availableTopics.push_back(missionScript);
 			std::ostringstream ss;
-			ss << tr(missionScript);
+			ss << _parent->cleanStr(tr(missionScript));
 			ss << tr("STR_MS_FLAG");
 			_lstTopics->addRow(1, ss.str().c_str());
 			_lstTopics->setRowColor(row, _lstTopics->getSecondaryColor());

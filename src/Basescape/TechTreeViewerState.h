@@ -76,7 +76,6 @@ private:
 	bool isPossibleArc(const RuleArcScript* ruleArc);
 	bool isPossibleEvent(const RuleEventScript* ruleEvent);
 	bool isPossibleMission(const RuleMissionScript* ruleMission);
-	void strTrunc(std::ostringstream& refStream, const std::string& origString);
 	void onSelectLeftTopic(Action *action);
 	void onSelectRightTopic(Action *action);
 	void onSelectFullTopic(Action *action);
@@ -111,6 +110,10 @@ public:
 	bool isProtectedAndDiscoveredItem(const std::string &topic) const;
 	/// Is given craft discovered/available for both purchase and usage/equipment?
 	bool isDiscoveredCraft(const std::string &topic) const;
+	/// Appends to stream reverse-truncated string based on option value.
+	void strCut(std::ostringstream& refStream, const std::string& origString);
+	/// Replaces all underscores with spaces for better word wrapping.
+	const std::string cleanStr(const std::string& origString);
 };
 
 }
