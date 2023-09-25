@@ -352,7 +352,10 @@ void TechTreeViewerState::initLists()
 	// Set topic name
 	{
 		std::ostringstream ss;
-		ss << tr(_selectedTopic);
+		if (_selectedFlag > TTV_CRAFTS)
+			ss << cleanStr(tr(_selectedTopic)); // Data Viewer entries only
+		else ss << tr(_selectedTopic);
+
 		if (_selectedFlag == TTV_MANUFACTURING)
 		{
 			ss << tr("STR_M_FLAG");
@@ -2000,11 +2003,11 @@ void TechTreeViewerState::handleEventScript()
 		_rightTopics.push_back("-");
 		_rightFlags.push_back(TTV_NONE);
 		row++;
-		for (auto& eventSet : eventWeights)
+		for (auto evIt = eventWeights.begin(); evIt != eventWeights.end(); ++evIt)
 		{
+			auto& eventSet = *evIt;
 			if (eventSet.second->getChoices().size() > 0)
 			{
-				bool isValidTime = _currMonth >= eventSet.first;
 				std::ostringstream name;
 				name << "  ";
 				if (eventSet.first == 0) name << tr("STR_EVENT_AT_START");
@@ -2014,12 +2017,17 @@ void TechTreeViewerState::handleEventScript()
 				_rightTopics.push_back("-");
 				_rightFlags.push_back(TTV_NONE);
 				row++;
-				const auto& choiceColor = isValidTime ? _purple : _pink;
+				bool isCurrValid = _currMonth >= eventSet.first;
+				bool isNextValid = (std::next(evIt) != eventWeights.end()
+					&& _currMonth >= std::next(evIt)->first);
+				auto& choiceColor =
+					isCurrValid && !isNextValid ?
+					_purple : _pink;
 				for (auto& eventChoice : eventSet.second->getChoices())
 				{
 					std::ostringstream name;
 					name << "    ";
-					strTrunc(name, eventChoice.first);
+					strCut(name, eventChoice.first);
 					name << ": ";
 					name << eventChoice.second;
 					_lstRight->addRow(1, name.str().c_str());
@@ -2086,24 +2094,6 @@ bool TechTreeViewerState::isPossibleMission(const RuleMissionScript* ruleMission
 		(ruleMission->getMinDifficulty() <= _currDiff))
 		return true;
 	return false;
-}
-
-/**
- * Appends to stream reverse-truncated string based on option value.
- * @param stream reference, where to new value will be pushed.
- * @param string original string reference.
- */
-void TechTreeViewerState::strTrunc(std::ostringstream& refStream, const std::string& origString)
-{
-	size_t length = Options::oxceDataViewStringTrunc;
-	if (length == 0 || origString.size() <= length)
-	{
-		refStream << origString;
-	}
-	else
-	{
-		refStream << origString.substr(origString.size() - length);
-	}
 }
 
 /**
@@ -2266,6 +2256,46 @@ bool TechTreeViewerState::isDiscoveredCraft(const std::string &topic) const
 		return false;
 	}
 	return true;
+}
+
+/**
+ * Appends to stream reverse-truncated string based on option value.
+ * @param stream reference, where to new value will be pushed.
+ * @param original string reference.
+ */
+void TechTreeViewerState::strCut(std::ostringstream& refStream, const std::string& origString)
+{
+	size_t length = Options::oxceDataViewStringTrunc;
+	std::string newString = cleanStr(origString);
+	if (length == 0 || newString.size() <= length)
+	{
+		refStream << newString;
+	}
+	else
+	{
+		refStream << newString.substr(newString.size() - length);
+	}
+}
+
+/**
+ * Replaces all underscores with spaces for better word wrapping.
+ * @param stream reference, where to new value will be pushed.
+ * @param original string reference.
+ * @return new string without underscores.
+ */
+const std::string TechTreeViewerState::cleanStr(const std::string& origString)
+{
+	if (Options::oxceDataViewCleanReplace)
+	{
+		size_t pos;
+		std::string cleanString = origString;
+		while ((pos = cleanString.find("STR_")) != std::string::npos)
+			cleanString.erase(pos, 4); // Removing "STR_" to conserve space.
+		std::replace(cleanString.begin(), cleanString.end(), '_', ' ');
+		// Data Viewer entries are unlikely to use '_' so it should be fine.
+		return cleanString;
+	}
+	else return origString;
 }
 
 }
