@@ -37,6 +37,7 @@ class RuleCraft;
 class RuleArcScript;
 class RuleEventScript;
 class RuleMissionScript;
+class SavedGame;
 
 enum TTVMode { TTV_NONE, TTV_RESEARCH, TTV_MANUFACTURING, TTV_FACILITIES, TTV_ITEMS, TTV_CRAFTS, TTV_ARCS, TTV_EVENTS, TTV_MISSIONS };
 enum GameDifficulty : int;
@@ -64,6 +65,7 @@ private:
 	int _currMonth, _currScore;
 	GameDifficulty _currDiff;
 	int64_t _currFunds;
+	SavedGame *_save;
 	void initLists();
 	void handleResearchData();
 	void handleManufactureData();
@@ -73,9 +75,9 @@ private:
 	void handleArcScript();
 	void handleEventScript();
 	void handleMissionScript();
-	bool isPossibleArc(const RuleArcScript* ruleArc);
-	bool isPossibleEvent(const RuleEventScript* ruleEvent);
-	bool isPossibleMission(const RuleMissionScript* ruleMission);
+	bool isPossibleArc(const RuleArcScript* ruleArc) const;
+	bool isPossibleEvent(const RuleEventScript* ruleEvent) const;
+	bool isPossibleMission(const RuleMissionScript* ruleMission) const;
 	void onSelectLeftTopic(Action *action);
 	void onSelectRightTopic(Action *action);
 	void onSelectFullTopic(Action *action);
@@ -97,6 +99,7 @@ public:
 	void setSelectedTopic(const std::string &selectedTopic, TTVMode topicType);
 	/// Gets the color coding for the given research topic.
 	Uint8 getResearchColor(const std::string &topic) const;
+	/// Gets the alternative color coding for the given research topic.
 	Uint8 getAltResearchColor(const std::string &topic) const;
 	/// Is given research topic discovered/available?
 	bool isDiscoveredResearch(const std::string &topic) const;
@@ -110,6 +113,12 @@ public:
 	bool isProtectedAndDiscoveredItem(const std::string &topic) const;
 	/// Is given craft discovered/available for both purchase and usage/equipment?
 	bool isDiscoveredCraft(const std::string &topic) const;
+	/// Are all basic triggers of the Arc valid?
+	bool isGuaranteedArc(const RuleArcScript* ruleArc) const;
+	/// Are all basic triggers of the Event valid?
+	bool isGuaranteedEvent(const RuleEventScript* ruleEvent) const;
+	/// Are all basic triggers of the Mission valid?
+	bool isGuaranteedMission(const RuleMissionScript* ruleMission) const;
 	/// Appends to stream reverse-truncated string based on option value.
 	void strCut(std::ostringstream& refStream, const std::string& origString);
 	/// Replaces all underscores with spaces for better word wrapping.
