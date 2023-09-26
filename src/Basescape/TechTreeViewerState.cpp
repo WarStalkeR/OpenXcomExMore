@@ -38,6 +38,7 @@
 #include "../Interface/Text.h"
 #include "../Interface/TextButton.h"
 #include "../Interface/TextList.h"
+#include "../Savegame/AlienStrategy.h"
 #include "../Savegame/SavedGame.h"
 #include <algorithm>
 #include <unordered_set>
@@ -1994,7 +1995,117 @@ void TechTreeViewerState::handleEventScript()
 		return;
 
 	// 1. Basic Triggers
+	_lstLeft->addRow(1, tr("STR_TRIGGERS_BASIC").c_str());
+	_lstLeft->setRowColor(row, _white);
+	_leftTopics.push_back("-");
+	_leftFlags.push_back(TTV_NONE);
+	row++;
+	std::ostringstream bTrigger;
 
+	// 1a. Execution Odds
+	bTrigger << "  " << tr("STR_TRIGGER_ODDS") << " ";
+	bTrigger << Unicode::formatPercentage(rule->getExecutionOdds());
+	_lstLeft->addRow(1, bTrigger.str().c_str());
+	_lstLeft->setRowColor(row, _gold);
+	_leftTopics.push_back("-");
+	_leftFlags.push_back(TTV_NONE);
+	row++; bTrigger.str(""); bTrigger.clear();
+
+	// 1b. First/Last Month
+	bTrigger << "  " << tr("STR_TRIGGER_MONTH") << " ";
+	if (rule->getFirstMonth() == 0) bTrigger << tr("STR_TRIGGER_MONTH_0");
+	else bTrigger << tr("STR_TRIGGER_MONTH_X") << " " << rule->getFirstMonth();
+	if (rule->getFirstMonth() != rule->getLastMonth())
+	{
+		if (rule->getLastMonth() == -1) bTrigger << " " << tr("STR_TRSIGN_UP");
+		else bTrigger << " " << tr("STR_TRSIGN_MID") << " " <<
+			tr("STR_TRIGGER_MONTH_X") << " " << rule->getLastMonth();
+	}
+	bool isValidTrigger = isValidMonthTrigger(0, rule);
+	_lstLeft->addRow(1, bTrigger.str().c_str());
+	_lstLeft->setRowColor(row, isValidTrigger ? _purple : _pink);
+	_leftTopics.push_back("-");
+	_leftFlags.push_back(TTV_NONE);
+	row++; bTrigger.str(""); bTrigger.clear();
+
+	// 1c. Min/Max Difficulty
+	bTrigger << "  " << tr("STR_TRIGGER_DIFFICULTY") << " ";
+	bTrigger << tr("STR_TRIGGER_DIFF_" + std::to_string(rule->getMinDifficulty()));
+	if (rule->getMinDifficulty() != rule->getMaxDifficulty())
+	{
+		bTrigger << " " << tr("STR_TRSIGN_MID") << " ";
+		bTrigger << tr("STR_TRIGGER_DIFF_" + std::to_string(rule->getMaxDifficulty()));
+	}
+	isValidTrigger = isValidDiffTrigger(0, rule);
+	_lstLeft->addRow(1, bTrigger.str().c_str());
+	_lstLeft->setRowColor(row, isValidTrigger ? _purple : _pink);
+	_leftTopics.push_back("-");
+	_leftFlags.push_back(TTV_NONE);
+	row++; bTrigger.str(""); bTrigger.clear();
+
+	// 1d. Min/Max Score
+	bTrigger << "  " << tr("STR_TRIGGER_SCORE") << " ";
+	if (rule->getMinScore() == INT_MIN && rule->getMaxScore() == INT_MAX)
+		bTrigger << tr("STR_TRSCORE_NONE");
+	else
+	{
+		if (rule->getMinScore() > INT_MIN) bTrigger << rule->getMinScore() << " ";
+		else bTrigger << tr("STR_TRSIGN_UP") << " ";
+		if (rule->getMinScore() > INT_MIN && rule->getMaxScore() < INT_MAX)
+			bTrigger << tr("STR_TRSIGN_MID") << " ";
+		if (rule->getMaxScore() < INT_MAX) bTrigger << rule->getMaxScore();
+		else bTrigger << tr("STR_TRSIGN_UP");
+	}
+	isValidTrigger = isValidScoreTrigger(0, rule);
+	_lstLeft->addRow(1, bTrigger.str().c_str());
+	_lstLeft->setRowColor(row, isValidTrigger ? _purple : _pink);
+	_leftTopics.push_back("-");
+	_leftFlags.push_back(TTV_NONE);
+	row++; bTrigger.str(""); bTrigger.clear();
+
+	// 1e. Min/Max Funds
+	bTrigger << "  " << tr("STR_TRIGGER_FUNDS") << " ";
+	if (rule->getMinFunds() == INT64_MIN && rule->getMaxFunds() == INT64_MAX)
+		bTrigger << tr("STR_TRFUNDS_NONE");
+	else
+	{
+		if (rule->getMinFunds() > INT64_MIN) bTrigger <<
+			Unicode::formatFunding(rule->getMinFunds()) << " ";
+		else bTrigger << tr("STR_TRSIGN_UP") << " ";
+		if (rule->getMinFunds() > INT64_MIN && rule->getMaxFunds() < INT64_MAX)
+			bTrigger << tr("STR_TRSIGN_MID") << " ";
+		if (rule->getMaxFunds() < INT64_MAX) bTrigger <<
+			Unicode::formatFunding(rule->getMaxFunds());
+		else bTrigger << tr("STR_TRSIGN_UP");
+	}
+	isValidTrigger = isValidFundsTrigger(0, rule);
+	_lstLeft->addRow(1, bTrigger.str().c_str());
+	_lstLeft->setRowColor(row, isValidTrigger ? _purple : _pink);
+	_leftTopics.push_back("-");
+	_leftFlags.push_back(TTV_NONE);
+	row++; bTrigger.str(""); bTrigger.clear();
+
+	// 1f. Min/Max Counter
+	bTrigger << "  " << tr("STR_TRIGGER_COUNTER") << " ";
+	if (rule->getMissionVarName().empty() && rule->getMissionMarkerName().empty())
+		bTrigger << tr("STR_TRCOUNT_NONE");
+	else if (rule->getCounterMin() == 0 && rule->getCounterMax() == -1)
+		bTrigger << tr("STR_TRCOUNT_NONE");
+	else
+	{
+		if (rule->getCounterMin() > 0) bTrigger << rule->getCounterMin() << " ";
+		else bTrigger << tr("STR_TRSIGN_UP") << " ";
+		if (rule->getCounterMin() > 0 && rule->getCounterMax() != -1)
+			bTrigger << tr("STR_TRSIGN_MID") << " ";
+		if (rule->getCounterMax() != 1) bTrigger << rule->getCounterMax();
+	}
+	isValidTrigger = isValidCounterTrigger(0, rule);
+	_lstLeft->addRow(1, bTrigger.str().c_str());
+	_lstLeft->setRowColor(row, isValidTrigger ? _purple : _pink);
+	_leftTopics.push_back("-");
+	_leftFlags.push_back(TTV_NONE);
+	row++; bTrigger.str(""); bTrigger.clear();
+	row++;
 
 	// 2. Research Trigger
 
@@ -2018,7 +2129,7 @@ void TechTreeViewerState::handleEventScript()
 	if (oneTimeSeqEvents.size() > 0)
 	{
 		_lstRight->addRow(1, tr("STR_EVENT_ONETIME_SEQ").c_str());
-		_lstRight->setRowColor(row, _blue);
+		_lstRight->setRowColor(row, _white);
 		_rightTopics.push_back("-");
 		_rightFlags.push_back(TTV_NONE);
 		row++;
@@ -2042,7 +2153,7 @@ void TechTreeViewerState::handleEventScript()
 	if (oneTimeRandEvents.size() > 0)
 	{
 		_lstRight->addRow(1, tr("STR_EVENT_ONETIME_RAND").c_str());
-		_lstRight->setRowColor(row, _blue);
+		_lstRight->setRowColor(row, _white);
 		_rightTopics.push_back("-");
 		_rightFlags.push_back(TTV_NONE);
 		row++;
@@ -2068,7 +2179,7 @@ void TechTreeViewerState::handleEventScript()
 	if (eventWeights.size() > 0)
 	{
 		_lstRight->addRow(1, tr("STR_EVENT_WEIGHTS").c_str());
-		_lstRight->setRowColor(row, _blue);
+		_lstRight->setRowColor(row, _white);
 		_rightTopics.push_back("-");
 		_rightFlags.push_back(TTV_NONE);
 		row++;
@@ -2082,16 +2193,14 @@ void TechTreeViewerState::handleEventScript()
 				if (eventSet.first == 0) rowSet << tr("STR_EVENT_AT_START");
 				else rowSet << tr("STR_EVENT_AT_MONTH").arg(eventSet.first);
 				_lstRight->addRow(1, rowSet.str().c_str());
-				_lstRight->setRowColor(row, _white);
+				_lstRight->setRowColor(row, _blue);
 				_rightTopics.push_back("-");
 				_rightFlags.push_back(TTV_NONE);
 				row++;
 				bool isCurrValid = _currMonth >= eventSet.first;
 				bool isNextValid = (std::next(evIt) != eventWeights.end()
 					&& _currMonth >= std::next(evIt)->first);
-				auto& choiceColor =
-					isCurrValid && !isNextValid ?
-					_purple : _pink;
+				auto& choiceColor = isCurrValid && !isNextValid ? _purple : _pink;
 				for (auto& eventChoice : eventSet.second->getChoices())
 				{
 					std::ostringstream rowOpt;
@@ -2122,16 +2231,181 @@ void TechTreeViewerState::handleMissionScript()
 }
 
 /**
+* Is month trigger for Arc/Event/Mission Script valid?
+*/
+bool TechTreeViewerState::isValidMonthTrigger(const RuleArcScript *ruleArc, const RuleEventScript *ruleEvent, const RuleMissionScript *ruleMission) const
+{
+	if (ruleArc != 0)
+	{
+		return (ruleArc->getFirstMonth() <= _currMonth &&
+			(ruleArc->getLastMonth() >= _currMonth ||
+				ruleArc->getLastMonth() == -1));
+	}
+	else if (ruleEvent != 0)
+	{
+		return (ruleEvent->getFirstMonth() <= _currMonth &&
+			(ruleEvent->getLastMonth() >= _currMonth ||
+				ruleEvent->getLastMonth() == -1));
+	}
+	else if (ruleMission != 0)
+	{
+		return (ruleMission->getFirstMonth() <= _currMonth &&
+			(ruleMission->getLastMonth() >= _currMonth ||
+				ruleMission->getLastMonth() == -1));
+	}
+	return false;
+}
+
+/**
+* Is difficulty trigger for Arc/Event/Mission Script valid?
+*/
+bool TechTreeViewerState::isValidDiffTrigger(const RuleArcScript *ruleArc, const RuleEventScript *ruleEvent, const RuleMissionScript *ruleMission) const
+{
+	if (ruleArc != 0)
+	{
+		return (ruleArc->getMinDifficulty() <= _currDiff &&
+			ruleArc->getMaxDifficulty() >= _currDiff);
+	}
+	else if (ruleEvent != 0)
+	{
+		return (ruleEvent->getMinDifficulty() <= _currDiff &&
+			ruleEvent->getMaxDifficulty() >= _currDiff);
+	}
+	else if (ruleMission != 0)
+	{
+		return (ruleMission->getMinDifficulty() <= _currDiff);
+	}
+	return false;
+}
+
+/**
+* Is score trigger for Arc/Event/Mission Script valid?
+*/
+bool TechTreeViewerState::isValidScoreTrigger(const RuleArcScript *ruleArc, const RuleEventScript *ruleEvent, const RuleMissionScript *ruleMission) const
+{
+	if (ruleArc != 0)
+	{
+		return (ruleArc->getMinScore() <= _currScore &&
+			ruleArc->getMaxScore() >= _currScore);
+	}
+	else if (ruleEvent != 0)
+	{
+		return (ruleEvent->getMinScore() <= _currScore &&
+			ruleEvent->getMaxScore() >= _currScore);
+	}
+	else if (ruleMission != 0)
+	{
+		return (ruleMission->getMinScore() <= _currScore &&
+			ruleMission->getMaxScore() >= _currScore);
+	}
+	return false;
+}
+
+/**
+* Is funds trigger for Arc/Event/Mission Script valid?
+*/
+bool TechTreeViewerState::isValidFundsTrigger(const RuleArcScript *ruleArc, const RuleEventScript *ruleEvent, const RuleMissionScript *ruleMission) const
+{
+	if (ruleArc != 0)
+	{
+		return (ruleArc->getMinFunds() <= _currFunds &&
+			ruleArc->getMaxFunds() >= _currFunds);
+	}
+	else if (ruleEvent != 0)
+	{
+		return (ruleEvent->getMinFunds() <= _currFunds &&
+			ruleEvent->getMaxFunds() >= _currFunds);
+	}
+	else if (ruleMission != 0)
+	{
+		return (ruleMission->getMinFunds() <= _currFunds &&
+			ruleMission->getMaxFunds() >= _currFunds);
+	}
+	return false;
+}
+
+/**
+* Is counter trigger for Arc/Event/Mission Script valid?
+*/
+bool TechTreeViewerState::isValidCounterTrigger(const RuleArcScript *ruleArc, const RuleEventScript *ruleEvent, const RuleMissionScript *ruleMission) const
+{
+	if (ruleArc != 0)
+	{
+		if (ruleArc->getCounterMin() > 0)
+		{
+			if (!ruleArc->getMissionVarName().empty() && ruleArc->getCounterMin() >
+				_save->getAlienStrategy().getMissionsRun(ruleArc->getMissionVarName()))
+				return false;
+			if (!ruleArc->getMissionMarkerName().empty() && ruleArc->getCounterMin() >
+				_save->getLastId(ruleArc->getMissionMarkerName()))
+				return false;
+		}
+		if (ruleArc->getCounterMax() != -1)
+		{
+			if (!ruleArc->getMissionVarName().empty() && ruleArc->getCounterMax() <
+				_save->getAlienStrategy().getMissionsRun(ruleArc->getMissionVarName()))
+				return false;
+			if (!ruleArc->getMissionMarkerName().empty() && ruleArc->getCounterMax() <
+				_save->getLastId(ruleArc->getMissionMarkerName()))
+				return false;
+		}
+		return true;
+	}
+	else if (ruleEvent != 0)
+	{
+		if (ruleEvent->getCounterMin() > 0)
+		{
+			if (!ruleEvent->getMissionVarName().empty() && ruleEvent->getCounterMin() >
+				_save->getAlienStrategy().getMissionsRun(ruleEvent->getMissionVarName()))
+				return false;
+			if (!ruleEvent->getMissionMarkerName().empty() && ruleEvent->getCounterMin() >
+				_save->getLastId(ruleEvent->getMissionMarkerName()))
+				return false;
+		}
+		if (ruleEvent->getCounterMax() != -1)
+		{
+			if (!ruleEvent->getMissionVarName().empty() && ruleEvent->getCounterMax() <
+				_save->getAlienStrategy().getMissionsRun(ruleEvent->getMissionVarName()))
+				return false;
+			if (!ruleEvent->getMissionMarkerName().empty() && ruleEvent->getCounterMax() <
+				_save->getLastId(ruleEvent->getMissionMarkerName()))
+				return false;
+		}
+		return true;
+	}
+	else if (ruleMission != 0)
+	{
+		if (ruleMission->getCounterMin() > 0)
+		{
+			if (!ruleMission->getMissionVarName().empty() && ruleMission->getCounterMin() >
+				_save->getAlienStrategy().getMissionsRun(ruleMission->getMissionVarName()))
+				return false;
+			if (!ruleMission->getMissionMarkerName().empty() && ruleMission->getCounterMin() >
+				_save->getLastId(ruleMission->getMissionMarkerName()))
+				return false;
+		}
+		if (ruleMission->getCounterMax() != -1)
+		{
+			if (!ruleMission->getMissionVarName().empty() && ruleMission->getCounterMax() <
+				_save->getAlienStrategy().getMissionsRun(ruleMission->getMissionVarName()))
+				return false;
+			if (!ruleMission->getMissionMarkerName().empty() && ruleMission->getCounterMax() <
+				_save->getLastId(ruleMission->getMissionMarkerName()))
+				return false;
+		}
+		return true;
+	}
+	return false;
+}
+
+/**
  * Are the defining triggers of the Arc valid?
  * @param string name of the Arc Script.
  */
 bool TechTreeViewerState::isPossibleArc(const RuleArcScript* ruleArc) const
 {
-	if ((ruleArc->getMinDifficulty() <= _currDiff &&
-			ruleArc->getMaxDifficulty() >= _currDiff) &&
-		(ruleArc->getFirstMonth() <= _currMonth &&
-			(ruleArc->getLastMonth() >= _currMonth ||
-			ruleArc->getLastMonth() == -1)))
+	if (isValidDiffTrigger(ruleArc) &&
+		isValidMonthTrigger(ruleArc))
 		return true;
 	return false;
 }
@@ -2142,11 +2416,8 @@ bool TechTreeViewerState::isPossibleArc(const RuleArcScript* ruleArc) const
  */
 bool TechTreeViewerState::isPossibleEvent(const RuleEventScript* ruleEvent) const
 {
-	if ((ruleEvent->getMinDifficulty() <= _currDiff &&
-			ruleEvent->getMaxDifficulty() >= _currDiff) &&
-		(ruleEvent->getFirstMonth() <= _currMonth &&
-			(ruleEvent->getLastMonth() >= _currMonth ||
-			ruleEvent->getLastMonth() == -1)))
+	if (isValidDiffTrigger(0, ruleEvent) &&
+		isValidMonthTrigger(0, ruleEvent))
 		return true;
 	return false;
 }
@@ -2157,10 +2428,8 @@ bool TechTreeViewerState::isPossibleEvent(const RuleEventScript* ruleEvent) cons
  */
 bool TechTreeViewerState::isPossibleMission(const RuleMissionScript* ruleMission) const
 {
-	if ((ruleMission->getMinDifficulty() <= _currDiff) &&
-		(ruleMission->getFirstMonth() <= _currMonth &&
-			(ruleMission->getLastMonth() >= _currMonth ||
-			ruleMission->getLastMonth() == -1)))
+	if (isValidDiffTrigger(0, 0, ruleMission) &&
+		isValidMonthTrigger(0, 0, ruleMission))
 		return true;
 	return false;
 }
@@ -2333,15 +2602,10 @@ bool TechTreeViewerState::isDiscoveredCraft(const std::string &topic) const
  */
 bool TechTreeViewerState::isGuaranteedArc(const RuleArcScript* ruleArc) const
 {
-	if ((ruleArc->getMinDifficulty() <= _currDiff &&
-			ruleArc->getMaxDifficulty() >= _currDiff) &&
-		(ruleArc->getFirstMonth() <= _currMonth &&
-			(ruleArc->getLastMonth() >= _currMonth ||
-			ruleArc->getLastMonth() == -1)) &&
-		(ruleArc->getMinScore() <= _currScore &&
-			ruleArc->getMaxScore() >= _currScore) &&
-		(ruleArc->getMinFunds() <= _currFunds &&
-			ruleArc->getMaxFunds() >= _currFunds))
+	if (isValidDiffTrigger(ruleArc) &&
+		isValidMonthTrigger(ruleArc) &&
+		isValidScoreTrigger(ruleArc) &&
+		isValidFundsTrigger(ruleArc))
 		return true;
 	return false;
 }
@@ -2352,15 +2616,10 @@ bool TechTreeViewerState::isGuaranteedArc(const RuleArcScript* ruleArc) const
  */
 bool TechTreeViewerState::isGuaranteedEvent(const RuleEventScript* ruleEvent) const
 {
-	if ((ruleEvent->getMinDifficulty() <= _currDiff &&
-			ruleEvent->getMaxDifficulty() >= _currDiff) &&
-		(ruleEvent->getFirstMonth() <= _currMonth &&
-			(ruleEvent->getLastMonth() >= _currMonth ||
-			ruleEvent->getLastMonth() == -1)) &&
-		(ruleEvent->getMinScore() <= _currScore &&
-			ruleEvent->getMaxScore() >= _currScore) &&
-		(ruleEvent->getMinFunds() <= _currFunds &&
-			ruleEvent->getMaxFunds() >= _currFunds))
+	if (isValidDiffTrigger(0, ruleEvent) &&
+		isValidMonthTrigger(0, ruleEvent) &&
+		isValidScoreTrigger(0, ruleEvent) &&
+		isValidFundsTrigger(0, ruleEvent))
 		return true;
 	return false;
 }
@@ -2371,14 +2630,10 @@ bool TechTreeViewerState::isGuaranteedEvent(const RuleEventScript* ruleEvent) co
  */
 bool TechTreeViewerState::isGuaranteedMission(const RuleMissionScript* ruleMission) const
 {
-	if ((ruleMission->getMinDifficulty() <= _currDiff) &&
-		(ruleMission->getFirstMonth() <= _currMonth &&
-			(ruleMission->getLastMonth() >= _currMonth ||
-			ruleMission->getLastMonth() == -1)) &&
-		(ruleMission->getMinScore() <= _currScore &&
-			ruleMission->getMaxScore() >= _currScore) &&
-		(ruleMission->getMinFunds() <= _currFunds &&
-			ruleMission->getMaxFunds() >= _currFunds))
+	if (isValidDiffTrigger(0, 0, ruleMission) &&
+		isValidMonthTrigger(0, 0, ruleMission) &&
+		isValidScoreTrigger(0, 0, ruleMission) &&
+		isValidFundsTrigger(0, 0, ruleMission))
 		return true;
 	return false;
 }
