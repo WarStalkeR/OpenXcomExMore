@@ -75,6 +75,11 @@ private:
 	void handleArcScript();
 	void handleEventScript();
 	void handleMissionScript();
+	bool isValidMonthTrigger(const RuleArcScript *ruleArc = 0, const RuleEventScript *ruleEvent = 0, const RuleMissionScript *ruleMission = 0) const;
+	bool isValidDiffTrigger(const RuleArcScript *ruleArc = 0, const RuleEventScript *ruleEvent = 0, const RuleMissionScript *ruleMission = 0) const;
+	bool isValidScoreTrigger(const RuleArcScript *ruleArc = 0, const RuleEventScript *ruleEvent = 0, const RuleMissionScript *ruleMission = 0) const;
+	bool isValidFundsTrigger(const RuleArcScript *ruleArc = 0, const RuleEventScript *ruleEvent = 0, const RuleMissionScript *ruleMission = 0) const;
+	bool isValidCounterTrigger(const RuleArcScript *ruleArc = 0, const RuleEventScript *ruleEvent = 0, const RuleMissionScript *ruleMission = 0) const;
 	bool isPossibleArc(const RuleArcScript* ruleArc) const;
 	bool isPossibleEvent(const RuleEventScript* ruleEvent) const;
 	bool isPossibleMission(const RuleMissionScript* ruleMission) const;
