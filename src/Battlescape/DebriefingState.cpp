@@ -1201,6 +1201,7 @@ void DebriefingState::prepareDebriefing()
 			}
 			// this may cause the base to become disjointed, destroy the disconnected parts.
 			base->destroyDisconnectedFacilities();
+			base->syncCraftChanges();
 		}
 	}
 

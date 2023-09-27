@@ -1856,6 +1856,7 @@ void Base::damageFacilities(Ufo *ufo)
 	{
 		destroyDisconnectedFacilities();
 	}
+	syncCraftChanges();
 }
 
 /**
@@ -2201,7 +2202,6 @@ void Base::destroyFacility(BASEFACILITIESITERATOR facility)
 	_destroyedFacilitiesCache[(*facility)->getRules()] += 1;
 	delete *facility;
 	_facilities.erase(facility);
-	syncCraftChanges();
 }
 
 /**
