@@ -86,6 +86,7 @@ OPT bool oxceShowAdvancedDebugOptions;
 OPT bool oxceTechTreeDataView;
 OPT int oxceDataViewStringTrunc;
 OPT bool oxceDataViewCleanReplace;
+OPT int oxceDataViewStrTranslate;
 
 // OXCE hidden, accessible only via options.cfg
 OPT bool oxceFatFingerLinks;
