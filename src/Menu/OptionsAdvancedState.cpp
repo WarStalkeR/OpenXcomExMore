@@ -112,6 +112,11 @@ OptionsAdvancedState::OptionsAdvancedState(OptionsOrigin origin) : OptionsBaseSt
 			{
 				_settingsOxce.push_back(optionInfo);
 			}
+			else if (Options::oxceShowAdvancedDebugOptions &&
+				optionInfo.category() == "STR_ADV_DEBUG")
+			{
+				_settingsAdvDebug.push_back(optionInfo);
+			}
 		}
 	}
 }
@@ -146,6 +151,13 @@ void OptionsAdvancedState::init()
 	_lstOptions->addRow(2, tr("STR_OXCE").c_str(), "");
 	_lstOptions->setCellColor(_settingsGeneral.size() + 2 + _settingsGeo.size() + 2 + _settingsBattle.size() + 2, 0, _colorGroup);
 	addSettings(_settingsOxce);
+	if (Options::oxceShowAdvancedDebugOptions)
+	{
+		_lstOptions->addRow(2, "", "");
+		_lstOptions->addRow(2, tr("STR_ADV_DEBUG").c_str(), "");
+		_lstOptions->setCellColor(_settingsGeneral.size() + 2 + _settingsGeo.size() + 2 + _settingsBattle.size() + 2 + _settingsOxce.size() + 2, 0, _colorGroup);
+		addSettings(_settingsAdvDebug);
+	}
 }
 
 /**
@@ -205,6 +217,11 @@ OptionInfo *OptionsAdvancedState::getSetting(size_t sel)
 		sel <= _settingsGeneral.size() + 2 + _settingsGeo.size() + 2 + _settingsBattle.size() + 2 + _settingsOxce.size())
 	{
 		return &_settingsOxce[sel - 1 - _settingsGeneral.size() - 2 - _settingsGeo.size() - 2 - _settingsBattle.size() - 2];
+	}
+	else if (Options::oxceShowAdvancedDebugOptions && sel > _settingsGeneral.size() + 2 + _settingsGeo.size() + 2 + _settingsBattle.size() + 2 + _settingsOxce.size() + 2 &&
+		sel <= _settingsGeneral.size() + 2 + _settingsGeo.size() + 2 + _settingsBattle.size() + 2 + _settingsOxce.size() + 2 + _settingsAdvDebug.size())
+	{
+		return &_settingsAdvDebug[sel - 1 - _settingsGeneral.size() - 2 - _settingsGeo.size() - 2 - _settingsBattle.size() - 2 - _settingsOxce.size() - 2];
 	}
 	else
 	{
