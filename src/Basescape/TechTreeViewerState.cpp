@@ -24,11 +24,13 @@
 #include "../Mod/RuleArcScript.h"
 #include "../Mod/RuleBaseFacility.h"
 #include "../Mod/RuleCraft.h"
+#include "../Mod/RuleCountry.h"
 #include "../Mod/RuleEventScript.h"
 #include "../Mod/RuleInterface.h"
 #include "../Mod/RuleItem.h"
 #include "../Mod/RuleManufacture.h"
 #include "../Mod/RuleMissionScript.h"
+#include "../Mod/RuleRegion.h"
 #include "../Mod/RuleResearch.h"
 #include "../Mod/RuleSoldierTransformation.h"
 #include "../Engine/LocalizedText.h"
@@ -39,6 +41,9 @@
 #include "../Interface/TextButton.h"
 #include "../Interface/TextList.h"
 #include "../Savegame/AlienStrategy.h"
+#include "../Savegame/Base.h"
+#include "../Savegame/Region.h"
+#include "../Savegame/Country.h"
 #include "../Savegame/SavedGame.h"
 #include <algorithm>
 #include <unordered_set>
@@ -2105,22 +2110,150 @@ void TechTreeViewerState::handleEventScript()
 	_leftTopics.push_back("-");
 	_leftFlags.push_back(TTV_NONE);
 	row++; bTrigger.str(""); bTrigger.clear();
-	row++;
 
 	// 2. Research Trigger
-
+	const auto& resTriggers = rule->getResearchTriggers();
+	if (resTriggers.size() > 0)
+	{
+		_lstLeft->addRow(1, ""); _leftTopics.push_back("-"); _leftFlags.push_back(TTV_NONE); row++;
+		_lstLeft->addRow(1, tr("STR_TRIGGERS_RESEARCH").c_str());
+		_lstLeft->setRowColor(row, _white);
+		_leftTopics.push_back("-");
+		_leftFlags.push_back(TTV_NONE);
+		row++;
+		for (auto& resTrigger : resTriggers)
+		{
+			std::ostringstream rowRes;
+			rowRes << "  " << tr(resTrigger.first);
+			rowRes << ": " << std::boolalpha << resTrigger.second;
+			bool isResearched = (_save->isResearched(resTrigger.first) == resTrigger.second);
+			_lstLeft->addRow(1, rowRes.str().c_str());
+			_lstLeft->setRowColor(row, isResearched ? _purple : _pink);
+			_leftTopics.push_back("-");
+			_leftFlags.push_back(TTV_NONE);
+			row++;
+		}
+	}
 
 	// 3. Item Triggers
-
+	const auto& itemTriggers = rule->getItemTriggers();
+	if (itemTriggers.size() > 0)
+	{
+		_lstLeft->addRow(1, ""); _leftTopics.push_back("-"); _leftFlags.push_back(TTV_NONE); row++;
+		_lstLeft->addRow(1, tr("STR_TRIGGERS_ITEM").c_str());
+		_lstLeft->setRowColor(row, _white);
+		_leftTopics.push_back("-");
+		_leftFlags.push_back(TTV_NONE);
+		row++;
+		for (auto& itemTrigger : itemTriggers)
+		{
+			std::ostringstream rowItem;
+			rowItem << "  " << tr(itemTrigger.first);
+			rowItem << ": " << std::boolalpha << itemTrigger.second;
+			bool isObtained = (_save->isItemObtained(itemTrigger.first) == itemTrigger.second);
+			_lstLeft->addRow(1, rowItem.str().c_str());
+			_lstLeft->setRowColor(row, isObtained ? _purple : _pink);
+			_leftTopics.push_back("-");
+			_leftFlags.push_back(TTV_NONE);
+			row++;
+		}
+	}
 
 	// 4. Facility Triggers
-
+	const auto& facTriggers = rule->getFacilityTriggers();
+	if (facTriggers.size() > 0)
+	{
+		_lstLeft->addRow(1, ""); _leftTopics.push_back("-"); _leftFlags.push_back(TTV_NONE); row++;
+		_lstLeft->addRow(1, tr("STR_TRIGGERS_FACILITY").c_str());
+		_lstLeft->setRowColor(row, _white);
+		_leftTopics.push_back("-");
+		_leftFlags.push_back(TTV_NONE);
+		row++;
+		for (auto& facTrigger : facTriggers)
+		{
+			std::ostringstream rowFac;
+			rowFac << "  " << tr(facTrigger.first);
+			rowFac << ": " << std::boolalpha << facTrigger.second;
+			bool isConstructed = (_save->isFacilityBuilt(facTrigger.first) == facTrigger.second);
+			_lstLeft->addRow(1, rowFac.str().c_str());
+			_lstLeft->setRowColor(row, isConstructed ? _purple : _pink);
+			_leftTopics.push_back("-");
+			_leftFlags.push_back(TTV_NONE);
+			row++;
+		}
+	}
 
 	// 5. Soldier Triggers
-
+	const auto& crewTriggers = rule->getSoldierTypeTriggers();
+	if (crewTriggers.size() > 0)
+	{
+		_lstLeft->addRow(1, ""); _leftTopics.push_back("-"); _leftFlags.push_back(TTV_NONE); row++;
+		_lstLeft->addRow(1, tr("STR_TRIGGERS_SOLDIER").c_str());
+		_lstLeft->setRowColor(row, _white);
+		_leftTopics.push_back("-");
+		_leftFlags.push_back(TTV_NONE);
+		row++;
+		for (auto& crewTrigger : crewTriggers)
+		{
+			std::ostringstream rowCrew;
+			rowCrew << "  " << tr(crewTrigger.first);
+			rowCrew << ": " << std::boolalpha << crewTrigger.second;
+			bool isTypeHired = (_save->isSoldierTypeHired(crewTrigger.first) == crewTrigger.second);
+			_lstLeft->addRow(1, rowCrew.str().c_str());
+			_lstLeft->setRowColor(row, isTypeHired ? _purple : _pink);
+			_leftTopics.push_back("-");
+			_leftFlags.push_back(TTV_NONE);
+			row++;
+		}
+	}
 
 	// 6. Regional Triggers
-
+	const auto& regTriggers = rule->getXcomBaseInRegionTriggers();
+	const auto& terTriggers = rule->getXcomBaseInCountryTriggers();
+	if (regTriggers.size() > 0 || terTriggers.size() > 0)
+	{
+		_lstLeft->addRow(1, ""); _leftTopics.push_back("-"); _leftFlags.push_back(TTV_NONE); row++;
+		std::set<std::string> baseRegions;
+		std::set<std::string> baseCountries;
+		for (auto* xcomBase : *_save->getBases())
+		{
+			Region* region = _save->locateRegion(*xcomBase);
+			if (region) baseRegions.insert(region->getRules()->getType());
+			Country* country = _save->locateCountry(*xcomBase);
+			if (country) baseCountries.insert(country->getRules()->getType());
+		}
+		_lstLeft->addRow(1, tr("STR_TRIGGERS_REGIONAL").c_str());
+		_lstLeft->setRowColor(row, _white);
+		_leftTopics.push_back("-");
+		_leftFlags.push_back(TTV_NONE);
+		row++;
+		for (auto& regTrigger : regTriggers)
+		{
+			std::ostringstream rowReg;
+			rowReg << "  " << tr(regTrigger.first);
+			rowReg << ": " << std::boolalpha << regTrigger.second;
+			bool isRegFound = (baseRegions.find(regTrigger.first) != baseRegions.end());
+			bool isRegValid = isRegFound == regTrigger.second;
+			_lstLeft->addRow(1, rowReg.str().c_str());
+			_lstLeft->setRowColor(row, isRegValid ? _purple : _pink);
+			_leftTopics.push_back("-");
+			_leftFlags.push_back(TTV_NONE);
+			row++;
+		}
+		for (auto& terTrigger : terTriggers)
+		{
+			std::ostringstream rowTer;
+			rowTer << "  " << tr(terTrigger.first);
+			rowTer << ": " << std::boolalpha << terTrigger.second;
+			bool isTerFound = (baseCountries.find(terTrigger.first) != baseCountries.end());
+			bool isTerValid = isTerFound == terTrigger.second;
+			_lstLeft->addRow(1, rowTer.str().c_str());
+			_lstLeft->setRowColor(row, isTerValid ? _purple : _pink);
+			_leftTopics.push_back("-");
+			_leftFlags.push_back(TTV_NONE);
+			row++;
+		}
+	}
 
 	row = 0; // Right UI Panel Switch
 
