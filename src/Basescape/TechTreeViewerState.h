@@ -119,13 +119,13 @@ public:
 	/// Is given craft discovered/available for both purchase and usage/equipment?
 	bool isDiscoveredCraft(const std::string &topic) const;
 	/// Are all basic triggers of the Arc valid?
-	bool isGuaranteedArc(const RuleArcScript* ruleArc) const;
+	bool isGuaranteedArc(const std::string &strArc) const;
 	/// Are all basic triggers of the Event valid?
-	bool isGuaranteedEvent(const RuleEventScript* ruleEvent) const;
+	bool isGuaranteedEvent(const std::string &strEvent) const;
 	/// Are all basic triggers of the Mission valid?
-	bool isGuaranteedMission(const RuleMissionScript* ruleMission) const;
-	/// Appends to stream reverse-truncated string based on option value.
-	void strCut(std::ostringstream& refStream, const std::string& origString);
+	bool isGuaranteedMission(const std::string &strMission) const;
+	/// Processes string based on options and appends it to stream.
+	void strPush(std::ostringstream& refStream, const std::string& origString);
 	/// Replaces all underscores with spaces for better word wrapping.
 	const std::string cleanStr(const std::string& origString);
 };

@@ -355,7 +355,7 @@ void TechTreeViewerState::initLists()
 	{
 		std::ostringstream ss;
 		if (_selectedFlag > TTV_CRAFTS)
-			ss << cleanStr(tr(_selectedTopic)); // Data Viewer entries only
+			strPush(ss, _selectedTopic); // Data Viewer entries only
 		else ss << tr(_selectedTopic);
 
 		if (_selectedFlag == TTV_MANUFACTURING)
@@ -2137,7 +2137,7 @@ void TechTreeViewerState::handleEventScript()
 		{
 			std::ostringstream rowSeq;
 			rowSeq << "  ";
-			strCut(rowSeq, eventSeq);
+			strPush(rowSeq, eventSeq);
 			_lstRight->addRow(1, rowSeq.str().c_str());
 			_lstRight->setRowColor(row,
 				_save->wasEventGenerated(eventSeq) ?
@@ -2161,7 +2161,7 @@ void TechTreeViewerState::handleEventScript()
 		{
 			std::ostringstream rowRand;
 			rowRand << "  ";
-			strCut(rowRand, eventRand.first);
+			strPush(rowRand, eventRand.first);
 			rowRand << ": ";
 			rowRand << eventRand.second;
 			_lstRight->addRow(1, rowRand.str().c_str());
@@ -2197,15 +2197,15 @@ void TechTreeViewerState::handleEventScript()
 				_rightTopics.push_back("-");
 				_rightFlags.push_back(TTV_NONE);
 				row++;
-				bool isCurrValid = _currMonth >= eventSet.first;
+				bool isCurrValid = _currMonth >= (int)eventSet.first;
 				bool isNextValid = (std::next(evIt) != eventWeights.end()
-					&& _currMonth >= std::next(evIt)->first);
+					&& _currMonth >= (int)std::next(evIt)->first);
 				auto& choiceColor = isCurrValid && !isNextValid ? _purple : _pink;
 				for (auto& eventChoice : eventSet.second->getChoices())
 				{
 					std::ostringstream rowOpt;
 					rowOpt << "    ";
-					strCut(rowOpt, eventChoice.first);
+					strPush(rowOpt, eventChoice.first);
 					rowOpt << ": ";
 					rowOpt << eventChoice.second;
 					_lstRight->addRow(1, rowOpt.str().c_str());
@@ -2600,8 +2600,10 @@ bool TechTreeViewerState::isDiscoveredCraft(const std::string &topic) const
  * Are all basic triggers of the Arc valid?
  * @param string name of the Arc Script.
  */
-bool TechTreeViewerState::isGuaranteedArc(const RuleArcScript* ruleArc) const
+bool TechTreeViewerState::isGuaranteedArc(const std::string &strArc) const
 {
+	const RuleArcScript *ruleArc =
+		_game->getMod()->getArcScript(strArc);
 	if (isValidDiffTrigger(ruleArc) &&
 		isValidMonthTrigger(ruleArc) &&
 		isValidScoreTrigger(ruleArc) &&
@@ -2614,8 +2616,10 @@ bool TechTreeViewerState::isGuaranteedArc(const RuleArcScript* ruleArc) const
  * Are all basic triggers of the Event valid?
  * @param string name of the Event Script.
  */
-bool TechTreeViewerState::isGuaranteedEvent(const RuleEventScript* ruleEvent) const
+bool TechTreeViewerState::isGuaranteedEvent(const std::string &strEvent) const
 {
+	const RuleEventScript *ruleEvent =
+		_game->getMod()->getEventScript(strEvent);
 	if (isValidDiffTrigger(0, ruleEvent) &&
 		isValidMonthTrigger(0, ruleEvent) &&
 		isValidScoreTrigger(0, ruleEvent) &&
@@ -2628,8 +2632,10 @@ bool TechTreeViewerState::isGuaranteedEvent(const RuleEventScript* ruleEvent) co
  * Are all basic triggers of the Mission valid?
  * @param string name of the Mission Script.
  */
-bool TechTreeViewerState::isGuaranteedMission(const RuleMissionScript* ruleMission) const
+bool TechTreeViewerState::isGuaranteedMission(const std::string &strMission) const
 {
+	const RuleMissionScript *ruleMission =
+		_game->getMod()->getMissionScript(strMission);
 	if (isValidDiffTrigger(0, 0, ruleMission) &&
 		isValidMonthTrigger(0, 0, ruleMission) &&
 		isValidScoreTrigger(0, 0, ruleMission) &&
@@ -2639,22 +2645,18 @@ bool TechTreeViewerState::isGuaranteedMission(const RuleMissionScript* ruleMissi
 }
 
 /**
- * Appends to stream reverse-truncated string based on option value.
+ * Processes string based on options and appends it to stream.
  * @param stream reference, where to new value will be pushed.
  * @param original string reference.
  */
-void TechTreeViewerState::strCut(std::ostringstream& refStream, const std::string& origString)
+void TechTreeViewerState::strPush(std::ostringstream& refStream, const std::string& origString)
 {
-	size_t length = Options::oxceDataViewStringTrunc;
-	std::string newString = cleanStr(origString);
-	if (length == 0 || newString.size() <= length)
-	{
-		refStream << newString;
-	}
-	else
-	{
-		refStream << newString.substr(newString.size() - length);
-	}
+	std::string newString = origString;
+	size_t trLen = Options::oxceDataViewStringTrunc;
+	if (Options::oxceDataViewStrTranslate) newString = tr(newString);
+	if (Options::oxceDataViewCleanReplace) newString = cleanStr(newString);
+	if (trLen == 0 || newString.size() <= trLen) refStream << newString;
+	else refStream << newString.substr(newString.size() - trLen);
 }
 
 /**
@@ -2665,17 +2667,12 @@ void TechTreeViewerState::strCut(std::ostringstream& refStream, const std::strin
  */
 const std::string TechTreeViewerState::cleanStr(const std::string& origString)
 {
-	if (Options::oxceDataViewCleanReplace)
-	{
-		size_t pos;
-		std::string cleanString = origString;
-		while ((pos = cleanString.find("STR_")) != std::string::npos)
-			cleanString.erase(pos, 4); // Removing "STR_" to conserve space.
-		std::replace(cleanString.begin(), cleanString.end(), '_', ' ');
-		// Data Viewer entries are unlikely to use '_' so it should be fine.
-		return cleanString;
-	}
-	else return origString;
+	std::string cleanString = origString;
+	size_t pos = cleanString.find("STR_"); // Removing "STR_" from string.
+	if (pos != std::string::npos && pos == 0) cleanString.erase(pos, 4);
+	std::replace(cleanString.begin(), cleanString.end(), '_', ' ');
+	// Data Viewer entries are unlikely to use '_' so it should be fine.
+	return cleanString;
 }
 
 }
