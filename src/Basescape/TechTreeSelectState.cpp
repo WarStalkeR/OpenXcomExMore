@@ -314,7 +314,7 @@ void TechTreeSelectState::initLists()
 
 		for (auto& arcScript : *_game->getMod()->getArcScriptList())
 		{
-			std::string arcName = tr(arcScript);
+			std::string arcName = arcScript;
 			Unicode::upperCase(arcName);
 			if (searchString == "ASCRIPT")
 			{
@@ -327,10 +327,13 @@ void TechTreeSelectState::initLists()
 
 			_availableTopics.push_back(arcScript);
 			std::ostringstream ss;
-			ss << _parent->cleanStr(tr(arcScript));
+			_parent->strPush(ss, arcScript);
 			ss << tr("STR_AS_FLAG");
 			_lstTopics->addRow(1, ss.str().c_str());
-			_lstTopics->setRowColor(row, _lstTopics->getSecondaryColor());
+			if (!_parent->isGuaranteedArc(arcScript))
+			{
+				_lstTopics->setRowColor(row, _lstTopics->getSecondaryColor());
+			}
 			++row;
 		}
 
@@ -338,7 +341,7 @@ void TechTreeSelectState::initLists()
 
 		for (auto& eventScript : *_game->getMod()->getEventScriptList())
 		{
-			std::string eventName = tr(eventScript);
+			std::string eventName = eventScript;
 			Unicode::upperCase(eventName);
 			if (searchString == "ESCRIPT")
 			{
@@ -351,10 +354,13 @@ void TechTreeSelectState::initLists()
 
 			_availableTopics.push_back(eventScript);
 			std::ostringstream ss;
-			ss << _parent->cleanStr(tr(eventScript));
+			_parent->strPush(ss, eventScript);
 			ss << tr("STR_ES_FLAG");
 			_lstTopics->addRow(1, ss.str().c_str());
-			_lstTopics->setRowColor(row, _lstTopics->getSecondaryColor());
+			if (!_parent->isGuaranteedEvent(eventScript))
+			{
+				_lstTopics->setRowColor(row, _lstTopics->getSecondaryColor());
+			}
 			++row;
 		}
 
@@ -362,7 +368,7 @@ void TechTreeSelectState::initLists()
 
 		for (auto& missionScript : *_game->getMod()->getMissionScriptList())
 		{
-			std::string missionName = tr(missionScript);
+			std::string missionName = missionScript;
 			Unicode::upperCase(missionName);
 			if (searchString == "MSCRIPT")
 			{
@@ -375,10 +381,13 @@ void TechTreeSelectState::initLists()
 
 			_availableTopics.push_back(missionScript);
 			std::ostringstream ss;
-			ss << _parent->cleanStr(tr(missionScript));
+			_parent->strPush(ss, missionScript);
 			ss << tr("STR_MS_FLAG");
 			_lstTopics->addRow(1, ss.str().c_str());
-			_lstTopics->setRowColor(row, _lstTopics->getSecondaryColor());
+			if (!_parent->isGuaranteedMission(missionScript))
+			{
+				_lstTopics->setRowColor(row, _lstTopics->getSecondaryColor());
+			}
 			++row;
 		}
 	}

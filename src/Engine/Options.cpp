@@ -236,6 +236,7 @@ void create()
 	_info.push_back(OptionInfo("oxceTechTreeDataView", &oxceTechTreeDataView, false, "STR_GAME_DATA_VIEWER_OPTION", "STR_ADV_DEBUG"));
 	_info.push_back(OptionInfo("oxceDataViewStringTrunc", &oxceDataViewStringTrunc, 0, "STR_DATA_VIEWER_STRING_TRUNC", "STR_ADV_DEBUG"));
 	_info.push_back(OptionInfo("oxceDataViewCleanReplace", &oxceDataViewCleanReplace, true, "STR_DATA_VIEWER_CLEAN_REPLACE", "STR_ADV_DEBUG"));
+	_info.push_back(OptionInfo("oxceDataViewStrTranslate", &oxceDataViewStrTranslate, false, "STR_DATA_VIEWER_TRANSLATE", "STR_ADV_DEBUG"));
 
 	// OXCE hidden
 #ifdef __MOBILE__
