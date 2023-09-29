@@ -2007,13 +2007,13 @@ void TechTreeViewerState::handleArcScript()
 
 	// 1b. First/Last Month
 	bTrigger << "  " << tr("STR_TRIGGER_MONTH") << " ";
-	if (rule->getFirstMonth() == 0) bTrigger << tr("STR_TRIGGER_MONTH_0");
-	else bTrigger << tr("STR_TRIGGER_MONTH_X") << " " << rule->getFirstMonth();
+	if (rule->getFirstMonth() == 0) bTrigger << tr("STR_TRMONTH_FIRST");
+	else bTrigger << tr("STR_TRMONTH_LATER") << " " << rule->getFirstMonth();
 	if (rule->getFirstMonth() != rule->getLastMonth())
 	{
 		if (rule->getLastMonth() == -1) bTrigger << " " << tr("STR_TRSIGN_UP");
 		else bTrigger << " " << tr("STR_TRSIGN_MID") << " " <<
-			tr("STR_TRIGGER_MONTH_X") << " " << rule->getLastMonth();
+			tr("STR_TRMONTH_LATER") << " " << rule->getLastMonth();
 	}
 	bool isValidTrigger = isValidMonthTrigger(rule);
 	_lstLeft->addRow(1, bTrigger.str().c_str());
@@ -2024,11 +2024,11 @@ void TechTreeViewerState::handleArcScript()
 
 	// 1c. Min/Max Difficulty
 	bTrigger << "  " << tr("STR_TRIGGER_DIFFICULTY") << " ";
-	bTrigger << tr("STR_TRIGGER_DIFF_" + std::to_string(rule->getMinDifficulty()));
+	bTrigger << tr("STR_TRDIFF_LVL_" + std::to_string(rule->getMinDifficulty()));
 	if (rule->getMinDifficulty() != rule->getMaxDifficulty())
 	{
 		bTrigger << " " << tr("STR_TRSIGN_MID") << " ";
-		bTrigger << tr("STR_TRIGGER_DIFF_" + std::to_string(rule->getMaxDifficulty()));
+		bTrigger << tr("STR_TRDIFF_LVL_" + std::to_string(rule->getMaxDifficulty()));
 	}
 	isValidTrigger = isValidDiffTrigger(rule);
 	_lstLeft->addRow(1, bTrigger.str().c_str());
@@ -2100,11 +2100,11 @@ void TechTreeViewerState::handleArcScript()
 	_leftFlags.push_back(TTV_NONE);
 	row++; bTrigger.str(""); bTrigger.clear();
 
-	// 1g. Max Arcs Number
+	// 1g. Max Arcs Limit
 	const auto& arcSeqResearch = rule->getSequentialArcs();
 	const auto& arcRandResearch = rule->getRandomArcs();
-	bTrigger << "  " << tr("STR_ARC_MAXLIMIT") << " ";
-	if (rule->getMaxArcs() < 0) bTrigger << tr("STR_ARC_LIMIT_NONE");
+	bTrigger << "  " << tr("STR_TRIGGER_ARCLIMIT") << " ";
+	if (rule->getMaxArcs() < 0) bTrigger << tr("STR_TRARCLIM_NONE");
 	else bTrigger << rule->getMaxArcs();
 	bool isValidAmount = (rule->getMaxArcs() == -1);
 	if (rule->getMaxArcs() > -1)
@@ -2329,13 +2329,13 @@ void TechTreeViewerState::handleEventScript()
 
 	// 1b. First/Last Month
 	bTrigger << "  " << tr("STR_TRIGGER_MONTH") << " ";
-	if (rule->getFirstMonth() == 0) bTrigger << tr("STR_TRIGGER_MONTH_0");
-	else bTrigger << tr("STR_TRIGGER_MONTH_X") << " " << rule->getFirstMonth();
+	if (rule->getFirstMonth() == 0) bTrigger << tr("STR_TRMONTH_FIRST");
+	else bTrigger << tr("STR_TRMONTH_LATER") << " " << rule->getFirstMonth();
 	if (rule->getFirstMonth() != rule->getLastMonth())
 	{
 		if (rule->getLastMonth() == -1) bTrigger << " " << tr("STR_TRSIGN_UP");
 		else bTrigger << " " << tr("STR_TRSIGN_MID") << " " <<
-			tr("STR_TRIGGER_MONTH_X") << " " << rule->getLastMonth();
+			tr("STR_TRMONTH_LATER") << " " << rule->getLastMonth();
 	}
 	bool isValidTrigger = isValidMonthTrigger(0, rule);
 	_lstLeft->addRow(1, bTrigger.str().c_str());
@@ -2346,11 +2346,11 @@ void TechTreeViewerState::handleEventScript()
 
 	// 1c. Min/Max Difficulty
 	bTrigger << "  " << tr("STR_TRIGGER_DIFFICULTY") << " ";
-	bTrigger << tr("STR_TRIGGER_DIFF_" + std::to_string(rule->getMinDifficulty()));
+	bTrigger << tr("STR_TRDIFF_LVL_" + std::to_string(rule->getMinDifficulty()));
 	if (rule->getMinDifficulty() != rule->getMaxDifficulty())
 	{
 		bTrigger << " " << tr("STR_TRSIGN_MID") << " ";
-		bTrigger << tr("STR_TRIGGER_DIFF_" + std::to_string(rule->getMaxDifficulty()));
+		bTrigger << tr("STR_TRDIFF_LVL_" + std::to_string(rule->getMaxDifficulty()));
 	}
 	isValidTrigger = isValidDiffTrigger(0, rule);
 	_lstLeft->addRow(1, bTrigger.str().c_str());
@@ -2644,8 +2644,8 @@ void TechTreeViewerState::handleEventScript()
 			{
 				std::ostringstream rowSet;
 				rowSet << "  ";
-				if (eventSet.first == 0) rowSet << tr("STR_EVENT_AT_START");
-				else rowSet << tr("STR_EVENT_AT_MONTH").arg(eventSet.first);
+				if (eventSet.first == 0) rowSet << tr("STR_CASE_AT_START");
+				else rowSet << tr("STR_CASE_AT_MONTH").arg(eventSet.first);
 				_lstRight->addRow(1, rowSet.str().c_str());
 				_lstRight->setRowColor(row, _blue);
 				_rightTopics.push_back("-");
@@ -2682,6 +2682,464 @@ void TechTreeViewerState::handleMissionScript()
 	const RuleMissionScript *rule = _game->getMod()->getMissionScript(_selectedTopic);
 	if (rule == 0)
 		return;
+
+	// 1. Basic Triggers
+	_lstLeft->addRow(1, tr("STR_TRIGGERS_BASIC").c_str());
+	_lstLeft->setRowColor(row, _white);
+	_leftTopics.push_back("-");
+	_leftFlags.push_back(TTV_NONE);
+	row++;
+	std::ostringstream bTrigger;
+
+	// 1a. Execution Odds
+	bTrigger << "  " << tr("STR_TRIGGER_ODDS") << " ";
+	bTrigger << Unicode::formatPercentage(rule->getExecutionOdds());
+	_lstLeft->addRow(1, bTrigger.str().c_str());
+	_lstLeft->setRowColor(row, _gold);
+	_leftTopics.push_back("-");
+	_leftFlags.push_back(TTV_NONE);
+	row++; bTrigger.str(""); bTrigger.clear();
+
+	// 1b. First/Last Month
+	bTrigger << "  " << tr("STR_TRIGGER_MONTH") << " ";
+	if (rule->getFirstMonth() == 0) bTrigger << tr("STR_TRMONTH_FIRST");
+	else bTrigger << tr("STR_TRMONTH_LATER") << " " << rule->getFirstMonth();
+	if (rule->getFirstMonth() != rule->getLastMonth())
+	{
+		if (rule->getLastMonth() == -1) bTrigger << " " << tr("STR_TRSIGN_UP");
+		else bTrigger << " " << tr("STR_TRSIGN_MID") << " " <<
+			tr("STR_TRMONTH_LATER") << " " << rule->getLastMonth();
+	}
+	bool isValidTrigger = isValidMonthTrigger(0, 0, rule);
+	_lstLeft->addRow(1, bTrigger.str().c_str());
+	_lstLeft->setRowColor(row, isValidTrigger ? _purple : _pink);
+	_leftTopics.push_back("-");
+	_leftFlags.push_back(TTV_NONE);
+	row++; bTrigger.str(""); bTrigger.clear();
+
+	// 1c. Min/Max Difficulty
+	bTrigger << "  " << tr("STR_TRIGGER_DIFFICULTY") << " ";
+	bTrigger << tr("STR_TRDIFF_LVL_" + std::to_string(rule->getMinDifficulty()));
+	if (rule->getMinDifficulty() < 4) bTrigger << " " << tr("STR_TRSIGN_UP");
+	isValidTrigger = isValidDiffTrigger(0, 0, rule);
+	_lstLeft->addRow(1, bTrigger.str().c_str());
+	_lstLeft->setRowColor(row, isValidTrigger ? _purple : _pink);
+	_leftTopics.push_back("-");
+	_leftFlags.push_back(TTV_NONE);
+	row++; bTrigger.str(""); bTrigger.clear();
+
+	// 1d. Min/Max Score
+	bTrigger << "  " << tr("STR_TRIGGER_SCORE") << " ";
+	if (rule->getMinScore() == INT_MIN && rule->getMaxScore() == INT_MAX)
+		bTrigger << tr("STR_TRSCORE_NONE");
+	else
+	{
+		if (rule->getMinScore() > INT_MIN) bTrigger << rule->getMinScore() << " ";
+		else bTrigger << tr("STR_TRSIGN_UP") << " ";
+		if (rule->getMinScore() > INT_MIN && rule->getMaxScore() < INT_MAX)
+			bTrigger << tr("STR_TRSIGN_MID") << " ";
+		if (rule->getMaxScore() < INT_MAX) bTrigger << rule->getMaxScore();
+		else bTrigger << tr("STR_TRSIGN_UP");
+	}
+	isValidTrigger = isValidScoreTrigger(0, 0, rule);
+	_lstLeft->addRow(1, bTrigger.str().c_str());
+	_lstLeft->setRowColor(row, isValidTrigger ? _purple : _pink);
+	_leftTopics.push_back("-");
+	_leftFlags.push_back(TTV_NONE);
+	row++; bTrigger.str(""); bTrigger.clear();
+
+	// 1e. Min/Max Funds
+	bTrigger << "  " << tr("STR_TRIGGER_FUNDS") << " ";
+	if (rule->getMinFunds() == INT64_MIN && rule->getMaxFunds() == INT64_MAX)
+		bTrigger << tr("STR_TRFUNDS_NONE");
+	else
+	{
+		if (rule->getMinFunds() > INT64_MIN) bTrigger <<
+			Unicode::formatFunding(rule->getMinFunds()) << " ";
+		else bTrigger << tr("STR_TRSIGN_UP") << " ";
+		if (rule->getMinFunds() > INT64_MIN && rule->getMaxFunds() < INT64_MAX)
+			bTrigger << tr("STR_TRSIGN_MID") << " ";
+		if (rule->getMaxFunds() < INT64_MAX) bTrigger <<
+			Unicode::formatFunding(rule->getMaxFunds());
+		else bTrigger << tr("STR_TRSIGN_UP");
+	}
+	isValidTrigger = isValidFundsTrigger(0, 0, rule);
+	_lstLeft->addRow(1, bTrigger.str().c_str());
+	_lstLeft->setRowColor(row, isValidTrigger ? _purple : _pink);
+	_leftTopics.push_back("-");
+	_leftFlags.push_back(TTV_NONE);
+	row++; bTrigger.str(""); bTrigger.clear();
+
+	// 1f. Min/Max Counter
+	bTrigger << "  " << tr("STR_TRIGGER_COUNTER") << " ";
+	if (rule->getMissionVarName().empty() && rule->getMissionMarkerName().empty())
+		bTrigger << tr("STR_TRCOUNT_NONE");
+	else if (rule->getCounterMin() == 0 && rule->getCounterMax() == -1)
+		bTrigger << tr("STR_TRCOUNT_NONE");
+	else
+	{
+		if (rule->getCounterMin() > 0) bTrigger << rule->getCounterMin() << " ";
+		else bTrigger << tr("STR_TRSIGN_UP") << " ";
+		if (rule->getCounterMin() > 0 && rule->getCounterMax() != -1)
+			bTrigger << tr("STR_TRSIGN_MID") << " ";
+		if (rule->getCounterMax() != 1) bTrigger << rule->getCounterMax();
+	}
+	isValidTrigger = isValidCounterTrigger(0, 0, rule);
+	_lstLeft->addRow(1, bTrigger.str().c_str());
+	_lstLeft->setRowColor(row, isValidTrigger ? _purple : _pink);
+	_leftTopics.push_back("-");
+	_leftFlags.push_back(TTV_NONE);
+	row++; bTrigger.str(""); bTrigger.clear();
+
+	// 2. Mission Triggers
+	_lstLeft->addRow(1, ""); _leftTopics.push_back("-"); _leftFlags.push_back(TTV_NONE); row++;
+	_lstLeft->addRow(1, tr("STR_TRIGGERS_MISSION").c_str());
+	_lstLeft->setRowColor(row, _white);
+	_leftTopics.push_back("-");
+	_leftFlags.push_back(TTV_NONE);
+	row++;
+
+	// 2a. Target Base Odds
+	bTrigger << "  " << tr("STR_TRIGGER_BASE") << " ";
+	bTrigger << Unicode::formatPercentage(rule->getTargetBaseOdds());
+	_lstLeft->addRow(1, bTrigger.str().c_str());
+	_lstLeft->setRowColor(row, _gold);
+	_leftTopics.push_back("-");
+	_leftFlags.push_back(TTV_NONE);
+	row++; bTrigger.str(""); bTrigger.clear();
+
+	// 2b. Execution Label
+	bTrigger << "  " << tr("STR_TRIGGER_LABEL") << " ";
+	if (rule->getLabel() == 0)
+		bTrigger << tr("STR_TRLABEL_NONE");
+	else bTrigger << rule->getLabel();
+	_lstLeft->addRow(1, bTrigger.str().c_str());
+	_lstLeft->setRowColor(row, _blue);
+	_leftTopics.push_back("-");
+	_leftFlags.push_back(TTV_NONE);
+	row++; bTrigger.str(""); bTrigger.clear();
+
+	// 2c. Start/Random Delay
+	bTrigger << "  " << tr("STR_TRIGGER_DELAY") << " ";
+	bTrigger << rule->getBaseDelay();
+	if (rule->getRandomDelay() > 0)
+	{
+		bTrigger << " " << tr("STR_TRSIGN_MID");
+		bTrigger << " " << (rule->getBaseDelay()
+			+ rule->getRandomDelay());
+	}
+	bTrigger << " " << tr("STR_TRDELAY_MINUTES");
+	_lstLeft->addRow(1, bTrigger.str().c_str());
+	_lstLeft->setRowColor(row, _blue);
+	_leftTopics.push_back("-");
+	_leftFlags.push_back(TTV_NONE);
+	row++; bTrigger.str(""); bTrigger.clear();
+
+	// 2d. Conditionals
+	bTrigger << "  " << tr("STR_TRIGGER_CONDS") << " ";
+	const auto& numConditions = rule->getConditionals();
+	if (numConditions.size() > 0)
+	{
+		for (size_t i = 0; i < numConditions.size(); ++i)
+		{
+			if (i != 0) bTrigger << ", ";
+			bTrigger << numConditions[i];
+		}
+	}
+	else bTrigger << tr("STR_TRCONDS_NONE");
+	_lstLeft->addRow(1, bTrigger.str().c_str());
+	_lstLeft->setRowColor(row, _blue);
+	_leftTopics.push_back("-");
+	_leftFlags.push_back(TTV_NONE);
+	row++; bTrigger.str(""); bTrigger.clear();
+
+	// 2e. Repeat Avoidance
+	bTrigger << "  " << tr("STR_TRIGGER_REPEAT") << " ";
+	if (rule->getRepeatAvoidance() == 0)
+		bTrigger << tr("STR_TRREPEAT_NONE");
+	else bTrigger << rule->getRepeatAvoidance();
+	_lstLeft->addRow(1, bTrigger.str().c_str());
+	_lstLeft->setRowColor(row, _blue);
+	_leftTopics.push_back("-");
+	_leftFlags.push_back(TTV_NONE);
+	row++; bTrigger.str(""); bTrigger.clear();
+
+	// 2f. Max Mission Runs
+	bTrigger << "  " << tr("STR_TRIGGER_MAXRUNS") << " ";
+	if (rule->getMaxRuns() == -1)
+		bTrigger << tr("STR_TRMAXRUN_NONE");
+	else bTrigger << rule->getMaxRuns();
+	isValidTrigger = (rule->getMaxRuns() == -1 || rule->getMaxRuns() >
+		_save->getAlienStrategy().getMissionsRun(rule->getVarName()));
+	_lstLeft->addRow(1, bTrigger.str().c_str());
+	_lstLeft->setRowColor(row, isValidTrigger ? _purple : _pink);
+	_leftTopics.push_back("-");
+	_leftFlags.push_back(TTV_NONE);
+	row++; bTrigger.str(""); bTrigger.clear();
+
+	// 3. Research Trigger
+	const auto& resTriggers = rule->getResearchTriggers();
+	if (resTriggers.size() > 0)
+	{
+		_lstLeft->addRow(1, ""); _leftTopics.push_back("-"); _leftFlags.push_back(TTV_NONE); row++;
+		_lstLeft->addRow(1, tr("STR_TRIGGERS_RESEARCH").c_str());
+		_lstLeft->setRowColor(row, _white);
+		_leftTopics.push_back("-");
+		_leftFlags.push_back(TTV_NONE);
+		row++;
+		for (auto& resTrigger : resTriggers)
+		{
+			std::ostringstream rowRes;
+			rowRes << "  " << tr(resTrigger.first);
+			rowRes << ": " << std::boolalpha << resTrigger.second;
+			bool isResearched = (_save->isResearched(resTrigger.first) == resTrigger.second);
+			_lstLeft->addRow(1, rowRes.str().c_str());
+			_lstLeft->setRowColor(row, isResearched ? _purple : _pink);
+			_leftTopics.push_back("-");
+			_leftFlags.push_back(TTV_NONE);
+			row++;
+		}
+	}
+
+	// 4. Item Triggers
+	const auto& itemTriggers = rule->getItemTriggers();
+	if (itemTriggers.size() > 0)
+	{
+		_lstLeft->addRow(1, ""); _leftTopics.push_back("-"); _leftFlags.push_back(TTV_NONE); row++;
+		_lstLeft->addRow(1, tr("STR_TRIGGERS_ITEM").c_str());
+		_lstLeft->setRowColor(row, _white);
+		_leftTopics.push_back("-");
+		_leftFlags.push_back(TTV_NONE);
+		row++;
+		for (auto& itemTrigger : itemTriggers)
+		{
+			std::ostringstream rowItem;
+			rowItem << "  " << tr(itemTrigger.first);
+			rowItem << ": " << std::boolalpha << itemTrigger.second;
+			bool isObtained = (_save->isItemObtained(itemTrigger.first) == itemTrigger.second);
+			_lstLeft->addRow(1, rowItem.str().c_str());
+			_lstLeft->setRowColor(row, isObtained ? _purple : _pink);
+			_leftTopics.push_back("-");
+			_leftFlags.push_back(TTV_NONE);
+			row++;
+		}
+	}
+
+	// 5. Facility Triggers
+	const auto& facTriggers = rule->getFacilityTriggers();
+	if (facTriggers.size() > 0)
+	{
+		_lstLeft->addRow(1, ""); _leftTopics.push_back("-"); _leftFlags.push_back(TTV_NONE); row++;
+		_lstLeft->addRow(1, tr("STR_TRIGGERS_FACILITY").c_str());
+		_lstLeft->setRowColor(row, _white);
+		_leftTopics.push_back("-");
+		_leftFlags.push_back(TTV_NONE);
+		row++;
+		for (auto& facTrigger : facTriggers)
+		{
+			std::ostringstream rowFac;
+			rowFac << "  " << tr(facTrigger.first);
+			rowFac << ": " << std::boolalpha << facTrigger.second;
+			bool isConstructed = (_save->isFacilityBuilt(facTrigger.first) == facTrigger.second);
+			_lstLeft->addRow(1, rowFac.str().c_str());
+			_lstLeft->setRowColor(row, isConstructed ? _purple : _pink);
+			_leftTopics.push_back("-");
+			_leftFlags.push_back(TTV_NONE);
+			row++;
+		}
+	}
+
+	// 6. Regional Triggers
+	const auto& regTriggers = rule->getXcomBaseInRegionTriggers();
+	const auto& terTriggers = rule->getXcomBaseInCountryTriggers();
+	if (regTriggers.size() > 0 || terTriggers.size() > 0)
+	{
+		_lstLeft->addRow(1, ""); _leftTopics.push_back("-"); _leftFlags.push_back(TTV_NONE); row++;
+		std::set<std::string> baseRegions;
+		std::set<std::string> baseCountries;
+		for (auto* xcomBase : *_save->getBases())
+		{
+			Region* region = _save->locateRegion(*xcomBase);
+			if (region) baseRegions.insert(region->getRules()->getType());
+			Country* country = _save->locateCountry(*xcomBase);
+			if (country) baseCountries.insert(country->getRules()->getType());
+		}
+		_lstLeft->addRow(1, tr("STR_TRIGGERS_REGIONAL").c_str());
+		_lstLeft->setRowColor(row, _white);
+		_leftTopics.push_back("-");
+		_leftFlags.push_back(TTV_NONE);
+		row++;
+		for (auto& regTrigger : regTriggers)
+		{
+			std::ostringstream rowReg;
+			rowReg << "  " << tr(regTrigger.first);
+			rowReg << ": " << std::boolalpha << regTrigger.second;
+			bool isRegFound = (baseRegions.find(regTrigger.first) != baseRegions.end());
+			bool isRegValid = isRegFound == regTrigger.second;
+			_lstLeft->addRow(1, rowReg.str().c_str());
+			_lstLeft->setRowColor(row, isRegValid ? _purple : _pink);
+			_leftTopics.push_back("-");
+			_leftFlags.push_back(TTV_NONE);
+			row++;
+		}
+		for (auto& terTrigger : terTriggers)
+		{
+			std::ostringstream rowTer;
+			rowTer << "  " << tr(terTrigger.first);
+			rowTer << ": " << std::boolalpha << terTrigger.second;
+			bool isTerFound = (baseCountries.find(terTrigger.first) != baseCountries.end());
+			bool isTerValid = isTerFound == terTrigger.second;
+			_lstLeft->addRow(1, rowTer.str().c_str());
+			_lstLeft->setRowColor(row, isTerValid ? _purple : _pink);
+			_leftTopics.push_back("-");
+			_leftFlags.push_back(TTV_NONE);
+			row++;
+		}
+	}
+
+	row = 0; // Right UI Panel Switch
+
+	// 7. Mission Weights
+	const auto& missionWeights = rule->getMissionWeights();
+	if (missionWeights.size() > 0)
+	{
+		_lstRight->addRow(1, tr("STR_MISSION_WEIGHTS").c_str());
+		_lstRight->setRowColor(row, _white);
+		_rightTopics.push_back("-");
+		_rightFlags.push_back(TTV_NONE);
+		row++;
+		for (auto misIt = missionWeights.begin(); misIt != missionWeights.end(); ++misIt)
+		{
+			auto& missionSet = *misIt;
+			if (missionSet.second->getChoices().size() > 0)
+			{
+				std::ostringstream rowSet;
+				rowSet << "  ";
+				if (missionSet.first == 0) rowSet << tr("STR_CASE_AT_START");
+				else rowSet << tr("STR_CASE_AT_MONTH").arg(missionSet.first);
+				_lstRight->addRow(1, rowSet.str().c_str());
+				_lstRight->setRowColor(row, _blue);
+				_rightTopics.push_back("-");
+				_rightFlags.push_back(TTV_NONE);
+				row++;
+				bool isCurrValid = _currMonth >= (int)missionSet.first;
+				bool isNextValid = (std::next(misIt) != missionWeights.end()
+					&& _currMonth >= (int)std::next(misIt)->first);
+				auto& choiceColor = isCurrValid && !isNextValid ? _purple : _pink;
+				for (auto& missionChoice : missionSet.second->getChoices())
+				{
+					std::ostringstream rowOpt;
+					rowOpt << "    ";
+					strPush(rowOpt, missionChoice.first);
+					rowOpt << ": ";
+					rowOpt << missionChoice.second;
+					_lstRight->addRow(1, rowOpt.str().c_str());
+					_lstRight->setRowColor(row, choiceColor);
+					_rightTopics.push_back("-");
+					_rightFlags.push_back(TTV_NONE);
+					row++;
+				}
+			}
+		}
+	}
+
+	// 8. Region Weights
+	const auto& regionWeights = rule->getRegionWeights();
+	if (regionWeights.size() > 0)
+	{
+		if (missionWeights.size() > 0)
+		{
+			_lstRight->addRow(1, ""); _rightTopics.push_back("-");
+			_rightFlags.push_back(TTV_NONE); row++;
+		}
+		_lstRight->addRow(1, tr("STR_MISSION_REGIONS").c_str());
+		_lstRight->setRowColor(row, _white);
+		_rightTopics.push_back("-");
+		_rightFlags.push_back(TTV_NONE);
+		row++;
+		for (auto regIt = regionWeights.begin(); regIt != regionWeights.end(); ++regIt)
+		{
+			auto& regionSet = *regIt;
+			if (regionSet.second->getChoices().size() > 0)
+			{
+				std::ostringstream rowSet;
+				rowSet << "  ";
+				if (regionSet.first == 0) rowSet << tr("STR_CASE_AT_START");
+				else rowSet << tr("STR_CASE_AT_MONTH").arg(regionSet.first);
+				_lstRight->addRow(1, rowSet.str().c_str());
+				_lstRight->setRowColor(row, _blue);
+				_rightTopics.push_back("-");
+				_rightFlags.push_back(TTV_NONE);
+				row++;
+				bool isCurrValid = _currMonth >= (int)regionSet.first;
+				bool isNextValid = (std::next(regIt) != regionWeights.end()
+					&& _currMonth >= (int)std::next(regIt)->first);
+				auto& choiceColor = isCurrValid && !isNextValid ? _purple : _pink;
+				for (auto& regionChoice : regionSet.second->getChoices())
+				{
+					std::ostringstream rowOpt;
+					rowOpt << "    ";
+					strPush(rowOpt, regionChoice.first);
+					rowOpt << ": ";
+					rowOpt << regionChoice.second;
+					_lstRight->addRow(1, rowOpt.str().c_str());
+					_lstRight->setRowColor(row, choiceColor);
+					_rightTopics.push_back("-");
+					_rightFlags.push_back(TTV_NONE);
+					row++;
+				}
+			}
+		}
+	}
+
+	// 9. Race Weights
+	const auto& raceWeights = rule->getRaceWeights();
+	if (raceWeights.size() > 0)
+	{
+		if (regionWeights.size() > 0)
+		{
+			_lstRight->addRow(1, ""); _rightTopics.push_back("-");
+			_rightFlags.push_back(TTV_NONE); row++;
+		}
+		_lstRight->addRow(1, tr("STR_MISSION_RACES").c_str());
+		_lstRight->setRowColor(row, _white);
+		_rightTopics.push_back("-");
+		_rightFlags.push_back(TTV_NONE);
+		row++;
+		for (auto raceIt = raceWeights.begin(); raceIt != raceWeights.end(); ++raceIt)
+		{
+			auto& raceSet = *raceIt;
+			if (raceSet.second->getChoices().size() > 0)
+			{
+				std::ostringstream rowSet;
+				rowSet << "  ";
+				if (raceSet.first == 0) rowSet << tr("STR_CASE_AT_START");
+				else rowSet << tr("STR_CASE_AT_MONTH").arg(raceSet.first);
+				_lstRight->addRow(1, rowSet.str().c_str());
+				_lstRight->setRowColor(row, _blue);
+				_rightTopics.push_back("-");
+				_rightFlags.push_back(TTV_NONE);
+				row++;
+				bool isCurrValid = _currMonth >= (int)raceSet.first;
+				bool isNextValid = (std::next(raceIt) != raceWeights.end()
+					&& _currMonth >= (int)std::next(raceIt)->first);
+				auto& choiceColor = isCurrValid && !isNextValid ? _purple : _pink;
+				for (auto& raceChoice : raceSet.second->getChoices())
+				{
+					std::ostringstream rowOpt;
+					rowOpt << "    ";
+					strPush(rowOpt, raceChoice.first);
+					rowOpt << ": ";
+					rowOpt << raceChoice.second;
+					_lstRight->addRow(1, rowOpt.str().c_str());
+					_lstRight->setRowColor(row, choiceColor);
+					_rightTopics.push_back("-");
+					_rightFlags.push_back(TTV_NONE);
+					row++;
+				}
+			}
+		}
+	}
 }
 
 /**

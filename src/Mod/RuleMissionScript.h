@@ -61,6 +61,12 @@ public:
 	std::vector<std::string> getRegions(const int month) const;
 	/// Gets a list of the mission types in this command's mission weights for a given month.
 	std::vector<std::string> getMissionTypes(const int month) const;
+	/// Gets the list of all missions (with weights).
+	const std::vector<std::pair<size_t, WeightedOptions*>> &getMissionWeights() const { return _missionWeights; }
+	/// Gets the list of all region overrides (with weights).
+	const std::vector<std::pair<size_t, WeightedOptions*>> &getRegionWeights() const { return _regionWeights; }
+	/// Gets the list of all race overrides (with weights).
+	const std::vector<std::pair<size_t, WeightedOptions*>> &getRaceWeights() const { return _raceWeights; }
 	/// Gets the first month this command will run.
 	int getFirstMonth() const;
 	/// Gets the last month this command will run.
@@ -79,6 +85,10 @@ public:
 	int getRepeatAvoidance() const;
 	/// Gets the number of minutes to delay spawning of the first wave of this mission, overrides the spawn delay defined in the mission waves.
 	int getDelay() const;
+	/// Gets the base delay number in minutes.
+	int getBaseDelay() const { return _delay; };
+	/// Gets the max possible delay number increase in minutes.
+	int getRandomDelay() const { return _randomDelay; };
 	/// Gets the minimum score (from last month) for this command to run.
 	int getMinScore() const { return _minScore; }
 	/// Gets the maximum score (from last month) for this command to run.
