@@ -71,15 +71,18 @@ of crafts in hangar (when in base view mode) and if they are permanently
 hidden.  
 `facilities:`  
 `  - type: NEW_FANCY_HANGAR`  
-`    crafts: 2` Original code isn't going anywhere for sake of max
+`    crafts: 3` Original code isn't going anywhere for sake of max
 backwards compatibility.  
 `    craftsHidden: false` Flag to render or not render housed crafts in
 base view. Mostly for damaged/sealed hangars.  
-`    craftOptions:` Horizontal offset - `X`, Vertical offset - `Y`, Craft
-size limit `Z` (0 is no size limit and default).  
-`      - [2, -4, 37]` This slot can fit size 37 craft or smaller.  
-`      - [8, 2, -25]` This slot can fit size 24 craft or smaller and is
-always hidden, regardless of the 'craftsHidden' setting.
+`    craftOptions:` Horizontal offset - `x`, Vertical offset - `y`, Craft
+minimum size - `min`, Craft maximum size - `max`, Hide craft - `true/false`.  
+`      - [2, -4, 20, 49, false]` This slot can fit any craft of size between 20
+(inclusive) and 49 (inclusive), and craft isn't hidden.  
+`      - [8, 2, 1, 19, true]` This slot can fit any craft of size between 1 and
+19, and always hides craft, regardless of the 'craftsHidden' setting.  
+`      - [2, -4, 0, 0, false]` This slot can fit any craft of any size, because
+`0, 0` is option to ignore craft sizes and classic hangars default.
 
 In `crafts:` code in `.rul` files it is possible to define craft's size:  
 `crafts:`  
@@ -145,26 +148,15 @@ refitting craft with selected weapon, system or utility, its size will
 change beyond the limits defined by the classification."`  
 
 ### Bigger Craft Spites (for Base View and Refit Screen)
-In `crafts:` code in `.rul` files it is possible to define sprite offset for
-crafts with bigger sprites in order to stil keep them centered at original
+In `crafts:` code in `.rul` files it is possible to define new sprite size for
+crafts with bigger sprites in order to still keep them centered at original
 coordinates.  
 `crafts:`  
 `  - type: BIG_SPRITE_CRAFT`  
-`    bigOffsetX: -11` Because sprite width got increased by 22, i.e.
-from 32 to 54.  
-`    bigOffsetY: -16` Because sprite height got increased by 32, i.e.
-from 40 to 72.  
-Everything is based of default craft's sprite size: i.e. 32x40 pixels.  
+`    spriteSize: [54, 72]` Exactly same values as vertical and horizontal size
+of your image in pixels.  
 Any change to the sprite size should be even: i.e. you can't use 35x45
 pixels sprite.  
-Any change to sprite size should get reflected as negative half in `bigOffsetX`
-and `bigOffsetY`.  
-For example, if you increased craft's sprite width by `20 pixels`, you will
-need to set `bigOffsetX: -10`  
-For example, if you increased craft's sprite height by `14 pixels`, you will
-need to set `bigOffsetY: -7`  
-In theory, you can use this feature to reduce sprite size, but it isn't
-tested.  
 
 ### Base Attack/Missile Strikes Debug Triggers
 Only works when in `options.cfg` the option `debug: true` is set. In
