@@ -34,6 +34,38 @@ class RuleItem;
 struct VerticalLevel;
 enum BasePlacementErrors : int;
 
+struct CraftOption
+{
+	/// Horizontal offset for rendering craft in the facility.
+	int x = 0;
+	/// Vertical offset for rendering craft in the facility.
+	int y = 0;
+	/// Minimum size of craft that can be housed in the slot.
+	int min = 0;
+	/// Maximum size of craft that can be housed in the slot.
+	int max = 0;
+	/// Is craft hidden or rendered in the base in the slot.
+	bool hide = false;
+	/// Constructor with default parameters. Needed for YAML.
+	CraftOption()
+	{
+		hide = false;
+		min = 0;
+		max = 0;
+		x = 0;
+		y = 0;
+	}
+	/// Constructor that allows to define facility craft slots.
+	CraftOption(int xOffset, int yOffset, int minSize, int maxSize, bool isHidden)
+	{
+		hide = isHidden;
+		min = minSize;
+		max = maxSize;
+		x = xOffset;
+		y = yOffset;
+	}
+};
+
 /**
  * Represents a specific type of base facility.
  * Contains constant info about a facility like
@@ -58,7 +90,7 @@ private:
 	std::map<std::string, std::pair<int, int> > _buildCostItems;
 	int _storage, _personnel, _aliens, _crafts, _labs, _workshops, _psiLabs;
 	bool _spriteEnabled, _craftsHidden;
-	std::vector<Position> _craftOptions;
+	std::vector<CraftOption> _craftOptions;
 	int _sightRange, _sightChance;
 	int _radarRange, _radarChance, _defense, _hitRatio, _fireSound, _hitSound, _placeSound;
 	int _ammoNeeded;
@@ -156,7 +188,7 @@ public:
 	/// Gets if facility's crafts are hidden or not.
 	bool getCraftsHidden() const;
 	/// Gets a list of which tiles are used to place items stored in this facility
-	const std::vector<Position>& getCraftOptions() const;
+	const std::vector<CraftOption>& getCraftOptions() const;
 	/// Gets the facility's sight range.
 	int getSightRange() const { return _sightRange; }
 	/// Gets the facility's alien base detection chance.
@@ -217,4 +249,38 @@ public:
 	const RuleBaseFacility* getDestroyedFacility() const;
 };
 
+}
+
+namespace YAML
+{
+	template<>
+	struct convert<OpenXcom::CraftOption>
+	{
+		static Node encode(const OpenXcom::CraftOption& crOpt)
+		{
+			Node node;
+			node.SetStyle(EmitterStyle::Flow);
+			node.push_back(crOpt.x);
+			node.push_back(crOpt.y);
+			node.push_back(crOpt.min);
+			node.push_back(crOpt.max);
+			node.push_back(crOpt.hide);
+			return node;
+		}
+
+		static bool decode(const Node& node, OpenXcom::CraftOption& crOpt)
+		{
+			if (!node.IsSequence() || node.size() != 5)
+				return false;
+
+			crOpt.x = node[0].as<int>();
+			crOpt.y = node[1].as<int>();
+			crOpt.min = node[2].as<int>();
+			crOpt.max = node[3].as<int>();
+			crOpt.hide = node[4].as<bool>();
+
+			if (crOpt.min > crOpt.max) return false;
+			return true;
+		}
+	};
 }

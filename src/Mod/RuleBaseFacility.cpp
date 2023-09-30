@@ -41,7 +41,7 @@ RuleBaseFacility::RuleBaseFacility(const std::string &type, int listOrder) :
 	_lift(false), _hyper(false), _mind(false), _grav(false), _mindPower(1),
 	_size(1), _buildCost(0), _refundValue(0), _buildTime(0), _monthlyCost(0),
 	_storage(0), _personnel(0), _aliens(0), _crafts(0), _labs(0), _workshops(0), _psiLabs(0),
-	_spriteEnabled(false), _craftsHidden(false), _craftOptions({Position(0, 0, 0)}),
+	_spriteEnabled(false), _craftsHidden(false), _craftOptions(),
 	_sightRange(0), _sightChance(0), _radarRange(0), _radarChance(0),
 	_defense(0), _hitRatio(0), _fireSound(0), _hitSound(0), _placeSound(-1), _ammoNeeded(1), _listOrder(listOrder),
 	_trainingRooms(0), _maxAllowedPerBase(0), _sickBayAbsoluteBonus(0.0f), _sickBayRelativeBonus(0.0f),
@@ -101,7 +101,7 @@ void RuleBaseFacility::load(const YAML::Node &node, Mod *mod)
 
 	_spriteEnabled = node["spriteEnabled"].as<bool>(_spriteEnabled);
 	_craftsHidden = node["craftsHidden"].as<bool>(_craftsHidden);
-	_craftOptions = node["craftOptions"].as<std::vector<Position>>(_craftOptions);
+	_craftOptions = node["craftOptions"].as<std::vector<CraftOption>>(_craftOptions);
 
 	_sightRange = node["sightRange"].as<int>(_sightRange);
 	_sightChance = node["sightChance"].as<int>(_sightChance);
@@ -475,11 +475,9 @@ bool RuleBaseFacility::getCraftsHidden() const
 
 /**
  * Gets the list of craft placement and limit options.
- * X - horizontal render offset, Y - vertical render offset,
- * Z - hangar slot craft size limit. If 0, size is ignored.
- * @return the list of options as X/Y/Z positions.
+ * @return the list of CraftOption entries.
  */
-const std::vector<Position> &RuleBaseFacility::getCraftOptions() const
+const std::vector<CraftOption> &RuleBaseFacility::getCraftOptions() const
 {
 	return _craftOptions;
 }

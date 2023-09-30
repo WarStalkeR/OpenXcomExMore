@@ -564,7 +564,8 @@ void BaseView::draw()
 						Craft* slotCraft = craftSlotIt->craft;
 						const RuleCraft* slotRules = slotCraft->getRules();
 						Surface* frame = _texture->getFrame(slotCraft->getSkinSprite() + 33);
-						frame->blitNShade(this, craftSlotIt->x + slotRules->getBigOffsetX(), craftSlotIt->y + slotRules->getBigOffsetY());
+						frame->blitNShade(this, craftSlotIt->x + slotRules->getSizeOffsetX(),
+							craftSlotIt->y + slotRules->getSizeOffsetY());
 						fac->setCraftForDrawing(slotCraft);
 					}
 					++craftSlotIt;

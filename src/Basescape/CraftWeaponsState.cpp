@@ -195,7 +195,9 @@ void CraftWeaponsState::lstWeaponsClick(Action *)
 				return refSlot.craft == refCraft;
 			});
 			if (!((craftSlotIt != _base->getCraftSlots()->end() &&
-				(craftSlotIt->size == 0 || craftSlotIt->size >= newCraftSize)) ||
+				((craftSlotIt->min == 0 && craftSlotIt->max == 0) ||
+					(newCraftSize >= craftSlotIt->min &&
+						newCraftSize <= craftSlotIt->max))) ||
 					_base->getFreeCraftSlots(newCraftSize) > 0))
 				allowChange = false;
 			if (classChanged && !classChangeAllowed)

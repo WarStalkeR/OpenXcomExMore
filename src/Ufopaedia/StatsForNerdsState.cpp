@@ -3089,16 +3089,19 @@ void StatsForNerdsState::initFacilityList()
 
 	if (facilityRule->getCraftOptions().size() > 0)
 	{
-		std::vector<int> craftSlotSizes;
+		std::vector<std::string> craftSlotSizes;
 		for (size_t i = 0; i < facilityRule->getCraftOptions().size(); ++i)
 		{
 			if ((int)i > (facilityRule->getCrafts() - 1)) break;
-			int refSize = facilityRule->getCraftOptions().at(i).z;
-			int trueSlotSize = refSize >= 0 ? refSize : std::abs(refSize + 1);
-			craftSlotSizes.push_back(trueSlotSize);
+			std::ostringstream slotEntry;
+			const int& minSize = facilityRule->getCraftOptions().at(i).min;
+			const int& maxSize = facilityRule->getCraftOptions().at(i).max;
+			if (minSize == maxSize) slotEntry << "[" << maxSize << "]";
+			else slotEntry << "[" << minSize << "~" << maxSize << "]";
+			craftSlotSizes.push_back(slotEntry.str());
 		}
 		std::sort(craftSlotSizes.begin(), craftSlotSizes.end());
-		addVectorOfIntegers(ss, craftSlotSizes, "craftSlotSizes");
+		addVectorOfStrings(ss, craftSlotSizes, "craftSlotSizes", false);
 	}
 
 	addInteger(ss, facilityRule->getLaboratories(), "labs");

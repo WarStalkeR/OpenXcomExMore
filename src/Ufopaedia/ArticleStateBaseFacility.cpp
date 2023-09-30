@@ -146,9 +146,10 @@ namespace OpenXcom
 			const auto& hangarOptions = facility->getCraftOptions();
 			for (const auto& refSlot : hangarOptions)
 			{
-				int slotSize = refSlot.z >= 0 ? refSlot.z : std::abs(refSlot.z + 1);
-				const std::string craftClass = _game->getMod()->getCraftClassFromSize(slotSize);
-				const std::string slotClass = craftClass.empty() ? std::to_string(slotSize) : tr(craftClass + "_UC").c_str();
+				const std::string craftClass =
+					_game->getMod()->getCraftClassFromSize(refSlot.max);
+				const std::string slotClass = craftClass.empty() ?
+					std::to_string(refSlot.max) : tr(craftClass + "_UC").c_str();
 				auto craftHangarIt = craftHangars.find(slotClass);
 				if (craftHangarIt != craftHangars.end()) ++(craftHangarIt->second);
 				else craftHangars.emplace(slotClass, 1);
