@@ -113,13 +113,13 @@ CraftInfoState::CraftInfoState(Base *base, size_t craftId) : _base(base), _craft
 		_txtWAmmo[i] = new Text(75, 24, x, y + 16);
 	}
 	const RuleCraft* craftRule = _craft->getRules();
-	if (craftRule->getBigOffsetX() != 0 || craftRule->getBigOffsetY() != 0)
+	if (craftRule->getSizeOffsetX() != 0 || craftRule->getSizeOffsetY() != 0)
 	{
 		_sprite = new InteractiveSurface(
-			32 + std::abs(craftRule->getBigOffsetX()) * 2,
-			40 + std::abs(craftRule->getBigOffsetY()) * 2,
-			144 + craftRule->getBigOffsetX(),
-			56 + craftRule->getBigOffsetY());
+			32 + std::abs(craftRule->getSizeOffsetX()) * 2,
+			40 + std::abs(craftRule->getSizeOffsetY()) * 2,
+			144 + craftRule->getSizeOffsetX(),
+			56 + craftRule->getSizeOffsetY());
 	}
 	else
 	{

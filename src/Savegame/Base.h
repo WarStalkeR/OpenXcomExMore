@@ -86,21 +86,28 @@ struct BaseSumDailyRecovery
 
 struct CraftSlot
 {
+	/// Pointer to the parent facility, where the slot belongs.
+	const BaseFacility* parent = nullptr;
 	/// Pointer to the craft which is housed in the slot.
 	Craft* craft = nullptr;
-	/// Flag if craft is hidden or rendered in the base at this position.
+	/// Is craft hidden or rendered in the base in the slot.
 	bool hidden = false;
-	/// Size of the slot where the craft will be housed.
-	int size = 0;
-	/// Horizontal offset for rendering craft in the base.
+	/// Minimum size of craft that can be housed in the slot.
+	int min = 0;
+	/// Maximum size of craft that can be housed in the slot.
+	int max = 0;
+	/// Horizontal offset for rendering craft in the facility.
 	int x = 0;
-	/// Vertical offset for rendering craft in the base.
+	/// Vertical offset for rendering craft in the facility.
 	int y = 0;
 	/// Constructor that allows to create new craft slots.
-	CraftSlot(Craft* craftPtr, bool isCraftHidden, int slotSize, int xOffset, int yOffset) {
+	CraftSlot(const BaseFacility* facPtr, Craft* craftPtr, bool isCraftHidden,
+		int minSize, int maxSize, int xOffset, int yOffset) {
+		parent = facPtr;
 		craft = craftPtr;
 		hidden = isCraftHidden;
-		size = slotSize;
+		min = minSize;
+		max = maxSize;
 		x = xOffset;
 		y = yOffset;
 	}
