@@ -92,6 +92,8 @@ struct CraftSlot
 	Craft* craft = nullptr;
 	/// Is craft hidden or rendered in the base in the slot.
 	bool hidden = false;
+	/// Group identifier which allows treat multiple slots as one.
+	int group = 0;
 	/// Minimum size of craft that can be housed in the slot.
 	int min = 0;
 	/// Maximum size of craft that can be housed in the slot.
@@ -102,14 +104,36 @@ struct CraftSlot
 	int y = 0;
 	/// Constructor that allows to create new craft slots.
 	CraftSlot(const BaseFacility* facPtr, Craft* craftPtr, bool isCraftHidden,
-		int minSize, int maxSize, int xOffset, int yOffset) {
+		int slotGroup, int minSize, int maxSize, int xOffset, int yOffset)
+	{
 		parent = facPtr;
 		craft = craftPtr;
 		hidden = isCraftHidden;
+		group = slotGroup;
 		min = minSize;
 		max = maxSize;
 		x = xOffset;
 		y = yOffset;
+	}
+};
+
+struct VirtualSlot
+{
+	/// Simplified pointer to the size of the craft.
+	int* size;
+	/// Group identifier which allows treat multiple slots as one.
+	int group;
+	/// Minimum size of craft that can be housed in the slot.
+	int min;
+	/// Maximum size of craft that can be housed in the slot.
+	int max;
+	/// Constructor that allows to create new virtual slots.
+	VirtualSlot(int* sizePtr, int slotGroup, int minSize, int maxSize)
+	{
+		size = sizePtr;
+		group = slotGroup;
+		min = minSize;
+		max = maxSize;
 	}
 };
 
@@ -122,6 +146,8 @@ class Base : public Target
 private:
 	static const int BASE_SIZE = 6;
 	static const int GRID_SIZE = 32;
+	static const int HNG_CENTER_X = 2;
+	static const int HNG_CENTER_Y = -4;
 	const Mod *_mod;
 	std::vector<BaseFacility*> _facilities;
 	std::vector<Soldier*> _soldiers;
@@ -231,6 +257,12 @@ public:
 	int getUsedHangars() const;
 	/// Gets the base's available hangars.
 	int getAvailableHangars() const;
+	/// Returns heuristic cost of the craft for specified craft slot.
+	int getCraftSlotCost(const int& craftSize, const CraftSlot& rSlot,
+		const std::vector<int>& rGroup) const;
+	/// Returns heuristic cost of the craft for specified virtual craft slot.
+	int getCraftVirtualCost(const int& craftSize, const VirtualSlot& rSlot,
+		const std::vector<int>& rGroup, const std::vector<VirtualSlot>& vSlots) const;
 	/// Updates list of all existing craft slots.
 	void updateCraftSlots();
 	/// Updates list of occupied craft slots.
@@ -243,9 +275,9 @@ public:
 	int getFreeLaboratories() const;
 	/// Get the number of available space lab (not used by a Production)
 	int getFreeWorkshops() const;
-
+	/// Gets the amount of scientists currently in use.
 	int getAllocatedScientists() const;
-
+	/// Gets the amount of engineers currently in use.
 	int getAllocatedEngineers() const;
 	/// Gets the base's defense value.
 	int getDefenseValue() const;
@@ -335,6 +367,7 @@ public:
 	std::list<BASEFACILITIESITERATOR> getDisconnectedFacilities(BaseFacility *remove);
 	/// destroy a facility and deal with the side effects.
 	void destroyFacility(BASEFACILITIESITERATOR facility);
+	/// Cancels all prisoner interrogations. Cancels all incoming prisoner transfers.
 	void cleanupPrisons(int prisonType);
 	/// Cleans up the defenses vector and optionally reclaims the tanks and their ammo.
 	void cleanupDefenses(bool reclaimItems);
