@@ -555,7 +555,7 @@ void BaseView::draw()
 		fac->setCraftForDrawing(0);
 		if (fac->getBuildTime() == 0 && fac->getRules()->getCrafts() > 0)
 		{
-			for (int i = 0; i < fac->getRules()->getCrafts(); ++i)
+			for (int i = 0; i < fac->getRules()->getCraftGroupSum(); ++i)
 			{
 				if (craftSlotIt != _base->getCraftSlots()->end())
 				{
