@@ -271,6 +271,8 @@ public:
 	void syncCraftChanges();
 	/// Gets number of unoccupied hangar slots for specific craft size.
 	int getFreeCraftSlots(int craftSize = 0) const;
+	/// Checks if there are suitable slots for craft, if it changes size.
+	bool allowCraftRefit(const Craft* refCraft, int newCraftSize) const;
 	/// Get the number of available space lab (not used by a ResearchProject)
 	int getFreeLaboratories() const;
 	/// Get the number of available space lab (not used by a Production)

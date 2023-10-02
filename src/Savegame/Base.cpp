@@ -1347,6 +1347,63 @@ int Base::getFreeCraftSlots(int craftSize) const
 }
 
 /**
+ * Checks if there are suitable slots for craft, if it changes size.
+ * @param Reference pointer to the craft object.
+ * @param Integer of craft size after refit.
+ * @return True, if size change is allowed.
+ */
+bool Base::allowCraftRefit(const Craft* refCraft, int newCraftSize) const
+{
+	// Find relevant craft slot, where craft is housed.
+	auto craftSlotPtr = std::find_if(getCraftSlots()->begin(),
+		getCraftSlots()->end(), [refCraft](const CraftSlot& refSlot)
+	{
+		return refSlot.craft == refCraft;
+	});
+
+	// You can't refit crafts that aren't allocated to craft slots.
+	if (craftSlotPtr == getCraftSlots()->end())
+		return false;
+
+	// Approve, if current slot can house craft after refit.
+	if ((craftSlotPtr->min == 0 && craftSlotPtr->max == 0) ||
+		(newCraftSize >= craftSlotPtr->min &&
+			newCraftSize <= craftSlotPtr->max))
+		return true;
+
+	// Approve, if any slot in group can house craft after refit.
+	if (craftSlotPtr->group > 0)
+	{
+		std::vector<VirtualSlot> virtualSlotsGroup;
+		for (const auto& craftSlot : *getCraftSlots())
+		{
+			if (craftSlot.group == craftSlotPtr->group)
+				virtualSlotsGroup.push_back(VirtualSlot(nullptr,
+					craftSlot.group, craftSlot.min, craftSlot.max));
+		}
+		if (virtualSlotsGroup.size() > 0)
+		{
+			auto virtSlotPtr = std::find_if(virtualSlotsGroup.begin(),
+				virtualSlotsGroup.end(), [newCraftSize](const VirtualSlot& vSlot)
+			{
+				return ((vSlot.min == 0 && vSlot.max == 0) ||
+					(newCraftSize >= vSlot.min &&
+					newCraftSize <= vSlot.max));
+			});
+			if (virtSlotPtr != virtualSlotsGroup.end())
+				return true;
+		}
+	}
+
+	// Approve, if any other slot or group can house craft after refit.
+	if (getFreeCraftSlots(newCraftSize) > 0) return true;
+
+	// We only checking if we have suitable slot or not.
+	// Allocation itself will be handled by syncCraftSlots().
+	return false;
+}
+
+/**
  * Return laboratories space not used by a ResearchProject
  * @return laboratories space not used by a ResearchProject
  */
