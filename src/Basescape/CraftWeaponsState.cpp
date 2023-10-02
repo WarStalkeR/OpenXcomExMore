@@ -170,7 +170,6 @@ void CraftWeaponsState::lstWeaponsClick(Action *)
 	bool classChanged = false;
 	bool unitCapChanged = false;
 	bool classChangeAllowed = _game->getMod()->getCraftsCanChangeClass();
-	const Craft* refCraft = _craft;
 	const RuleCraftWeapon* refWeapon = nullptr;
 	const RuleCraftWeapon* currWeapon = nullptr;
 	CraftWeapon* current = _craft->getWeapons()->at(_weapon);
@@ -190,15 +189,7 @@ void CraftWeaponsState::lstWeaponsClick(Action *)
 			int newCraftSize = refCraftSize + refWeaponSize - currWeaponSize;
 			classChanged = _game->getMod()->getCraftClassFromSize(newCraftSize) !=
 				_game->getMod()->getCraftClassFromSize(refCraftSize);
-			auto craftSlotIt = std::find_if(_base->getCraftSlots()->begin(),
-				_base->getCraftSlots()->end(), [refCraft](const CraftSlot& refSlot) {
-				return refSlot.craft == refCraft;
-			});
-			if (!((craftSlotIt != _base->getCraftSlots()->end() &&
-				((craftSlotIt->min == 0 && craftSlotIt->max == 0) ||
-					(newCraftSize >= craftSlotIt->min &&
-						newCraftSize <= craftSlotIt->max))) ||
-					_base->getFreeCraftSlots(newCraftSize) > 0))
+			if (!_base->allowCraftRefit(_craft, newCraftSize))
 				allowChange = false;
 			if (classChanged && !classChangeAllowed)
 				allowChange = false;
