@@ -86,7 +86,7 @@ OPT bool oxceShowAdvancedDebugOptions;
 OPT bool oxceTechTreeDataView;
 OPT int oxceDataViewStringTrunc;
 OPT bool oxceDataViewCleanReplace;
-OPT int oxceDataViewStrTranslate;
+OPT bool oxceDataViewStrTranslate;
 
 // OXCE hidden, accessible only via options.cfg
 OPT bool oxceFatFingerLinks;
@@ -134,6 +134,9 @@ OPT bool oxceDisableInventoryTuCost;
 OPT bool oxceShowBaseNameInPopups;
 OPT int oxceGeoscapeDebugLogMaxEntries;
 OPT bool oxceGeoscapeEventsInstantDelivery;
+OPT bool oxcePediaFacilityLockedStats;
+OPT int oxcePediaFacilityColOffset;
+OPT int oxcePediaFacilityRowsCutoff;
 
 // Flags and other stuff that don't need OptionInfo's.
 OPT bool mute, reload, newOpenGL, newScaleFilter, newHQXFilter, newXBRZFilter, newRootWindowedMode, newFullscreen, newAllowResize, newBorderless;
