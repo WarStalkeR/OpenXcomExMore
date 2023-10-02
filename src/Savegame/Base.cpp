@@ -1054,7 +1054,7 @@ int Base::getCraftVirtualCost(const int& craftSize, const VirtualSlot& rSlot,
  */
 void Base::updateCraftSlots()
 {
-	int cSlotGroup = 0;
+	int cSlotGroup = 1;
 	_craftSlots.clear();
 	if (getAvailableHangars() <= 0) return;
 
@@ -1081,18 +1081,10 @@ void Base::updateCraftSlots()
 				groupSum = 0; // Discard grouping, if not assigned correctly. Keep modding responsibly.
 			}
 			auto groupIt = fac->getRules()->getOptionGroups().begin();
-			if (groupIt != fac->getRules()->getOptionGroups().end()) ++cSlotGroup; // Kick-start counter, if 'optionGroups' exists.
 			for (int i = 0; i < craftNumOrGroupSum; ++i)
 			{
 				if (size_t(i) < fac->getRules()->getCraftOptions().size())
 				{
-					if (groupSum > 0 && groupIt != fac->getRules()->getOptionGroups().end()
-						&& groupItCounter >= *groupIt)
-					{
-						if (*groupIt > 1) ++cSlotGroup; // Increase group counter, only if it was used.
-						groupItCounter = 0;
-						++groupIt;
-					}
 					if (groupSum > 0 && groupIt != fac->getRules()->getOptionGroups().end())
 					{
 						const int sGroup = *groupIt > 1 ? cSlotGroup : 0; // Disable grouping for single entries.
@@ -1108,6 +1100,13 @@ void Base::updateCraftSlots()
 						_craftSlots.push_back(CraftSlot(fac, nullptr, refOpts.hide || hidesCrafts, 0, refOpts.min, refOpts.max,
 							fac->getX() * GRID_SIZE + (fac->getRules()->getSize() - 1) * GRID_SIZE / 2 + refOpts.x,
 							fac->getY() * GRID_SIZE + (fac->getRules()->getSize() - 1) * GRID_SIZE / 2 + refOpts.y));
+					}
+					if (groupSum > 0 && groupIt != fac->getRules()->getOptionGroups().end()
+						&& groupItCounter >= *groupIt)
+					{
+						if (*groupIt > 1) ++cSlotGroup; // Increase group counter, only if it was used.
+						groupItCounter = 0;
+						++groupIt;
 					}
 				}
 				else // Default center offsets for hangars with undefined craft slots.
@@ -1125,7 +1124,7 @@ void Base::updateCraftSlots()
 		for (size_t i = 0; i < _craftSlots.size(); ++i)
 		{
 			Log(LOG_DEBUG) << "Base: " << _name << ", " << _craftSlots[i].parent->getRules()->getType()
-				<< " Slot #" << i << ", Offset: [" << _craftSlots[i].x << "," << _craftSlots[i].y << "], Group: "
+				<< " Slot #" << (i+1) << ", Offset: [" << _craftSlots[i].x << "," << _craftSlots[i].y << "], Group: "
 				<< _craftSlots[i].group << ", Size: " << _craftSlots[i].min << "~" << _craftSlots[i].max;
 		}
 	}
@@ -1224,7 +1223,7 @@ void Base::syncCraftSlots()
 			if (_craftSlots[i].craft != nullptr)
 			{
 				Log(LOG_DEBUG) << "Base: " << _name << ", " << _craftSlots[i].parent->getRules()->getType()
-					<< ", Slot #" << i << ", Offset: [" << _craftSlots[i].x << "," << _craftSlots[i].y << "], Group: "
+					<< ", Slot #" << (i+1) << ", Offset: [" << _craftSlots[i].x << "," << _craftSlots[i].y << "], Group: "
 					<< _craftSlots[i].group << ", Size: " << _craftSlots[i].min << "~" << _craftSlots[i].max
 					<< ", Craft: " << _craftSlots[i].craft->getType() << "-" << _craftSlots[i].craft->getId();
 			}
