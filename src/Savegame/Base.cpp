@@ -1064,9 +1064,9 @@ void Base::updateCraftSlots()
 		if (fac->getBuildTime() == 0 && fac->getRules()->getCrafts() > 0)
 		{
 			int groupItCounter = 0;
-			int groupSum = fac->getRules()->getCraftGroupSum();
 			bool hidesCrafts = fac->getRules()->getCraftsHidden();
-			int craftNumOrGroupSum = std::max(groupSum, fac->getRules()->getCrafts());
+			int groupsNum = fac->getRules()->getOptionGroups().size();
+			int craftNumOrGroupSum = fac->getRules()->getCraftGroupSum();
 			if (size_t(fac->getRules()->getCrafts()) > fac->getRules()->getCraftOptions().size())
 			{
 				Log(LOG_WARNING) << "Facility " << fac->getRules()->getType()
@@ -1074,19 +1074,19 @@ void Base::updateCraftSlots()
 					<< ", but slots are defined only for "
 					<< fac->getRules()->getCraftOptions().size() << "!";
 			}
-			if (groupSum > 0 && fac->getRules()->getCraftOptions().size() != (size_t)groupSum)
+			if (groupsNum > 0 && fac->getRules()->getCraftOptions().size() != (size_t)craftNumOrGroupSum)
 			{
 				Log(LOG_WARNING) << "The sum of 'optionGroups' isn't equal to number"
 					<< " of entries in 'craftOptions' variable! Discarding...";
 				craftNumOrGroupSum = fac->getRules()->getCrafts();
-				groupSum = 0; // Discard grouping, if not assigned correctly. Keep modding responsibly.
+				groupsNum = 0; // Discard grouping, if not assigned correctly. Keep modding responsibly.
 			}
 			auto groupIt = fac->getRules()->getOptionGroups().begin();
 			for (int i = 0; i < craftNumOrGroupSum; ++i)
 			{
 				if (size_t(i) < fac->getRules()->getCraftOptions().size())
 				{
-					if (groupSum > 0 && groupIt != fac->getRules()->getOptionGroups().end())
+					if (groupsNum > 0 && groupIt != fac->getRules()->getOptionGroups().end())
 					{
 						const int sGroup = *groupIt > 1 ? cSlotGroup : 0; // Disable grouping for single entries.
 						const auto& refOpts = fac->getRules()->getCraftOptions()[i];
@@ -1102,7 +1102,7 @@ void Base::updateCraftSlots()
 							fac->getX() * GRID_SIZE + (fac->getRules()->getSize() - 1) * GRID_SIZE / 2 + refOpts.x,
 							fac->getY() * GRID_SIZE + (fac->getRules()->getSize() - 1) * GRID_SIZE / 2 + refOpts.y));
 					}
-					if (groupSum > 0 && groupIt != fac->getRules()->getOptionGroups().end()
+					if (groupsNum > 0 && groupIt != fac->getRules()->getOptionGroups().end()
 						&& groupItCounter >= *groupIt)
 					{
 						if (*groupIt > 1) ++cSlotGroup; // Increase group counter, only if it was used.
