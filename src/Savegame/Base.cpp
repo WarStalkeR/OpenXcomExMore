@@ -1059,7 +1059,7 @@ void Base::updateCraftSlots()
 	_craftSlots.clear();
 	if (getAvailableHangars() <= 0) return;
 
-	for (const auto* fac : _facilities)
+	for (auto* fac : _facilities)
 	{
 		if (fac->getBuildTime() == 0 && fac->getRules()->getCrafts() > 0)
 		{
@@ -1186,6 +1186,7 @@ void Base::syncCraftSlots()
 				bestSlot->craft = _crafts[i];
 				if (bestSlot->group > 0)
 					occupiedGroups.push_back(bestSlot->group);
+				bestSlot->parent->setCraftForDrawing(_crafts[i]);
 				gotPlace = true;
 			}
 
@@ -1203,6 +1204,7 @@ void Base::syncCraftSlots()
 					_craftSlots[j].craft = _crafts[i];
 					if (_craftSlots[j].group > 0)
 						occupiedGroups.push_back(_craftSlots[j].group);
+					_craftSlots[j].parent->setCraftForDrawing(_crafts[i]);
 					gotPlace = true;
 					break;
 				}

@@ -552,7 +552,6 @@ void BaseView::draw()
 		}
 
 		// Draw crafts
-		fac->setCraftForDrawing(0);
 		if (fac->getBuildTime() == 0 && fac->getRules()->getCrafts() > 0)
 		{
 			for (int i = 0; i < fac->getRules()->getCraftGroupSum(); ++i)
@@ -566,7 +565,6 @@ void BaseView::draw()
 						Surface* frame = _texture->getFrame(slotCraft->getSkinSprite() + 33);
 						frame->blitNShade(this, craftSlotIt->x + slotRules->getSizeOffsetX(),
 							craftSlotIt->y + slotRules->getSizeOffsetY());
-						fac->setCraftForDrawing(slotCraft);
 					}
 					++craftSlotIt;
 				}
