@@ -1136,8 +1136,13 @@ void Base::updateCraftSlots()
 void Base::syncCraftSlots()
 {
 	// Flush existing crafts to slots allocation.
-	std::for_each(_craftSlots.begin(), _craftSlots.end(), [](CraftSlot& slot)
+	std::for_each(_craftSlots.begin(),
+		_craftSlots.end(), [](CraftSlot& slot)
 		{ slot.craft = nullptr; });
+	std::for_each(_facilities.begin(),
+		_facilities.end(), [](BaseFacility* fac)
+		{ if (fac->getRules()->getCrafts() > 0)
+			fac->setCraftForDrawing(0); });
 	if (_crafts.size() <= 0) return;
 
 	std::vector<int> craftSizes;
@@ -2137,6 +2142,8 @@ int Base::damageFacility(BaseFacility *toBeDamaged)
 		// move the craft from the original hangar to the damaged hangar
 		if (fac->getRules()->getCrafts() > 0)
 		{
+			for (auto& craftSlot : _craftSlots)
+				if (craftSlot.parent == toBeDamaged) craftSlot.parent = fac;
 			fac->setCraftForDrawing(toBeDamaged->getCraftForDrawing());
 			toBeDamaged->setCraftForDrawing(0);
 		}
@@ -2284,34 +2291,38 @@ void Base::destroyFacility(BASEFACILITIESITERATOR facility)
 	{
 		// hangar destruction - destroy crafts and any production of crafts
 		// if this will mean there is no hangar to contain it
-		if ((*facility)->getCraftForDrawing())
+		for (auto& craftSlot : _craftSlots)
 		{
-			// remove all soldiers
-			for (Soldier *s : _soldiers)
+			// go through each craft slot related to the facility
+			if (craftSlot.parent == *facility && craftSlot.craft != nullptr)
 			{
-				if (s->getCraft() == (*facility)->getCraftForDrawing())
+				// remove all soldiers
+				for (Soldier *s : _soldiers)
 				{
-					s->setCraft(0);
+					if (s->getCraft() == craftSlot.craft)
+					{
+						s->setCraft(0);
+					}
 				}
-			}
 
-			// remove all items
-			while (!(*facility)->getCraftForDrawing()->getItems()->getContents()->empty())
-			{
-				auto i = (*facility)->getCraftForDrawing()->getItems()->getContents()->begin();
-				_items->addItem(i->first, i->second);
-				(*facility)->getCraftForDrawing()->getItems()->removeItem(i->first, i->second);
-			}
-			Collections::deleteIf(_crafts, 1,
-				[&](Craft* c)
+				// remove all items
+				while (!craftSlot.craft->getItems()->getContents()->empty())
 				{
-					return c == (*facility)->getCraftForDrawing();
+					auto i = craftSlot.craft->getItems()->getContents()->begin();
+					_items->addItem(i->first, i->second);
+					craftSlot.craft->getItems()->removeItem(i->first, i->second);
 				}
-			);
+
+				// delete craft itself
+				Collections::deleteIf(_crafts, 1, [&](Craft* c)
+				{
+					return c == craftSlot.craft;
+				});
+				craftSlot.craft = nullptr;
+			}
 		}
-		else
-		{
-			int remove = -(getAvailableHangars() - getUsedHangars() - (*facility)->getRules()->getCrafts());
+		int remove = -(getAvailableHangars() - getUsedHangars() - (*facility)->getRules()->getCrafts());
+		if (remove > 0) {
 			remove = Collections::deleteIf(_productions, remove,
 				[&](Production* i)
 				{
