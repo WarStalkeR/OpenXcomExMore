@@ -1003,7 +1003,7 @@ int Base::getCraftSlotCost(const int& craftSize, const CraftSlot& rSlot,
 		return INT_MAX; // Incompatible or occupied slot, placement not possible.
 	}
 	int slotUseCost = std::max(1, rSlot.max -
-		craftSize); // Wasted slot space. Avoid zeros.
+		craftSize); // Wasted slot space. Avoid zeros just in case.
 	if (rSlot.group > 0)
 	{
 		int refSlotGroup = rSlot.group;
@@ -1012,7 +1012,7 @@ int Base::getCraftSlotCost(const int& craftSize, const CraftSlot& rSlot,
 		{
 			return cSlot.group == refSlotGroup;
 		});
-		slotUseCost += (groupCount * groupCount);
+		slotUseCost *= (groupCount * groupCount);
 	}
 	return slotUseCost;
 }
@@ -1035,7 +1035,7 @@ int Base::getCraftVirtualCost(const int& craftSize, const VirtualSlot& rSlot,
 		return INT_MAX; // Incompatible or occupied slot, placement not possible.
 	}
 	int slotUseCost = std::max(1, rSlot.max -
-		craftSize); // Wasted slot space. Avoid zeros.
+		craftSize); // Wasted slot space. Avoid zeros just in case.
 	if (rSlot.group > 0)
 	{
 		int refSlotGroup = rSlot.group;
@@ -1044,7 +1044,7 @@ int Base::getCraftVirtualCost(const int& craftSize, const VirtualSlot& rSlot,
 		{
 			return cSlot.group == refSlotGroup;
 		});
-		slotUseCost += (groupCount * groupCount);
+		slotUseCost *= (groupCount * groupCount);
 	}
 	return slotUseCost;
 }
@@ -2142,8 +2142,23 @@ int Base::damageFacility(BaseFacility *toBeDamaged)
 		// move the craft from the original hangar to the damaged hangar
 		if (fac->getRules()->getCrafts() > 0)
 		{
+			const auto& newOptions = fac->getRules()->getCraftOptions();
+			const auto& oldOptions = toBeDamaged->getRules()->getCraftOptions();
+			auto newOptionIt = newOptions.begin();
+			auto oldOptionIt = oldOptions.begin();
 			for (auto& craftSlot : _craftSlots)
-				if (craftSlot.parent == toBeDamaged) craftSlot.parent = fac;
+			{
+				if (craftSlot.parent == toBeDamaged)
+				{
+					if (newOptionIt != newOptions.end() &&
+						oldOptionIt != oldOptions.end())
+					{
+						craftSlot.parent = fac;
+					}
+					++newOptionIt;
+					++oldOptionIt;
+				}
+			}
 			fac->setCraftForDrawing(toBeDamaged->getCraftForDrawing());
 			toBeDamaged->setCraftForDrawing(0);
 		}
