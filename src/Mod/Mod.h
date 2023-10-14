@@ -242,7 +242,7 @@ private:
 	std::string _loseMoney, _loseRating, _loseDefeat;
 	int _ufoGlancingHitThreshold, _ufoBeamWidthParameter;
 	int _accelerationBonusDivisor, _accelerationPenaltyStandoff, _accelerationPenaltyCautious, _accelerationPenaltyCombat, _accelerationPenaltyManeuver;
-	int _accelerationCoefficientStandoff, _accelerationCoefficientCautious, _accelerationCoefficientCombat, _accelerationCoefficientManeuver;
+	std::pair<int, int> _accelerationCoefficientStandoff, _accelerationCoefficientCautious, _accelerationCoefficientCombat, _accelerationCoefficientManeuver;
 	int _ufoTractorBeamSizeModifiers[5];
 	int _escortRange, _drawEnemyRadarCircles;
 	bool _escortsJoinFightAgainstHK, _hunterKillerFastRetarget, _craftsCanChangeClass;
@@ -1126,13 +1126,13 @@ public:
 	/// Gets acceleration penalty used to check if HK or player dictates range in Standard Mode.
 	int getAccelerationPenaltyManeuver() const { return _accelerationPenaltyManeuver; }
 	/// Gets acceleration coefficient used in HK Standoff Mode activation formula.
-	int getAccelerationCoefficientStandoff() const { return _accelerationCoefficientStandoff; }
+	const std::pair<int, int> getAccelerationCoefficientStandoff() const { return _accelerationCoefficientStandoff; }
 	/// Gets acceleration coefficient used in HK Cautious/Evasion Mode switch formula.
-	int getAccelerationCoefficientCautious() const { return _accelerationCoefficientCautious; }
+	const std::pair<int, int> getAccelerationCoefficientCautious() const { return _accelerationCoefficientCautious; }
 	/// Gets acceleration coefficient used in HK Standard Mode activation formula.
-	int getAccelerationCoefficientCombat() const { return _accelerationCoefficientCombat; }
+	const std::pair<int, int> getAccelerationCoefficientCombat() const { return _accelerationCoefficientCombat; }
 	/// Gets acceleration coefficient used to check if HK or player dictates range in Standard Mode.
-	int getAccelerationCoefficientManeuver() const { return _accelerationCoefficientManeuver; }
+	const std::pair<int, int> getAccelerationCoefficientManeuver() const { return _accelerationCoefficientManeuver; }
 	/// Crafts can change their class due to change in their size (through systems/weapons)?
 	bool getCraftsCanChangeClass() const { return _craftsCanChangeClass; }
 

@@ -366,7 +366,7 @@ Mod::Mod() :
 	_loseMoney("loseGame"), _loseRating("loseGame"), _loseDefeat("loseGame"),
 	_ufoGlancingHitThreshold(0), _ufoBeamWidthParameter(1000),
 	_accelerationBonusDivisor(3), _accelerationPenaltyStandoff(10), _accelerationPenaltyCautious(10), _accelerationPenaltyCombat(10), _accelerationPenaltyManeuver(10),
-	_accelerationCoefficientStandoff(20), _accelerationCoefficientCautious(35), _accelerationCoefficientCombat(50), _accelerationCoefficientManeuver(70),
+	_accelerationCoefficientStandoff(20, 10), _accelerationCoefficientCautious(35, 15), _accelerationCoefficientCombat(50, 20), _accelerationCoefficientManeuver(70, 25),
 	_escortRange(20), _drawEnemyRadarCircles(1), _escortsJoinFightAgainstHK(true), _hunterKillerFastRetarget(true), _craftsCanChangeClass(false),
 	_crewEmergencyEvacuationSurvivalChance(100), _pilotsEmergencyEvacuationSurvivalChance(100),
 	_soldiersPerRank({-1, -1, 5, 11, 23, 30}),
@@ -3201,10 +3201,10 @@ void Mod::loadFile(const FileMap::FileRecord &filerec, ModScript &parsers)
 	_accelerationPenaltyCautious = doc["accelerationPenaltyCautious"].as<int>(_accelerationPenaltyCautious);
 	_accelerationPenaltyCombat = doc["accelerationPenaltyCombat"].as<int>(_accelerationPenaltyCombat);
 	_accelerationPenaltyManeuver = doc["accelerationPenaltyManeuver"].as<int>(_accelerationPenaltyManeuver);
-	_accelerationCoefficientStandoff = doc["accelerationCoefficientStandoff"].as<int>(_accelerationCoefficientStandoff);
-	_accelerationCoefficientCautious = doc["accelerationCoefficientCautious"].as<int>(_accelerationCoefficientCautious);
-	_accelerationCoefficientCombat = doc["accelerationCoefficientCombat"].as<int>(_accelerationCoefficientCombat);
-	_accelerationCoefficientManeuver = doc["accelerationCoefficientManeuver"].as<int>(_accelerationCoefficientManeuver);
+	_accelerationCoefficientStandoff = doc["accelerationCoefficientStandoff"].as<std::pair<int, int>>(_accelerationCoefficientStandoff);
+	_accelerationCoefficientCautious = doc["accelerationCoefficientCautious"].as<std::pair<int, int>>(_accelerationCoefficientCautious);
+	_accelerationCoefficientCombat = doc["accelerationCoefficientCombat"].as<std::pair<int, int>>(_accelerationCoefficientCombat);
+	_accelerationCoefficientManeuver = doc["accelerationCoefficientManeuver"].as<std::pair<int, int>>(_accelerationCoefficientManeuver);
 	_craftsCanChangeClass = doc["craftsCanChangeClass"].as<bool>(_craftsCanChangeClass);
 
 

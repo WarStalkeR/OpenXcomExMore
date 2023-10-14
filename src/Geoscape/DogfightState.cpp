@@ -291,29 +291,37 @@ DogfightState::DogfightState(GeoscapeState *state, Craft *craft, Ufo *ufo, bool 
 	}
 
 	// Craft can hold HK in Standoff Mode?
-	if (_craftSpeedBetter && _craft->getCraftStats().speedMax > std::max(1, (_ufo->getCraftStats().speedMax *
-		(1000 + _game->getMod()->getAccelerationCoefficientStandoff() * (_game->getMod()->getAccelerationPenaltyStandoff() - _craft->getCraftStats().accel))) / 1000))
+	const int coefficientStandoff = _craft->getCraftStats().accel >= _game->getMod()->getAccelerationPenaltyStandoff() ?
+		_game->getMod()->getAccelerationCoefficientStandoff().second : _game->getMod()->getAccelerationCoefficientStandoff().first;
+	if (_craft->getCraftStats().speedMax > std::max(1, (_ufo->getCraftStats().speedMax *
+		(1000 + coefficientStandoff * (_game->getMod()->getAccelerationPenaltyStandoff() - _craft->getCraftStats().accel))) / 1000))
 	{
 		_craftStandoffBetter = true;
 	}
 
 	// Craft can keep HK at range in Cautious Mode?
+	const int coefficientCautious = _craft->getCraftStats().accel >= _game->getMod()->getAccelerationPenaltyCautious() ?
+		_game->getMod()->getAccelerationCoefficientCautious().second : _game->getMod()->getAccelerationCoefficientCautious().first;
 	if (_craft->getCraftStats().speedMax > std::max(1, (_ufo->getCraftStats().speedMax *
-		(1000 + _game->getMod()->getAccelerationCoefficientCautious() * (_game->getMod()->getAccelerationPenaltyCautious() - _craft->getCraftStats().accel))) / 1000))
+		(1000 + coefficientCautious * (_game->getMod()->getAccelerationPenaltyCautious() - _craft->getCraftStats().accel))) / 1000))
 	{
 		_craftCautiousBetter = true;
 	}
 
 	// Craft can fight HK in Combat Mode?
+	const int coefficientCombat = _craft->getCraftStats().accel >= _game->getMod()->getAccelerationPenaltyCombat() ?
+		_game->getMod()->getAccelerationCoefficientCombat().second : _game->getMod()->getAccelerationCoefficientCombat().first;
 	if (_craft->getCraftStats().speedMax > std::max(1, (_ufo->getCraftStats().speedMax *
-		(1000 + _game->getMod()->getAccelerationCoefficientCombat() * (_game->getMod()->getAccelerationPenaltyCombat() - _craft->getCraftStats().accel))) / 1000))
+		(1000 + coefficientCombat * (_game->getMod()->getAccelerationPenaltyCombat() - _craft->getCraftStats().accel))) / 1000))
 	{
 		_craftCombatBetter = true;
 	}
 
 	// Craft can outmaneuver HK in Combat Mode?
+	const int coefficientManeuver = _craft->getCraftStats().accel >= _game->getMod()->getAccelerationPenaltyManeuver() ?
+		_game->getMod()->getAccelerationCoefficientManeuver().second : _game->getMod()->getAccelerationCoefficientManeuver().first;
 	if (_craft->getCraftStats().speedMax > std::max(1, (_ufo->getCraftStats().speedMax *
-		(1000 + _game->getMod()->getAccelerationCoefficientManeuver() * (_game->getMod()->getAccelerationPenaltyManeuver() - _craft->getCraftStats().accel))) / 1000))
+		(1000 + coefficientManeuver * (_game->getMod()->getAccelerationPenaltyManeuver() - _craft->getCraftStats().accel))) / 1000))
 	{
 		_craftManeuverBetter = true;
 	}
@@ -451,7 +459,7 @@ DogfightState::DogfightState(GeoscapeState *state, Craft *craft, Ufo *ufo, bool 
 		{
 			_window->drawRect(_btnDisengage->getX() + 2, _btnDisengage->getY() + 2, _btnDisengage->getWidth() - 4, _btnDisengage->getHeight() - 4, dogfightInterface->getElement("disengageButton")->color + 4);
 		}
-		if (!_craftStandoffBetter)
+		if (!_craftSpeedBetter)
 		{
 			int offset = dogfightInterface->getElement("minimizeButtonDummy")->TFTDMode ? 1 : 0;
 			_window->drawRect(_btnMinimize->getX() + 1 + offset, _btnMinimize->getY() + 1, _btnMinimize->getWidth() - 2 - offset, _btnMinimize->getHeight() - 2, dogfightInterface->getElement("minimizeButtonDummy")->color + 4);
@@ -484,7 +492,7 @@ DogfightState::DogfightState(GeoscapeState *state, Craft *craft, Ufo *ufo, bool 
 	_preview->onMouseClick((ActionHandler)&DogfightState::previewClick);
 
 	_btnMinimize->onMouseClick((ActionHandler)&DogfightState::btnMinimizeClick);
-	_btnMinimize->setVisible(!_ufoIsAttacking || (_ufoIsAttacking && _craftStandoffBetter));
+	_btnMinimize->setVisible(!_ufoIsAttacking || (_ufoIsAttacking && _craftSpeedBetter));
 
 	_btnStandoff->copy(_window);
 	_btnStandoff->setGroup(&_mode);
@@ -2161,7 +2169,7 @@ void DogfightState::previewClick(Action *)
 	_btnAggressive->setVisible(true);
 	_btnDisengage->setVisible(!_disableDisengage);
 	_btnUfo->setVisible(true);
-	_btnMinimize->setVisible(!_ufoIsAttacking || _craftIsDefenseless || (_ufoIsAttacking && _craftStandoffBetter));
+	_btnMinimize->setVisible(!_ufoIsAttacking || _craftIsDefenseless || (_ufoIsAttacking && _craftSpeedBetter));
 	for (int i = 0; i < _weaponNum; ++i)
 	{
 		_weapon[i]->setVisible(true);
