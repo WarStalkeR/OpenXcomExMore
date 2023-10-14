@@ -2143,20 +2143,20 @@ int Base::damageFacility(BaseFacility *toBeDamaged)
 		if (fac->getRules()->getCrafts() > 0)
 		{
 			const auto& newOptions = fac->getRules()->getCraftOptions();
-			const auto& oldOptions = toBeDamaged->getRules()->getCraftOptions();
 			auto newOptionIt = newOptions.begin();
-			auto oldOptionIt = oldOptions.begin();
 			for (auto& craftSlot : _craftSlots)
 			{
 				if (craftSlot.parent == toBeDamaged)
 				{
-					if (newOptionIt != newOptions.end() &&
-						oldOptionIt != oldOptions.end())
+					if (newOptionIt != newOptions.end())
 					{
-						craftSlot.parent = fac;
+						// if craft slots aren't compatible, you'll lose housed crafts.
+						if (craftSlot.max <= newOptionIt->max &&
+							craftSlot.min >= newOptionIt->min)
+							craftSlot.parent = fac;
 					}
+					else break;
 					++newOptionIt;
-					++oldOptionIt;
 				}
 			}
 			fac->setCraftForDrawing(toBeDamaged->getCraftForDrawing());
