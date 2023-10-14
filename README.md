@@ -81,7 +81,7 @@ base view.
 `      - [8, 2, 30, 49, false]` Rendered in base view.  
 `      - [8, 2, 1, 9, true]` Always hidden in base view.  
 `      - [2, -4, 0, 0, false]` Default hangar values.  
-`    optionGroups: [2, 2, 1]` Allows disconnected craft size ranges.   
+`    optionGroups: [2, 2, 1]` Allows disconnected craft size ranges.  
 **Usage**: Now it is possible to define positions of crafts in hangar (when in
 base view mode) and if they are permanently hidden. Each **craftOptions** entry
 consists from 5 variables: *Horizontal Offset*, *Vertical Offset*, *Craft
@@ -112,7 +112,7 @@ classify what size ranges belong to what classes.
 `craftWeapons:`  
 `  - type: NEW_FANCY_WEAPON`  
 `    stats:`  
-`      craftSize: 6`
+`      craftSize: 6`  
 In this example `craftSize` of `6` means that once this weapon is equipped,
 craft's size will be increased by 6. If crafts aren't allowed to change class
 (via option) or has no suitable hangar slot after such change, player will
@@ -179,7 +179,7 @@ change beyond the limits defined by the classification."`
 **Craft values for script files (with example below):**  
 `crafts:`  
 `  - type: BIG_SPRITE_CRAFT`  
-`    spriteSize: [54, 72]`
+`    spriteSize: [54, 72]`  
 Now it is possible to define new sprite size for crafts with bigger sprites
 in order to still keep them centered at original coordinates. The `spriteSize`
 values should be exactly as as vertical and horizontal size of your image in
@@ -225,7 +225,7 @@ space."`
 `    size: 2`  
 `    spriteShape: 2041` Remember that bigger shapes require multiple images.  
 `    spriteFacility: 549` Will be drawn over `spriteShape` if enabled.  
-`    spriteEnabled: true` Will enabled drawing `spriteFacility`.
+`    spriteEnabled: true` Will enabled drawing `spriteFacility`.  
 Now it is possible to enable same rendering behavior for bigger facilities
 (`size: 2` and more) as for `size: 1` facilities: where first shape is drawn
 and only then facility sprite over it.  The `spriteEnabled` option is
