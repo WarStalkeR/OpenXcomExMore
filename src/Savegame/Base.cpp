@@ -1214,6 +1214,25 @@ void Base::syncCraftSlots()
 				}
 			}
 
+			if (gotPlace) continue; // If housed in fall-back, proceed to next.
+
+			// No fall-back slot either? Just ram it into any slot.
+			for (size_t j = 0; j < _craftSlots.size(); ++j)
+			{
+				const bool isFreeSlotGroup = (_craftSlots[j].group == 0 ||
+					!(std::find(occupiedGroups.begin(), occupiedGroups.end(),
+						_craftSlots[j].group) != occupiedGroups.end()));
+				if (isFreeSlotGroup && _craftSlots[j].craft == nullptr) // Any unoccupied slot group.
+				{
+					_craftSlots[j].craft = _crafts[i];
+					if (_craftSlots[j].group > 0)
+						occupiedGroups.push_back(_craftSlots[j].group);
+					_craftSlots[j].parent->setCraftForDrawing(_crafts[i]);
+					gotPlace = true;
+					break;
+				}
+			}
+
 			if (!gotPlace)
 			{
 				Log(LOG_WARNING) << "Craft: " << _crafts[i]->getType()
@@ -2309,7 +2328,8 @@ void Base::destroyFacility(BASEFACILITIESITERATOR facility)
 		for (auto& craftSlot : _craftSlots)
 		{
 			// go through each craft slot related to the facility
-			if (craftSlot.parent == *facility && craftSlot.craft != nullptr)
+			if (craftSlot.parent == *facility && craftSlot.craft != nullptr &&
+				craftSlot.craft->getStatus() != "STR_OUT")
 			{
 				// remove all soldiers
 				for (Soldier *s : _soldiers)

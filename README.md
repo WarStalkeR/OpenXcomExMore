@@ -167,6 +167,12 @@ _Standard Localization Strings: (saved in **\Language** folder)_
 `  STR_CRAFT_SIZE_UC: "SIZE>{ALT}{0}{ALT}"`  
 `  STR_CRAFT_CLASS_UC: "CLASS>{ALT}{0}{ALT}"`  
 `  STR_HANGAR_CRAFT_CAP: "Craft Capacity"`  
+`  STR_NO_FREE_HANGARS: "HANGAR CAPACITY EXCEEDED!{SMALLLINE}The amount of
+crafts we have in {0} exceeds hangar capacity. Transfer or sell the excess
+crafts!"`  
+`  STR_NO_FREE_HANGARS_AFTER_STRIKE: "HANGAR CAPACITY EXCEEDED!{SMALLLINE}After
+missile strike, the amount of crafts we have in {0} exceeds hangar capacity.
+Transfer or sell the excess crafts to avoid losing them!"`  
 `  STR_NO_FREE_HANGARS_FOR_REFIT: "NO SUITABLE HANGAR SLOT AFTER
 REFIT!{SMALLLINE}After refitting craft with selected weapon, system or
 utility, its size will change. However, after such refit there is no
