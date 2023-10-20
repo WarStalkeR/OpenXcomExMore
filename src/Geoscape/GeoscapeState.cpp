@@ -2094,8 +2094,14 @@ void GeoscapeState::time1Hour()
 	// Handle craft maintenance
 	for (auto* xbase : *_game->getSavedGame()->getBases())
 	{
+		int numCraftsOut = 0;
+
 		for (auto* xcraft : *xbase->getCrafts())
 		{
+			if (xcraft->getStatus() == "STR_OUT")
+			{
+				++numCraftsOut;
+			}
 			if (xcraft->getStatus() == "STR_REPAIRS")
 			{
 				xcraft->repair();
@@ -2117,6 +2123,15 @@ void GeoscapeState::time1Hour()
 				// Recharge craft shields in parallel (no wait for repair/rearm/refuel)
 				xcraft->setShield(xcraft->getShield() + xcraft->getRules()->getShieldRechargeAtBase());
 			}
+		}
+
+		if ((xbase->getUsedHangars() - numCraftsOut) > xbase->getAvailableHangars())
+		{
+			timerReset();
+			popup(new ErrorMessageState(tr("STR_NO_FREE_HANGARS").arg(xbase->getName()), _palette,
+				_game->getMod()->getInterface("geoscape")->getElement("errorMessage")->color, "BACK14.SCR",
+				_game->getMod()->getInterface("geoscape")->getElement("errorPalette")->color));
+			popup(new SellState(xbase, 0));
 		}
 	}
 
@@ -3484,6 +3499,14 @@ void GeoscapeState::handleBaseDefense(Base *base, Ufo *ufo)
 
 			// let the player know that some facilities were destroyed, but the base survived
 			popup(new BaseDestroyedState(base, true, true));
+
+			// check if we have enough hangar space, if not notify the user.
+			if (base->getUsedHangars() > base->getAvailableHangars())
+			{
+				popup(new ErrorMessageState(tr("STR_NO_FREE_HANGARS_AFTER_STRIKE").arg(base->getName()), _palette,
+					_game->getMod()->getInterface("geoscape")->getElement("errorMessage")->color, "BACK14.SCR",
+					_game->getMod()->getInterface("geoscape")->getElement("errorPalette")->color));
+			}
 		}
 	}
 	else if (base->getAvailableSoldiers(true, true) > 0 || !base->getVehicles()->empty())
