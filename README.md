@@ -195,9 +195,14 @@ pixels sprite.
 ## Base Attack/Missile Strikes Debug Triggers
 Only works when in `options.cfg` the option `debug: true` is set. In
 **Geoscape**, if you hold SHIFT, while clicking any of your bases, it will
-trigger base attack against random race/faction. If do so, whilst holding CTRL,
-missile strike against selected base will be triggered. If your mod has no
-`ufos:` with `missilePower` nothing will be triggered.  
+trigger base invasion with random race/faction. If you do so, whilst holding
+CTRL, missile strike against selected base will be triggered.  
+
+**Note**: If your mod has no `ufos:` rules with `missilePower`, then no missile
+strike will be triggered. In addition, all relevant missions, races and UFOs
+should be properly linked together, so they can be triggered and spawned
+normally by the game, otherwise nothing will spawn and you will get error
+message in log what is missing.  
 
 ## Soldier/Vehicle Capacity as Craft Stats
 **Craft values for script files (with example below):**  
