@@ -206,6 +206,22 @@ void SellState::delayedInit()
 				_cats.push_back(cat);
 			}
 		}
+		else
+		{
+			// We don't see in-flight crafts in sell list, so they don't count.
+			--_hangarChange;
+		}
+	}
+	if (_hangarChange != 0)
+	{
+		// We only run this check, if there are in-flight crafts.
+		overfull = _debriefingState == 0 && Options::storageLimitsEnforced && (_base->storesOverfull()
+			|| (_base->getUsedHangars() + _hangarChange) > _base->getAvailableHangars());
+
+		// Buttons visibility needs to be updated as well.
+		_btnCancel->setVisible(!overfull);
+		_btnOk->setVisible(!overfull);
+		_btnTransfer->setVisible(overfull);
 	}
 	if (_base->getAvailableScientists() > 0 && _debriefingState == 0)
 	{
@@ -1107,8 +1123,8 @@ void SellState::updateItemStrings()
 	if (_debriefingState == 0 && Options::storageLimitsEnforced)
 	{
 		_btnOk->setVisible(!_base->storesOverfull(_spaceChange) &&
-			(_base->getAvailableHangars() - _base->getUsedHangars() -
-				_hangarChange) >= 0);
+			(_base->getUsedHangars() + _hangarChange) <=
+				_base->getAvailableHangars());
 	}
 }
 
