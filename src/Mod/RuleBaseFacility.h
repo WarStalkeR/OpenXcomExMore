@@ -265,24 +265,24 @@ namespace YAML
 		{
 			Node node;
 			node.SetStyle(EmitterStyle::Flow);
-			node.push_back(crOpt.x);
-			node.push_back(crOpt.y);
-			node.push_back(crOpt.min);
-			node.push_back(crOpt.max);
-			node.push_back(crOpt.hide);
+			node["x"] = crOpt.x;
+			node["y"] = crOpt.y;
+			node["min"] = crOpt.min;
+			node["max"] = crOpt.max;
+			node["hide"] = crOpt.hide;
 			return node;
 		}
 
 		static bool decode(const Node& node, OpenXcom::CraftOption& crOpt)
 		{
-			if (!node.IsSequence() || node.size() != 5)
+			if (!node.IsMap())
 				return false;
 
-			crOpt.x = node[0].as<int>();
-			crOpt.y = node[1].as<int>();
-			crOpt.min = node[2].as<int>();
-			crOpt.max = node[3].as<int>();
-			crOpt.hide = node[4].as<bool>();
+			crOpt.x = node["x"].as<int>(2);
+			crOpt.y = node["y"].as<int>(-4);
+			crOpt.min = node["min"].as<int>(0);
+			crOpt.max = node["max"].as<int>(0);
+			crOpt.hide = node["hide"].as<bool>(false);
 
 			if (crOpt.min > crOpt.max) return false;
 			return true;
