@@ -76,11 +76,11 @@ backwards compatibility.
 `    craftsHidden: false` Flag to render or not render housed crafts in
 base view.  
 `    craftOptions:` More explanations below in **Usage** section.  
-`      - [2, -4, 30, 49, false]` Rendered in base view.  
-`      - [2, -4, 1, 9, true]` Always hidden in base view.  
-`      - [8, 2, 30, 49, false]` Rendered in base view.  
-`      - [8, 2, 1, 9, true]` Always hidden in base view.  
-`      - [2, -4, 0, 0, false]` Default hangar values.  
+`      - {x: 2, y: -4, min: 30, max: 49, hide: false}` Rendered in base view.  
+`      - {x: 2, y: -4, min: 1, max: 9, hide: true}` Always hidden in base view.  
+`      - {x: 8, y: 2, min: 30, max: 49, hide: false}` Rendered in base view.  
+`      - {x: 8, y: 2, min: 1, max: 9, hide: true}` Always hidden in base view.  
+`      - {x: 2, y: -4, min: 0, max: 0, hide: false}` Default hangar values.  
 `    optionGroups: [2, 2, 1]` Allows disconnected craft size ranges.  
 **Usage**: Now it is possible to define positions of crafts in hangar (when in
 base view mode) and if they are permanently hidden. Each **craftOptions** entry
