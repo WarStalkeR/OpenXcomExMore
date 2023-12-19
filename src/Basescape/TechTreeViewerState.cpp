@@ -2720,7 +2720,11 @@ void TechTreeViewerState::handleMissionScript()
 	// 1c. Min/Max Difficulty
 	bTrigger << "  " << tr("STR_TRIGGER_DIFFICULTY") << " ";
 	bTrigger << tr("STR_TRDIFF_LVL_" + std::to_string(rule->getMinDifficulty()));
-	if (rule->getMinDifficulty() < 4) bTrigger << " " << tr("STR_TRSIGN_UP");
+	if (rule->getMinDifficulty() != rule->getMaxDifficulty())
+	{
+		bTrigger << " " << tr("STR_TRSIGN_MID") << " ";
+		bTrigger << tr("STR_TRDIFF_LVL_" + std::to_string(rule->getMaxDifficulty()));
+	}
 	isValidTrigger = isValidDiffTrigger(0, 0, rule);
 	_lstLeft->addRow(1, bTrigger.str().c_str());
 	_lstLeft->setRowColor(row, isValidTrigger ? _purple : _pink);
@@ -3185,7 +3189,8 @@ bool TechTreeViewerState::isValidDiffTrigger(const RuleArcScript *ruleArc, const
 	}
 	else if (ruleMission != 0)
 	{
-		return (ruleMission->getMinDifficulty() <= _currDiff);
+		return (ruleMission->getMinDifficulty() <= _currDiff &&
+			ruleMission->getMaxDifficulty() >= _currDiff);
 	}
 	return false;
 }
