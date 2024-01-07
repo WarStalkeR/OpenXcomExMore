@@ -165,93 +165,125 @@ void CraftWeaponsState::btnCancelClick(Action *)
  */
 void CraftWeaponsState::lstWeaponsClick(Action *)
 {
-	bool allowChange = true;
 	bool sizeChanged = false;
-	bool classChanged = false;
-	bool unitCapChanged = false;
-	bool classChangeAllowed = _game->getMod()->getCraftsCanChangeClass();
-	const RuleCraftWeapon* refWeapon = nullptr;
-	const RuleCraftWeapon* currWeapon = nullptr;
-	CraftWeapon* current = _craft->getWeapons()->at(_weapon);
-	if (_weapons[_lstWeapons->getSelectedRow()] != 0)
-		refWeapon = _weapons[_lstWeapons->getSelectedRow()];
-	if (current != 0) currWeapon = current->getRules();
+	CraftWeapon *current = _craft->getWeapons()->at(_weapon);
 
-	if ((refWeapon != nullptr && refWeapon->getBonusStats().craftSize != 0) ||
-		(currWeapon != nullptr && currWeapon->getBonusStats().craftSize != 0))
+	const RuleCraftWeapon* refWeapon = _weapons[_lstWeapons->getSelectedRow()];
+	const RuleCraftWeapon* currWeapon = current ? current->getRules() : nullptr;
+
+	// Validate craft size after refit.
 	{
-		int refCraftSize = _craft->getCraftSize();
-		int refWeaponSize = refWeapon != nullptr ? refWeapon->getBonusStats().craftSize : 0;
-		int currWeaponSize = currWeapon != nullptr ? currWeapon->getBonusStats().craftSize : 0;
-		sizeChanged = (refWeaponSize - currWeaponSize) != 0;
-		if (sizeChanged) // Craft size changed, hangar slots sync needed
+		int refWeaponCraftSize = refWeapon ? refWeapon->getBonusStats().craftSize : 0;
+		int currWeaponCraftSize = currWeapon ? currWeapon->getBonusStats().craftSize : 0;
+		int diffCraftSize = (refWeaponCraftSize - currWeaponCraftSize);
+		if (diffCraftSize)
 		{
-			int newCraftSize = refCraftSize + refWeaponSize - currWeaponSize;
-			classChanged = _game->getMod()->getCraftClassFromSize(newCraftSize) !=
-				_game->getMod()->getCraftClassFromSize(refCraftSize);
+			// Check, if there is suitable hangar slot for the new craft size.
+			int newCraftSize = _craft->getCraftSize() + diffCraftSize;
 			if (!_base->allowCraftRefit(_craft, newCraftSize))
-				allowChange = false;
-			if (classChanged && !classChangeAllowed)
-				allowChange = false;
+			{
+				_game->popState();
+				_game->pushState(new ErrorMessageState(
+					tr("STR_NO_FREE_HANGARS_FOR_REFIT"),
+					_palette,
+					_game->getMod()->getInterface("craftWeapons")->getElement("window")->color,
+					"BACK14.SCR",
+					_game->getMod()->getInterface("craftWeapons")->getElement("palette")->color)
+				);
+				return;
+			}
+
+			// Check, if game rules allow craft to change its classification.
+			bool classChanged = _game->getMod()->getCraftClassFromSize(newCraftSize) !=
+				_game->getMod()->getCraftClassFromSize(_craft->getCraftSize());
+			if (classChanged && !_game->getMod()->getCraftsCanChangeClass())
+			{
+				_game->popState();
+				_game->pushState(new ErrorMessageState(
+					tr("STR_NO_CRAFT_CLASS_CHANGE"),
+					_palette,
+					_game->getMod()->getInterface("craftWeapons")->getElement("window")->color,
+					"BACK14.SCR",
+					_game->getMod()->getInterface("craftWeapons")->getElement("palette")->color)
+				);
+				return;
+			}
+
+			// Notify game to sync hangar slots, since craft size got changed.
+			sizeChanged = true;
 		}
 	}
 
-	if (allowChange &&
-		((refWeapon != nullptr && refWeapon->getBonusStats().soldiers != 0) ||
-		(currWeapon != nullptr && currWeapon->getBonusStats().soldiers != 0)))
+	// Validate soldier capacity after refit.
 	{
-		int refUnitCapBonus = refWeapon != nullptr ? refWeapon->getBonusStats().soldiers : 0;
-		int currUnitCapBonus = currWeapon != nullptr ? currWeapon->getBonusStats().soldiers : 0;
-		unitCapChanged = (refUnitCapBonus - currUnitCapBonus) != 0;
-		if (unitCapChanged) // Unit capacity changed, verify that change is allowed
+		int refCapBonusSoldiers = refWeapon ? refWeapon->getBonusStats().soldiers : 0;
+		int currCapBonusSoldiers = currWeapon ? currWeapon->getBonusStats().soldiers : 0;
+		int diffSoldiers = (refCapBonusSoldiers - currCapBonusSoldiers);
+		if (diffSoldiers)
 		{
-			if ((_craft->getMaxUnits() - _craft->getSpaceUsed() +
-				refUnitCapBonus - currUnitCapBonus) < 0)
-				allowChange = false;
+			if ((_craft->getMaxUnits() - _craft->getSpaceUsed() + diffSoldiers) < 0)
+			{
+				_game->popState();
+				_game->pushState(new ErrorMessageState(
+					tr("STR_NOT_ENOUGH_CARGO_SPACE"),
+					_palette,
+					_game->getMod()->getInterface("craftWeapons")->getElement("window")->color,
+					"BACK14.SCR",
+					_game->getMod()->getInterface("craftWeapons")->getElement("palette")->color)
+				);
+				return;
+			}
 		}
 	}
 
-	if (allowChange)
+	// Validate vehicle capacity after refit.
 	{
-		// Remove current weapon
-		if (current != 0)
+		int refCapBonusVehicles = refWeapon ? refWeapon->getBonusStats().vehicles : 0;
+		int currCapBonusVehicles = currWeapon ? currWeapon->getBonusStats().vehicles : 0;
+		int diffVehicles = (refCapBonusVehicles - currCapBonusVehicles);
+		if (diffVehicles)
 		{
-			_base->getStorageItems()->addItem(current->getRules()->getLauncherItem());
-			_base->getStorageItems()->addItem(current->getRules()->getClipItem(), current->getClipsLoaded());
-			_craft->addCraftStats(-current->getRules()->getBonusStats());
-			// Make sure any extra shield is removed from craft too when the shield capacity decreases (exploit protection)
-			_craft->setShield(_craft->getShield());
-			delete current;
-			_craft->getWeapons()->at(_weapon) = 0;
-		}
-
-		// Equip new weapon
-		if (_weapons[_lstWeapons->getSelectedRow()] != 0)
-		{
-			CraftWeapon *sel = new CraftWeapon(_weapons[_lstWeapons->getSelectedRow()], 0);
-			_craft->addCraftStats(sel->getRules()->getBonusStats());
-			_base->getStorageItems()->removeItem(sel->getRules()->getLauncherItem());
-			_craft->getWeapons()->at(_weapon) = sel;
+			if ((_craft->getMaxVehiclesAndLargeSoldiers() - _craft->getNumVehiclesAndLargeSoldiers() + diffVehicles) < 0)
+			{
+				_game->popState();
+				_game->pushState(new ErrorMessageState(
+					tr("STR_NOT_ENOUGH_HWP_CAPACITY"),
+					_palette,
+					_game->getMod()->getInterface("craftWeapons")->getElement("window")->color,
+					"BACK14.SCR",
+					_game->getMod()->getInterface("craftWeapons")->getElement("palette")->color)
+				);
+				return;
+			}
 		}
 	}
 
+	// Remove current weapon
+	if (current != 0)
+	{
+		_base->getStorageItems()->addItem(current->getRules()->getLauncherItem());
+		_base->getStorageItems()->addItem(current->getRules()->getClipItem(), current->getClipsLoaded());
+		_craft->addCraftStats(-current->getRules()->getBonusStats());
+		// Make sure any extra shield is removed from craft too when the shield capacity decreases (exploit protection)
+		_craft->setShield(_craft->getShield());
+		delete current;
+		_craft->getWeapons()->at(_weapon) = 0;
+	}
+
+	// Equip new weapon
+	if (_weapons[_lstWeapons->getSelectedRow()] != 0)
+	{
+		CraftWeapon *sel = new CraftWeapon(_weapons[_lstWeapons->getSelectedRow()], 0);
+		_craft->addCraftStats(sel->getRules()->getBonusStats());
+		_base->getStorageItems()->removeItem(sel->getRules()->getLauncherItem());
+		_craft->getWeapons()->at(_weapon) = sel;
+	}
+
+	// Wrap up and finish function execution.
 	if (sizeChanged)
 		_base->syncCraftSlots();
 	_craft->checkup();
 	_game->popState();
-
-	if (!allowChange)
-	{
-		std::string errorMessage = "STR_NO_FREE_HANGARS_FOR_REFIT";
-		if (classChanged && !classChangeAllowed)
-			errorMessage = "STR_NO_CRAFT_CLASS_CHANGE";
-		else if (unitCapChanged)
-			errorMessage = "STR_NO_CARGO_SPACE_FOR_REFIT";
-		RuleInterface* menuInterface = _game->getMod()->getInterface("craftWeapons");
-		_game->pushState(new ErrorMessageState(tr(errorMessage), _palette,
-			menuInterface->getElement("window")->color, "BACK14.SCR",
-			menuInterface->getElement("palette")->color));
-	}
 }
 
 /**
