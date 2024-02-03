@@ -34,6 +34,31 @@ class RuleItem;
 struct VerticalLevel;
 enum BasePlacementErrors : int;
 
+struct CraftOption
+{
+	/// Horizontal offset for rendering craft in the facility.
+	int x = 2;
+	/// Vertical offset for rendering craft in the facility.
+	int y = -4;
+	/// Minimum size of craft that can be housed in the slot.
+	int min = 0;
+	/// Maximum size of craft that can be housed in the slot.
+	int max = 0;
+	/// Is craft hidden or rendered in the base in the slot.
+	bool hide = false;
+	/// Constructor with default parameters. Needed for YAML.
+	CraftOption() = default;
+	/// Constructor that allows to define facility craft slots.
+	CraftOption(int xOffset, int yOffset, int minSize, int maxSize, bool isHidden)
+	{
+		x = xOffset;
+		y = yOffset;
+		min = minSize;
+		max = maxSize;
+		hide = isHidden;
+	}
+};
+
 /**
  * Represents a specific type of base facility.
  * Contains constant info about a facility like
@@ -58,7 +83,9 @@ private:
 	int _buildCost, _refundValue, _buildTime, _monthlyCost;
 	std::map<std::string, std::pair<int, int> > _buildCostItems;
 	int _storage, _personnel, _aliens, _crafts, _labs, _workshops, _psiLabs;
-	bool _spriteEnabled;
+	bool _spriteEnabled, _craftsHidden;
+	std::vector<CraftOption> _craftOptions;
+	std::vector<int> _optionGroups;
 	int _sightRange, _sightChance;
 	int _radarRange, _radarChance, _defense, _hitRatio, _fireSound, _hitSound, _placeSound;
 	int _ammoMax, _rearmRate;
@@ -159,6 +186,14 @@ public:
 	int getWorkshops() const;
 	/// Gets the facility's psi-training capacity.
 	int getPsiLaboratories() const;
+	/// Gets if facility's crafts are hidden or not.
+	bool getCraftsHidden() const;
+	/// Gets a list of craft slots in this facility
+	const std::vector<CraftOption>& getCraftOptions() const;
+	/// Gets a list of craft slot groups in this facility
+	const std::vector<int>& getOptionGroups() const { return _optionGroups; }
+	/// Gets the maximum between crafts number and options group sum.
+	int getCraftGroupSum() const;
 	/// Gets the facility's sight range.
 	int getSightRange() const { return _sightRange; }
 	/// Gets the facility's alien base detection chance.
@@ -222,5 +257,8 @@ public:
 	/// Gets the ruleset for the destroyed version of this facility.
 	const RuleBaseFacility* getDestroyedFacility() const;
 };
+
+// helper overloads for deserialization-only
+bool read(ryml::ConstNodeRef const& n, CraftOption* val);
 
 }

@@ -193,6 +193,10 @@ int Mod::ACCELERATION_PENALTY[4];
 std::pair<int, int> Mod::ACCELERATION_COEFF[4];
 bool Mod::CRAFT_LIST_SHOW_CLASS;
 bool Mod::CRAFT_LIST_CLASS_SHORT;
+bool Mod::BASE_SHORT_HANGAR_LINKS;
+bool Mod::PEDIA_FACILITY_LOCKED_STATS;
+int Mod::PEDIA_FACILITY_ROWS_CUTOFF;
+int Mod::PEDIA_FACILITY_COL_OFFSET;
 bool Mod::EXTENDED_ITEM_RELOAD_COST;
 bool Mod::EXTENDED_INVENTORY_SLOT_SORTING;
 bool Mod::EXTENDED_RUNNING_COST;
@@ -318,6 +322,11 @@ void Mod::resetGlobalStatics()
 
 	CRAFT_LIST_SHOW_CLASS = false; // show class column in base craft list
 	CRAFT_LIST_CLASS_SHORT = false; // show short class name in class column
+
+	BASE_SHORT_HANGAR_LINKS = false; // base short hangar to craft links
+	PEDIA_FACILITY_LOCKED_STATS = true; // scrollbar lock for facility stats
+	PEDIA_FACILITY_ROWS_CUTOFF = 5; // pedia facility stat rows cutoff
+	PEDIA_FACILITY_COL_OFFSET = 0; // pedia facility stats column offset
 
 	EXTENDED_ITEM_RELOAD_COST = false;
 	EXTENDED_INVENTORY_SLOT_SORTING = false;
@@ -2671,6 +2680,10 @@ void Mod::loadConstants(const YAML::YamlNodeReader &reader)
 			arrayReader[j].tryReadVal(ACCELERATION_COEFF[j]);
 	reader.tryRead("baseCraftListShowClass", CRAFT_LIST_SHOW_CLASS);
 	reader.tryRead("baseCraftListClassShort", CRAFT_LIST_CLASS_SHORT);
+	reader.tryRead("baseShortHangarLinks", BASE_SHORT_HANGAR_LINKS);
+	reader.tryRead("pediaFacilityLockedStats", PEDIA_FACILITY_LOCKED_STATS);
+	reader.tryRead("pediaFacilityRowsCutoff", PEDIA_FACILITY_ROWS_CUTOFF);
+	reader.tryRead("pediaFacilityColOffset", PEDIA_FACILITY_COL_OFFSET);
 	reader.tryRead("extendedItemReloadCost", EXTENDED_ITEM_RELOAD_COST);
 	reader.tryRead("extendedInventorySlotSorting", EXTENDED_INVENTORY_SLOT_SORTING);
 	reader.tryRead("extendedRunningCost", EXTENDED_RUNNING_COST);
