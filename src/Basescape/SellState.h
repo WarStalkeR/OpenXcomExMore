@@ -58,6 +58,7 @@ private:
 	size_t _vanillaCategories;
 	size_t _sel;
 	int64_t _total;
+	int _hangarChange;
 	double _spaceChange;
 	Timer *_timerInc, *_timerDec;
 	Uint8 _ammoColor;

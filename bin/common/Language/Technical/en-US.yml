@@ -372,6 +372,7 @@ en-US:
   personnel: "Living space"
   aliens: "Prison space"
   crafts: "Hangar space"
+  craftSlotSizes: "Hangar slot sizes"
   labs: "Laboratory space"
   workshops: "Workshop space"
   psiLabs: "Psi-lab space"
