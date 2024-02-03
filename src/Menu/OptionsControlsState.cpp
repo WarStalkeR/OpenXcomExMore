@@ -68,10 +68,9 @@ OptionsControlsState::OptionsControlsState(OptionsOrigin origin) : OptionsBaseSt
 	_btnOXCE->setGroup(&_owner);
 	_btnOXCE->onMousePress((ActionHandler)&OptionsControlsState::btnGroupPress, SDL_BUTTON_LEFT);
 
-	_btnOTHER->setText(tr("STR_ENGINE_OTHER")); // rename in your fork
+	_btnOTHER->setText(tr("STR_ENGINE_OXCEM"));
 	_btnOTHER->setGroup(&_owner);
 	_btnOTHER->onMousePress((ActionHandler)&OptionsControlsState::btnGroupPress, SDL_BUTTON_LEFT);
-	_btnOTHER->setVisible(false); // enable in your fork
 
 	// Set up objects
 	_lstControls->setColumns(2, 152, 48);
