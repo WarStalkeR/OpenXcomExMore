@@ -38,11 +38,11 @@ class ScriptParserBase;
  */
 struct RuleCraftStats
 {
-	int fuelMax, damageMax, speedMax, accel, radarRange, radarChance, sightRange, hitBonus, avoidBonus, powerBonus, armor, shieldCapacity, shieldRecharge, shieldRechargeInGeoscape, shieldBleedThrough, soldiers, vehicles;
+	int craftSize, fuelMax, damageMax, speedMax, accel, radarRange, radarChance, sightRange, hitBonus, avoidBonus, powerBonus, armor, shieldCapacity, shieldRecharge, shieldRechargeInGeoscape, shieldBleedThrough, soldiers, vehicles;
 
 	/// Default constructor.
 	RuleCraftStats() :
-		fuelMax(0), damageMax(0), speedMax(0), accel(0),
+		craftSize(0), fuelMax(0), damageMax(0), speedMax(0), accel(0),
 		radarRange(0), radarChance(0), sightRange(0),
 		hitBonus(0), avoidBonus(0), powerBonus(0), armor(0),
 		shieldCapacity(0), shieldRecharge(0), shieldRechargeInGeoscape(0), shieldBleedThrough(0),
@@ -53,6 +53,7 @@ struct RuleCraftStats
 	/// Add different stats.
 	RuleCraftStats& operator+=(const RuleCraftStats& r)
 	{
+		craftSize += r.craftSize;
 		fuelMax += r.fuelMax;
 		damageMax += r.damageMax;
 		speedMax += r.speedMax;
@@ -75,6 +76,7 @@ struct RuleCraftStats
 	/// Subtract different stats.
 	RuleCraftStats& operator-=(const RuleCraftStats& r)
 	{
+		craftSize -= r.craftSize;
 		fuelMax -= r.fuelMax;
 		damageMax -= r.damageMax;
 		speedMax -= r.speedMax;
@@ -104,6 +106,7 @@ struct RuleCraftStats
 	/// Loads stats from YAML.
 	void load(const YAML::Node &node)
 	{
+		craftSize = node["craftSize"].as<int>(craftSize);
 		fuelMax = node["fuelMax"].as<int>(fuelMax);
 		damageMax = node["damageMax"].as<int>(damageMax);
 		speedMax = node["speedMax"].as<int>(speedMax);
@@ -126,6 +129,7 @@ struct RuleCraftStats
 	template<auto Stat, typename TBind>
 	static void addGetStatsScript(TBind& b, std::string prefix)
 	{
+		b.template addField<Stat, &RuleCraftStats::craftSize>(prefix + "getCraftSize");
 		b.template addField<Stat, &RuleCraftStats::fuelMax>(prefix + "getFuelMax");
 		b.template addField<Stat, &RuleCraftStats::damageMax>(prefix + "getDamageMax");
 		b.template addField<Stat, &RuleCraftStats::speedMax>(prefix + "getSpeedMax");
@@ -189,6 +193,7 @@ private:
 	int _repairRate, _refuelRate, _transferTime, _score;
 	RuleTerrain *_battlescapeTerrainData;
 	int _maxSkinIndex;
+	std::pair<int, int> _spriteSize;
 	bool _keepCraftAfterFailedMission, _allowLanding, _spacecraft, _notifyWhenRefueled, _autoPatrol, _undetectable;
 	int _listOrder, _maxItems, _maxAltitude;
 	double _maxStorageSpace;
@@ -227,8 +232,14 @@ public:
 	/// Gets the craft's sprite.
 	int getSprite(int skinIndex) const;
 	const std::vector<int> &getSkinSpritesRaw() const { return _skinSprites; }
+	/// Gets the craft's sprite horizontal offset.
+	int getSizeOffsetX() const;
+	/// Gets the craft's sprite vertical offset.
+	int getSizeOffsetY() const;
 	/// Gets the craft's globe marker.
 	int getMarker() const;
+	/// Gets the craft's hull size.
+	int getCraftSize() const;
 	/// Gets the craft's maximum fuel.
 	int getMaxFuel() const;
 	/// Gets the craft's maximum damage.

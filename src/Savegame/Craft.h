@@ -173,6 +173,8 @@ public:
 	void addCraftStats(const RuleCraftStats& s);
 	/// Gets the craft's stats.
 	const RuleCraftStats& getCraftStats() const;
+	/// Gets the craft's hull size.
+	int getCraftSize() const;
 	/// Gets the craft's max amount of fuel.
 	int getFuelMax() const;
 	/// Gets the craft's amount of fuel.
