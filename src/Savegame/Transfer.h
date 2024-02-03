@@ -83,6 +83,8 @@ public:
 	void setCraft(Craft *craft);
 	/// Gets the craft of the transfer.
 	Craft *getCraft();
+	/// Gets the craft of the transfer.
+	Craft *getCraft() const;
 	/// Gets the items of the transfer.
 	std::string getItems() const;
 	/// Sets the items of the transfer.

@@ -278,6 +278,10 @@ void create()
 	_info.push_back(OptionInfo("oxceGeoscapeEventsInstantDelivery", &oxceGeoscapeEventsInstantDelivery, true, "", "HIDDEN"));
 	_info.push_back(OptionInfo("oxceBaseCraftListShowClass", &oxceBaseCraftListShowClass, false, "", "HIDDEN"));
 	_info.push_back(OptionInfo("oxceBaseCraftListClassShort", &oxceBaseCraftListClassShort, false, "", "HIDDEN"));
+	_info.push_back(OptionInfo("oxcePediaFacilityLockedStats", &oxcePediaFacilityLockedStats, true, "", "HIDDEN"));
+	_info.push_back(OptionInfo("oxcePediaFacilityColOffset", &oxcePediaFacilityColOffset, 0, "", "HIDDEN"));
+	_info.push_back(OptionInfo("oxcePediaFacilityRowsCutoff", &oxcePediaFacilityRowsCutoff, 5, "", "HIDDEN"));
+	_info.push_back(OptionInfo("oxceBasescapeShortHangarLinks", &oxceBasescapeShortHangarLinks, false, "", "HIDDEN"));
 
 	// controls
 	_info.push_back(OptionInfo("keyOk", &keyOk, SDLK_RETURN, "STR_OK", "STR_GENERAL"));
