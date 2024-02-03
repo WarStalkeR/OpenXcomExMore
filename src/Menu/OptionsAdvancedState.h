@@ -44,6 +44,7 @@ private:
 	std::vector<OptionInfo> _settingsBase[OPTION_OWNER_MAX];
 	std::vector<OptionInfo> _settingsBattle[OPTION_OWNER_MAX];
 	std::vector<OptionInfo> _settingsAI[OPTION_OWNER_MAX];
+	std::vector<OptionInfo> _settingsAdvDebug[OPTION_OWNER_MAX];
 	int _offsetGeneralMin = -1;
 	int _offsetGeneralMax = -1;
 	int _offsetGeoMin = -1;
@@ -54,6 +55,8 @@ private:
 	int _offsetBattleMax = -1;
 	int _offsetAIMin = -1;
 	int _offsetAIMax = -1;
+	int _offsetAdvDebugMin = -1;
+	int _offsetAdvDebugMax = -1;
 
 	void addSettings(const std::vector<OptionInfo> &settings);
 	OptionInfo *getSetting(size_t sel);
