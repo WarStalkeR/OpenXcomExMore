@@ -104,6 +104,13 @@ OPT bool oxceAutomaticPromotions;
 OPT bool oxceEnableOffCentreShooting;
 OPT int oxceCrashedOrLanded;
 OPT bool oxceStartingBaseSelection;
+OPT bool oxceShowAdvancedDebugOptions;
+
+// OXCE hidden, but can be shown
+OPT bool oxceTechTreeDataView;
+OPT int oxceDataViewStringTrunc;
+OPT bool oxceDataViewCleanReplace;
+OPT bool oxceDataViewStrTranslate;
 
 // OXCE hidden, accessible only via options.cfg
 /**
