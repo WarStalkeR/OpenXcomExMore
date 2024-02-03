@@ -1208,6 +1208,7 @@ void DebriefingState::prepareDebriefing()
 			}
 			// this may cause the base to become disjointed, destroy the disconnected parts.
 			base->destroyDisconnectedFacilities();
+			base->syncCraftChanges();
 		}
 	}
 
@@ -1714,6 +1715,7 @@ void DebriefingState::prepareDebriefing()
 			save->stopHuntingXcomCraft(craft); // lost during ground mission
 			save->removeAllSoldiersFromXcomCraft(craft); // needed in case some soldiers couldn't spawn
 			base->removeCraft(craft, false);
+			base->syncCraftSlots();
 			delete craft;
 			craft = 0; // To avoid a crash down there!!
 			lostCraft = true;
