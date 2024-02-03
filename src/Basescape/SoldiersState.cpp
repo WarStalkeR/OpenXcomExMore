@@ -33,6 +33,7 @@
 #include "../Interface/Text.h"
 #include "../Interface/TextList.h"
 #include "../Savegame/Base.h"
+#include "../Savegame/BattleUnit.h"
 #include "../Savegame/Soldier.h"
 #include "../Savegame/SavedGame.h"
 #include "SoldierInfoState.h"
@@ -663,6 +664,17 @@ void SoldiersState::btnInventoryClick(Action *)
 		BattlescapeGenerator bgen = BattlescapeGenerator(_game);
 		bgen.setBase(_base);
 		bgen.runInventory(0);
+
+		auto* battleSave = _game->getSavedGame()->getSavedBattle();
+		const auto* selSoldier = _filteredListOfSoldiers.at(_lstSoldiers->getSelectedRow());
+		for (auto* battleUnit : *battleSave->getUnits())
+		{
+			if (battleUnit->getGeoscapeSoldier() == selSoldier)
+			{
+				battleSave->setSelectedUnit(battleUnit);
+				break;
+			}
+		}
 
 		_game->getScreen()->clear();
 		_game->pushState(new InventoryState(false, 0, _base, true));
