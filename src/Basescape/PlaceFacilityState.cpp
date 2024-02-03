@@ -311,6 +311,7 @@ void PlaceFacilityState::viewClick(Action *)
 				_view->reCalcQueuedBuildings();
 			}
 			_view->setBase(_base);
+			_base->syncCraftChanges();
 			_game->getSavedGame()->setFunds(_game->getSavedGame()->getFunds() - _rule->getBuildCost());
 			for (const auto& item: _rule->getBuildCostItems())
 			{

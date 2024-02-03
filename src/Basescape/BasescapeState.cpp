@@ -117,6 +117,8 @@ BasescapeState::BasescapeState(Base *base, Globe *globe) : _base(base), _globe(g
 	_view->onMouseClick((ActionHandler)&BasescapeState::viewLeftClick, SDL_BUTTON_LEFT);
 	_view->onMouseClick((ActionHandler)&BasescapeState::viewRightClick, SDL_BUTTON_RIGHT);
 	_view->onMouseClick((ActionHandler)&BasescapeState::viewMiddleClick, SDL_BUTTON_MIDDLE);
+	_view->onMousePress((ActionHandler)&BasescapeState::viewMouseWheelUp, SDL_BUTTON_WHEELUP);
+	_view->onMousePress((ActionHandler)&BasescapeState::viewMouseWheelDown, SDL_BUTTON_WHEELDOWN);
 	_view->onMouseOver((ActionHandler)&BasescapeState::viewMouseOver);
 	_view->onMouseOut((ActionHandler)&BasescapeState::viewMouseOut);
 
@@ -530,6 +532,104 @@ void BasescapeState::viewMiddleClick(Action *)
 }
 
 /**
+ * Selects previous craft in hangar.
+ * @param action Pointer to an action.
+ */
+void BasescapeState::viewMouseWheelUp(Action *)
+{
+	BaseFacility *f = _view->getSelectedFacility();
+	if (f == 0 || f->getBuildTime() != 0 ||
+		f->getRules()->getCrafts() <= 1 ||
+		f->getCraftForDrawing() == 0)
+		return;
+
+	// Collect craft slots related to this facility.
+	std::vector<CraftSlot*> relatedSlots;
+	for (auto& craftSlot : *_base->getCraftSlots())
+		if (craftSlot.parent == f)
+			relatedSlots.push_back(&craftSlot);
+
+	// Initialize used variables.
+	Craft* refCraft = f->getCraftForDrawing();
+	bool oldFound = false;
+	bool newFound = false;
+
+	// Look for previous suitable craft.
+	for (auto slotIt = relatedSlots.rbegin(); slotIt != relatedSlots.rend(); ++slotIt)
+	{
+		if (!oldFound && (*slotIt)->craft == refCraft)
+			oldFound = true;
+		else if (oldFound && (*slotIt)->craft != nullptr)
+		{
+			f->setCraftForDrawing((*slotIt)->craft);
+			newFound = true;
+			break;
+		}
+	}
+
+	// If prev is found, update the description.
+	if (newFound)
+	{
+		std::ostringstream ss;
+		ss << tr(f->getRules()->getType());
+		if (Mod::BASE_SHORT_HANGAR_LINKS) ss << " > "
+			<< f->getCraftForDrawing()->getName(_game->getLanguage());
+		else ss << " " << tr("STR_CRAFT_").arg(f->getCraftForDrawing()->
+			getName(_game->getLanguage()));
+		_txtFacility->setText(ss.str());
+	}
+}
+
+/**
+ * Selects next craft in hangar.
+ * @param action Pointer to an action.
+ */
+void BasescapeState::viewMouseWheelDown(Action *)
+{
+	BaseFacility *f = _view->getSelectedFacility();
+	if (f == 0 || f->getBuildTime() != 0 ||
+		f->getRules()->getCrafts() <= 1 ||
+		f->getCraftForDrawing() == 0)
+		return;
+
+	// Collect craft slots related to this facility.
+	std::vector<CraftSlot*> relatedSlots;
+	for (auto& craftSlot : *_base->getCraftSlots())
+		if (craftSlot.parent == f)
+			relatedSlots.push_back(&craftSlot);
+
+	// Initialize used variables.
+	Craft* refCraft = f->getCraftForDrawing();
+	bool oldFound = false;
+	bool newFound = false;
+
+	// Look for next suitable craft.
+	for (auto slotIt = relatedSlots.begin(); slotIt != relatedSlots.end(); ++slotIt)
+	{
+		if (!oldFound && (*slotIt)->craft == refCraft)
+			oldFound = true;
+		else if (oldFound && (*slotIt)->craft != nullptr)
+		{
+			f->setCraftForDrawing((*slotIt)->craft);
+			newFound = true;
+			break;
+		}
+	}
+
+	// If next is found, update the description.
+	if (newFound)
+	{
+		std::ostringstream ss;
+		ss << tr(f->getRules()->getType());
+		if (Mod::BASE_SHORT_HANGAR_LINKS) ss << " > "
+			<< f->getCraftForDrawing()->getName(_game->getLanguage());
+		else ss << " " << tr("STR_CRAFT_").arg(f->getCraftForDrawing()->
+			getName(_game->getLanguage()));
+		_txtFacility->setText(ss.str());
+	}
+}
+
+/**
  * Displays the name of the facility the mouse is over.
  * @param action Pointer to an action.
  */
@@ -548,7 +648,10 @@ void BasescapeState::viewMouseOver(Action *)
 			ss << tr(f->getRules()->getType());
 			if (f->getCraftForDrawing() != 0)
 			{
-				ss << " " << tr("STR_CRAFT_").arg(f->getCraftForDrawing()->getName(_game->getLanguage()));
+				if (Mod::BASE_SHORT_HANGAR_LINKS) ss << " > "
+					<< f->getCraftForDrawing()->getName(_game->getLanguage());
+				else ss << " " << tr("STR_CRAFT_").arg(f->getCraftForDrawing()->
+					getName(_game->getLanguage()));
 			}
 		}
 	}
