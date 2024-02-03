@@ -35,6 +35,8 @@ class WeightedOptions
 public:
 	/// Create an empty set.
 	WeightedOptions() : _totalWeight(0) { /* Empty by design. */ }
+	/// Get list of all available items.
+	const std::map<std::string, size_t> &getChoices() const { return _choices; }
 	/// Select from among the items.
 	std::string choose() const;
 	/// Set an option's weight.
