@@ -189,6 +189,8 @@ int Mod::BUY_PRICE_COEFFICIENT[5];
 int Mod::DIFFICULTY_BASED_RETAL_DELAY[5];
 int Mod::UNIT_RESPONSE_SOUNDS_FREQUENCY[4];
 int Mod::PEDIA_FACILITY_RENDER_PARAMETERS[4];
+int Mod::ACCELERATION_PENALTY[4];
+std::pair<int, int> Mod::ACCELERATION_COEFF[4];
 bool Mod::EXTENDED_ITEM_RELOAD_COST;
 bool Mod::EXTENDED_INVENTORY_SLOT_SORTING;
 bool Mod::EXTENDED_RUNNING_COST;
@@ -301,6 +303,16 @@ void Mod::resetGlobalStatics()
 	PEDIA_FACILITY_RENDER_PARAMETERS[1] = 2; // pedia facility max height
 	PEDIA_FACILITY_RENDER_PARAMETERS[2] = 0; // pedia facility X offset
 	PEDIA_FACILITY_RENDER_PARAMETERS[3] = 0; // pedia facility Y offset
+
+	ACCELERATION_PENALTY[0] = 10; // standoff acceleration penalty
+	ACCELERATION_PENALTY[1] = 10; // cautious acceleration penalty
+	ACCELERATION_PENALTY[2] = 10; // combat acceleration penalty
+	ACCELERATION_PENALTY[3] = 10; // maneuver acceleration penalty
+
+	ACCELERATION_COEFF[0] = { 10, 20 }; // standoff +/- acceleration coefficient
+	ACCELERATION_COEFF[1] = { 15, 35 }; // cautious +/- acceleration coefficient
+	ACCELERATION_COEFF[2] = { 20, 50 }; // combat +/- acceleration coefficient
+	ACCELERATION_COEFF[3] = { 25, 70 }; // maneuver +/- acceleration coefficient
 
 	EXTENDED_ITEM_RELOAD_COST = false;
 	EXTENDED_INVENTORY_SLOT_SORTING = false;
@@ -2659,6 +2671,24 @@ void Mod::loadConstants(const YAML::Node &node)
 		for (YAML::const_iterator j = node["extendedPediaFacilityParams"].begin(); j != node["extendedPediaFacilityParams"].end() && k < 4; ++j)
 		{
 			PEDIA_FACILITY_RENDER_PARAMETERS[k] = (*j).as<int>(PEDIA_FACILITY_RENDER_PARAMETERS[k]);
+			++k;
+		}
+	}
+	if (node["accelerationPenalty"])
+	{
+		int k = 0;
+		for (YAML::const_iterator j = node["accelerationPenalty"].begin(); j != node["accelerationPenalty"].end() && k < 4; ++j)
+		{
+			ACCELERATION_PENALTY[k] = (*j).as<int>(ACCELERATION_PENALTY[k]);
+			++k;
+		}
+	}
+	if (node["accelerationCoefficient"])
+	{
+		int k = 0;
+		for (YAML::const_iterator j = node["accelerationCoefficient"].begin(); j != node["accelerationCoefficient"].end() && k < 4; ++j)
+		{
+			ACCELERATION_COEFF[k] = (*j).as<std::pair<int, int>>(ACCELERATION_COEFF[k]);
 			++k;
 		}
 	}
