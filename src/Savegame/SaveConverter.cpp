@@ -740,6 +740,8 @@ void SaveConverter::loadDatBase()
 					facility->setY(y);
 					facility->setBuildTime(days);
 					base->getFacilities()->push_back(facility);
+					if (days == 0 && facility->getRules()->getCrafts() > 0)
+						base->syncCraftChanges();
 				}
 			}
 			int engineers = load<Uint8>(bdata + _rules->getOffset("BASE.DAT_ENGINEERS"));
@@ -948,6 +950,7 @@ void SaveConverter::loadDatCraft()
 					Base *b = dynamic_cast<Base*>(_targets[base]);
 					craft->setBase(b, false);
 					b->getCrafts()->push_back(craft);
+					b->syncCraftSlots();
 				}
 			}
 			Ufo *ufo = dynamic_cast<Ufo*>(_targets[i]);

@@ -65,8 +65,8 @@ namespace OpenXcom
  * @param base Pointer to the base to get info from.
  * @param origin Game section that originated this state.
  */
-SellState::SellState(Base *base, DebriefingState *debriefingState, OptionsOrigin origin) : _base(base), _debriefingState(debriefingState), _sel(0), _total(0), _spaceChange(0), _origin(origin),
-	_reset(false), _sellAllButOne(false), _delayedInitDone(false), _previousSort(TransferSortDirection::BY_LIST_ORDER), _currentSort(TransferSortDirection::BY_LIST_ORDER)
+SellState::SellState(Base *base, DebriefingState *debriefingState, OptionsOrigin origin) : _base(base), _debriefingState(debriefingState), _sel(0), _total(0), _hangarChange(0), _spaceChange(0),
+	_origin(origin), _reset(false), _sellAllButOne(false), _delayedInitDone(false), _previousSort(TransferSortDirection::BY_LIST_ORDER), _currentSort(TransferSortDirection::BY_LIST_ORDER)
 {
 	_timerInc = new Timer(250);
 	_timerInc->onTimer((StateHandler)&SellState::increase);
@@ -85,7 +85,8 @@ void SellState::delayedInit()
 	}
 	_delayedInitDone = true;
 
-	bool overfull = _debriefingState == 0 && Options::storageLimitsEnforced && _base->storesOverfull();
+	bool overfull = _debriefingState == 0 && Options::storageLimitsEnforced &&
+		(_base->storesOverfull() || _base->getUsedHangars() > _base->getAvailableHangars());
 	bool overfullCritical = overfull ? _base->storesOverfullCritical() : false;
 
 	// Create objects
@@ -206,6 +207,22 @@ void SellState::delayedInit()
 				_cats.push_back(cat);
 			}
 		}
+		else
+		{
+			// We don't see in-flight crafts in sell list, so they don't count.
+			--_hangarChange;
+		}
+	}
+	if (_hangarChange != 0)
+	{
+		// We only run this check, if there are in-flight crafts.
+		overfull = _debriefingState == 0 && Options::storageLimitsEnforced && (_base->storesOverfull()
+			|| (_base->getUsedHangars() + _hangarChange) > _base->getAvailableHangars());
+
+		// Buttons visibility needs to be updated as well.
+		_btnCancel->setVisible(!overfull);
+		_btnOk->setVisible(!overfull);
+		_btnTransfer->setVisible(overfull);
 	}
 	if (_base->getAvailableScientists() > 0 && _debriefingState == 0)
 	{
@@ -681,6 +698,7 @@ void SellState::btnOkClick(Action *)
 			case TRANSFER_CRAFT:
 				tmpCraft = (Craft*)transferRow.rule;
 				_base->removeCraft(tmpCraft, true);
+				_base->syncCraftSlots();
 				delete tmpCraft;
 				break;
 			case TRANSFER_SCIENTIST:
@@ -1053,6 +1071,8 @@ void SellState::changeByValue(int change, int dir)
 		break;
 	case TRANSFER_CRAFT:
 		// Note: in OXCE, there is no storage space change, everything on the craft is already included in the base storage space calculations
+		// Update: because of the multi-craft hangar implementation, we need to take into account crafts themselves as well.
+		_hangarChange -= dir * change;
 		break;
 	case TRANSFER_ITEM:
 		item = (const RuleItem*)getRow().rule;
@@ -1117,7 +1137,9 @@ void SellState::updateItemStrings()
 	_txtSpaceUsed->setText(tr("STR_SPACE_USED").arg(ss3.str()));
 	if (_debriefingState == 0 && Options::storageLimitsEnforced)
 	{
-		_btnOk->setVisible(!_base->storesOverfull(_spaceChange));
+		_btnOk->setVisible(!_base->storesOverfull(_spaceChange) &&
+			(_base->getUsedHangars() + _hangarChange) <=
+				_base->getAvailableHangars());
 	}
 }
 

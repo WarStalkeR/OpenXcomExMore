@@ -61,6 +61,7 @@ en-US:
   STR_BASE_DEFENSE_BRIEFING_PREVIEW: "This feature allows you to preview your base.{NEWLINE}Have fun!{NEWLINE}{NEWLINE}Click on the 'End Turn' icon to exit the preview."
 #CraftWeaponsState.cpp
   STR_NO_CRAFT_CLASS_CHANGE: "CRAFT CAN'T CHANGE CLASS!{SMALLLINE}After refitting craft with selected module, its size will change beyond the limits defined by the classification."
+  STR_NO_FREE_HANGARS_FOR_REFIT: "NO SUITABLE HANGAR SLOT AFTER REFIT!{SMALLLINE}After refitting craft with selected weapon, system or utility, its size will change. However, after such refit there is no suitable hangar slot to house it."
   STR_NOT_ENOUGH_CARGO_SPACE: "NOT ENOUGH CARGO SPACE AVAILABLE!{SMALLLINE}Use a different module or reduce the assigned crew."
   STR_NOT_ENOUGH_STORAGE_SPACE_1: "NOT ENOUGH STORAGE SPACE AVAILABLE!{SMALLLINE}Too many items! Use a different module or reduce the assigned equipment."
   STR_NOT_ENOUGH_STORAGE_SPACE_2: "NOT ENOUGH STORAGE SPACE AVAILABLE!{SMALLLINE}The items take up too much space! Use a different module or reduce the size of assigned equipment."
@@ -463,6 +464,8 @@ en-US:
   STR_AUTO_PATROL: "AUTO-PATROL"
   STR_ETA: "ETA>{ALT}{0}"
 #GeoscapeState.cpp
+  STR_NO_FREE_HANGARS: "HANGAR CAPACITY EXCEEDED!{SMALLLINE}The amount of crafts we have in {0} exceeds hangar capacity. Transfer or sell the excess crafts!"
+  STR_NO_FREE_HANGARS_AFTER_STRIKE: "HANGAR CAPACITY EXCEEDED!{SMALLLINE}After missile strike, the amount of crafts we have in {0} exceeds hangar capacity. Transfer or sell the excess crafts to avoid losing them!"
   STR_NOT_ENOUGH_ITEM_TO_REARM_FACILITY_AT_BASE: "Not enough {0} to rearm {1} at {2}"
   STR_UFO_STARTED_HUNTING: "{0} is on an intercept course with {1}"
   STR_CRAFT_IS_READY: "{0} at {1} is ready."
@@ -545,6 +548,9 @@ en-US:
 #ArticleState.cpp
   STR_DAMAGE_NONE: "NONE"
   STR_INFO_UFOPEDIA: "INFO"
+#ArticleStateBaseFacility.cpp
+  STR_HANGAR_CRAFT_CAP: "Craft Capacity"
+  STR_HANGAR_CRAFT_SLOTS: "Craft Slots"
 #ArticleStateCraft.cpp
   STR_CRAFT_SIZE_UC: "SIZE>{ALT}{0}{ALT}"
   STR_CRAFT_CLASS_UC: "CLASS>{ALT}{0}{ALT}"
