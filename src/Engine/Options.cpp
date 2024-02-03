@@ -230,6 +230,13 @@ void create()
 	_info.push_back(OptionInfo("oxceEnableOffCentreShooting", &oxceEnableOffCentreShooting, false, "STR_OFF_CENTRE_SHOOTING", "STR_OXCE"));
 	_info.push_back(OptionInfo("oxceManualPromotions", &oxceManualPromotions, false, "STR_MANUALPROMOTIONS", "STR_OXCE"));
 	_info.push_back(OptionInfo("oxceAutomaticPromotions", &oxceAutomaticPromotions, true, "STR_AUTOMATICPROMOTIONS", "STR_OXCE"));
+	_info.push_back(OptionInfo("oxceShowAdvancedDebugOptions", &oxceShowAdvancedDebugOptions, false, "STR_SHOW_ADVANCED_DEBUG", "STR_OXCE"));
+
+	// OXCE hidden, but can be shown
+	_info.push_back(OptionInfo("oxceTechTreeDataView", &oxceTechTreeDataView, false, "STR_GAME_DATA_VIEWER_OPTION", "STR_ADV_DEBUG"));
+	_info.push_back(OptionInfo("oxceDataViewStringTrunc", &oxceDataViewStringTrunc, 0, "STR_DATA_VIEWER_STRING_TRUNC", "STR_ADV_DEBUG"));
+	_info.push_back(OptionInfo("oxceDataViewCleanReplace", &oxceDataViewCleanReplace, true, "STR_DATA_VIEWER_CLEAN_REPLACE", "STR_ADV_DEBUG"));
+	_info.push_back(OptionInfo("oxceDataViewStrTranslate", &oxceDataViewStrTranslate, false, "STR_DATA_VIEWER_TRANSLATE", "STR_ADV_DEBUG"));
 
 	// OXCE hidden
 #ifdef __MOBILE__
