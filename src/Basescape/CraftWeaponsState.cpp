@@ -170,6 +170,31 @@ void CraftWeaponsState::lstWeaponsClick(Action *)
 	const RuleCraftWeapon* refWeapon = _weapons[_lstWeapons->getSelectedRow()];
 	const RuleCraftWeapon* currWeapon = current ? current->getRules() : nullptr;
 
+	// Validate craft size after refit.
+	{
+		int refWeaponCraftSize = refWeapon ? refWeapon->getBonusStats().craftSize : 0;
+		int currWeaponCraftSize = currWeapon ? currWeapon->getBonusStats().craftSize : 0;
+		int diffCraftSize = (refWeaponCraftSize - currWeaponCraftSize);
+		if (diffCraftSize)
+		{
+			// Check, if game rules allow craft to change its classification.
+			if ((_game->getMod()->getCraftClassFromSize(_craft->getCraftSize() + diffCraftSize) !=
+				_game->getMod()->getCraftClassFromSize(_craft->getCraftSize()))
+				&& !_game->getMod()->getCraftsCanChangeClass())
+			{
+				_game->popState();
+				_game->pushState(new ErrorMessageState(
+					tr("STR_NO_CRAFT_CLASS_CHANGE"),
+					_palette,
+					_game->getMod()->getInterface("craftWeapons")->getElement("window")->color,
+					"BACK14.SCR",
+					_game->getMod()->getInterface("craftWeapons")->getElement("palette")->color)
+				);
+				return;
+			}
+		}
+	}
+
 	// Validate soldier capacity after refit.
 	{
 		int refCapBonusSoldiers = refWeapon ? refWeapon->getBonusStats().soldiers : 0;
