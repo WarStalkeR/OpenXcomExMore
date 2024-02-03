@@ -12,6 +12,7 @@ Makefile.in
 depcomp
 compile
 .deps/
+.deps_vs/
 *.tar.gz
 *.tar.xz
 openxcom
@@ -66,6 +67,7 @@ _ReSharper.*/
 bin/UFO
 bin/TFTD
 deps/
+deps_vs/
 docs/html/
 build/
 Dependencies/
