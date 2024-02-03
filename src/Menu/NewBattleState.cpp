@@ -442,6 +442,7 @@ void NewBattleState::load(const std::string &filename)
 					std::string craftType = _crafts[_cbxCraft->getSelected()];
 					_craft = new Craft(_game->getMod()->getCraft(craftType), base, save->getId(craftType));
 					base->getCrafts()->push_back(_craft);
+					base->syncCraftSlots();
 				}
 				else
 				{
@@ -529,6 +530,7 @@ void NewBattleState::initSave()
 
 	_craft = new Craft(mod->getCraft(_crafts[_cbxCraft->getSelected()]), base, 1);
 	base->getCrafts()->push_back(_craft);
+	base->syncCraftSlots();
 
 	// Generate soldiers
 	bool psiStrengthEval = (Options::psiStrengthEval && save->isResearched(mod->getPsiRequirements()));

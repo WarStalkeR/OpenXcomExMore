@@ -592,6 +592,8 @@ void TransferItemsState::completeTransfer()
 					t->setCraft(craft);
 					_baseTo->getTransfers()->push_back(t);
 				}
+				_baseFrom->syncCraftSlots();
+				_baseTo->syncCraftSlots();
 				break;
 			case TRANSFER_SCIENTIST:
 				_baseFrom->setScientists(_baseFrom->getScientists() - transferRow.amount);
@@ -863,7 +865,7 @@ void TransferItemsState::increaseByValue(int change)
 		break;
 	case TRANSFER_CRAFT:
 		craft = (Craft*)getRow().rule;
-		if (_cQty + 1 > _baseTo->getAvailableHangars() - _baseTo->getUsedHangars())
+		if (_cQty + 1 > _baseTo->getFreeCraftSlots(craft->getCraftSize()))
 		{
 			errorMessage = tr("STR_NO_FREE_HANGARS_FOR_TRANSFER");
 		}
