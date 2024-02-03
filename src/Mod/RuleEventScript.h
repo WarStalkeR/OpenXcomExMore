@@ -55,6 +55,8 @@ public:
 	void load(const YAML::Node &node);
 	/// Gets the name of the script command.
 	const std::string &getType() const { return _type; }
+	/// Gets the list of all events (with weights).
+	const std::vector<std::pair<size_t, WeightedOptions*>> &getEventWeights() const { return _eventWeights; }
 	/// Gets the list of one time sequential events.
 	const std::vector<std::string> &getOneTimeSequentialEvents() const { return _oneTimeSequentialEvents; }
 	/// Gets the list of one time random events (with weights).
