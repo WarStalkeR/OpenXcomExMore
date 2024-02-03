@@ -191,6 +191,10 @@ int Mod::ACCELERATION_PENALTY[4];
 std::pair<int, int> Mod::ACCELERATION_COEFF[4];
 bool Mod::CRAFT_LIST_SHOW_CLASS;
 bool Mod::CRAFT_LIST_CLASS_SHORT;
+bool Mod::BASE_SHORT_HANGAR_LINKS;
+bool Mod::PEDIA_FACILITY_LOCKED_STATS;
+int Mod::PEDIA_FACILITY_ROWS_CUTOFF;
+int Mod::PEDIA_FACILITY_COL_OFFSET;
 bool Mod::EXTENDED_ITEM_RELOAD_COST;
 bool Mod::EXTENDED_INVENTORY_SLOT_SORTING;
 bool Mod::EXTENDED_RUNNING_COST;
@@ -307,6 +311,11 @@ void Mod::resetGlobalStatics()
 
 	CRAFT_LIST_SHOW_CLASS = false; // show class column in base craft list
 	CRAFT_LIST_CLASS_SHORT = false; // show short class name in class column
+
+	BASE_SHORT_HANGAR_LINKS = false; // base short hangar to craft links
+	PEDIA_FACILITY_LOCKED_STATS = true; // scrollbar lock for facility stats
+	PEDIA_FACILITY_ROWS_CUTOFF = 5; // pedia facility stat rows cutoff
+	PEDIA_FACILITY_COL_OFFSET = 0; // pedia facility stats column offset
 
 	EXTENDED_ITEM_RELOAD_COST = false;
 	EXTENDED_INVENTORY_SLOT_SORTING = false;
@@ -2680,6 +2689,10 @@ void Mod::loadConstants(const YAML::Node &node)
 	}
 	CRAFT_LIST_SHOW_CLASS = node["baseCraftListShowClass"].as<bool>(CRAFT_LIST_SHOW_CLASS);
 	CRAFT_LIST_CLASS_SHORT = node["baseCraftListClassShort"].as<bool>(CRAFT_LIST_CLASS_SHORT);
+	BASE_SHORT_HANGAR_LINKS = node["baseShortHangarLinks"].as<bool>(BASE_SHORT_HANGAR_LINKS);
+	PEDIA_FACILITY_LOCKED_STATS = node["pediaFacilityLockedStats"].as<bool>(PEDIA_FACILITY_LOCKED_STATS);
+	PEDIA_FACILITY_ROWS_CUTOFF = node["pediaFacilityRowsCutoff"].as<int>(PEDIA_FACILITY_ROWS_CUTOFF);
+	PEDIA_FACILITY_COL_OFFSET = node["pediaFacilityColOffset"].as<int>(PEDIA_FACILITY_COL_OFFSET);
 	EXTENDED_ITEM_RELOAD_COST = node["extendedItemReloadCost"].as<bool>(EXTENDED_ITEM_RELOAD_COST);
 	EXTENDED_INVENTORY_SLOT_SORTING = node["extendedInventorySlotSorting"].as<bool>(EXTENDED_INVENTORY_SLOT_SORTING);
 	EXTENDED_RUNNING_COST = node["extendedRunningCost"].as<bool>(EXTENDED_RUNNING_COST);
