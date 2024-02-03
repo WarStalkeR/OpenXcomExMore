@@ -39,6 +39,8 @@ class Target;
 class InterceptState : public State
 {
 private:
+	static const int EARTH_RADIUS_KM = 6371;
+
 	TextButton *_btnCancel, *_btnGotoBase;
 	Window *_window;
 	Text *_txtTitle, *_txtCraft, *_txtStatus, *_txtBase, *_txtWeapons;
