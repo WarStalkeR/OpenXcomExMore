@@ -112,6 +112,7 @@ void createOptionsOXC()
 	_info.push_back(OptionInfo(OPTION_OXC, "maxFrameSkip", &maxFrameSkip, 0));
 #endif
 	_info.push_back(OptionInfo(OPTION_OXC, "traceAI", &traceAI, false));
+	_info.push_back(OptionInfo(OPTION_OXC, "debugLogging", &debugLogging, false));
 	_info.push_back(OptionInfo(OPTION_OXC, "verboseLogging", &verboseLogging, false));
 	_info.push_back(OptionInfo(OPTION_OXC, "StereoSound", &StereoSound, true));
 	//_info.push_back(OptionInfo(OPTION_OXC, "baseXResolution", &baseXResolution, Screen::ORIGINAL_WIDTH));
@@ -806,6 +807,8 @@ bool init()
 	Logger::reportingLevel() = LOG_INFO;
 #endif
 
+	if (Options::debugLogging)
+		Logger::reportingLevel() = LOG_DEBUG;
 	if (Options::verboseLogging)
 		Logger::reportingLevel() = LOG_VERBOSE;
 

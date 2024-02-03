@@ -411,7 +411,7 @@ fr:
   STR_NEW_NOTE: "<NOUVELLE NOTE>"
   STR_ENGINE_OXC: "OXC"
   STR_ENGINE_OXCE: "OXCE"
-  STR_ENGINE_OTHER: "AUTRE"
+  STR_ENGINE_OXCEM: "OXCEM"
   STR_AI: "IA"
   STR_PATH_ENERGY_COST: "Énergie"
   STR_PATH_ENERGY_COST_DESC: "Un clique montre l'énergie restante de votre unité après avoir bougé à cette destination."

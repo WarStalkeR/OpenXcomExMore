@@ -427,7 +427,7 @@ ru:
   STR_NEW_NOTE: "<НОВАЯ ЗАМЕТКА>"
   STR_ENGINE_OXC: "OXC"
   STR_ENGINE_OXCE: "OXCE"
-  STR_ENGINE_OTHER: "ПРОЧИЕ"
+  STR_ENGINE_OXCEM: "OXCEM"
   STR_BASESCAPE: "Управление базой"
   STR_AI: "ИИ"
   STR_PATH_ENERGY_COST: "Выносл."

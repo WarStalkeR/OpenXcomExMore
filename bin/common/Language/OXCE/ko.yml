@@ -424,7 +424,7 @@ ko:
   STR_NEW_NOTE: "<NEW NOTE>"
   STR_ENGINE_OXC: "오픈엑스컴"
   STR_ENGINE_OXCE: "오픈엑스컴 익스텐디드"
-  STR_ENGINE_OTHER: "기타"
+  STR_ENGINE_OXCEM: "오픈엑스컴 익스텐디드+"
   STR_BASESCAPE: "기지 화면"
   STR_AI: "AI"
   STR_PATH_ENERGY_COST: "기력"
