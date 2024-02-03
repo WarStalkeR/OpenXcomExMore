@@ -215,6 +215,7 @@ void DismantleFacilityState::btnOkClick(Action *)
 				delete _fac;
 				// Reset the basescape view in case new facilities were created by removing the old one
 				_view->setBase(_base);
+				_base->syncCraftChanges();
 				if (Options::allowBuildingQueue) _view->reCalcQueuedBuildings();
 				break;
 			}
