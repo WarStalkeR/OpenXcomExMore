@@ -80,6 +80,7 @@ OPT bool oxceHighlightNewTopics;
 OPT bool oxcePediaShowClipSize;
 OPT bool oxceForce32bitMode;
 OPT bool oxceStartingBaseSelection;
+OPT bool oxceShowAdvancedDebugOptions;
 
 OPT int oxceInterceptTableSize;
 OPT bool oxceEnableSlackingIndicator;
@@ -114,6 +115,12 @@ OPT bool oxceAutomaticPromotions;
 OPT bool oxceEnableOffCentreShooting;
 OPT bool oxceUniformShootingSpread;
 OPT int oxceCrashedOrLanded;
+
+// OXCE hidden, but can be shown
+OPT bool oxceTechTreeDataView;
+OPT int oxceDataViewStringTrunc;
+OPT bool oxceDataViewCleanReplace;
+OPT bool oxceDataViewStrTranslate;
 
 // OXCE hidden, accessible only via options.cfg
 /**

@@ -46,6 +46,10 @@ private:
 	size_t _firstFacilitiesTopicIndex;
 	size_t _firstItemTopicIndex;
 	size_t _firstCraftTopicIndex;
+	size_t _firstArcScriptIndex;
+	size_t _firstEventScriptIndex;
+	size_t _firstMissionScriptIndex;
+	size_t _firstAdhocScriptIndex;
 	void initLists();
 	void onSelectTopic(Action *action);
 public:
