@@ -80,6 +80,13 @@ OPT bool oxceAutoSell;
 OPT int oxceAutoNightVisionThreshold;
 OPT bool oxceRememberDisabledCraftWeapons;
 OPT bool oxceEnableOffCentreShooting;
+OPT bool oxceShowAdvancedDebugOptions;
+
+// OXCE hidden, but can be shown
+OPT bool oxceTechTreeDataView;
+OPT int oxceDataViewStringTrunc;
+OPT bool oxceDataViewCleanReplace;
+OPT bool oxceDataViewStrTranslate;
 
 // OXCE hidden, accessible only via options.cfg
 OPT bool oxceFatFingerLinks;
