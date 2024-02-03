@@ -139,6 +139,10 @@ OptionsAdvancedState::OptionsAdvancedState(OptionsOrigin origin) : OptionsBaseSt
 			{
 				_settingsAI[optionInfo.owner()].push_back(optionInfo);
 			}
+			else if (optionInfo.category() == "STR_ADV_DEBUG")
+			{
+				_settingsAdvDebug[optionInfo.owner()].push_back(optionInfo);
+			}
 		}
 	}
 }
@@ -178,6 +182,8 @@ void OptionsAdvancedState::updateList()
 	_offsetBattleMax = -1;
 	_offsetAIMin = -1;
 	_offsetAIMax = -1;
+	_offsetAdvDebugMin = -1;
+	_offsetAdvDebugMax = -1;
 
 	_lstOptions->clearList();
 
@@ -236,6 +242,17 @@ void OptionsAdvancedState::updateList()
 		addSettings(_settingsAI[idx]);
 		row += _settingsAI[idx].size();
 		_offsetAIMax = row;
+	}
+	if (Options::oxceShowAdvancedDebugOptions && _settingsAdvDebug[idx].size() > 0)
+	{
+		if (row > -1) { _lstOptions->addRow(2, "", ""); row++; }
+		_lstOptions->addRow(2, tr("STR_ADV_DEBUG").c_str(), "");
+		row++;
+		_offsetAdvDebugMin = row;
+		_lstOptions->setCellColor(_offsetAdvDebugMin, 0, _colorGroup);
+		addSettings(_settingsAdvDebug[idx]);
+		row += _settingsAdvDebug[idx].size();
+		_offsetAdvDebugMax = row;
 	}
 }
 
@@ -299,6 +316,10 @@ OptionInfo *OptionsAdvancedState::getSetting(size_t sel)
 	else if (selInt > _offsetAIMin && selInt <= _offsetAIMax)
 	{
 		return &_settingsAI[idx][selInt - 1 - _offsetAIMin];
+	}
+	else if (Options::oxceShowAdvancedDebugOptions && selInt > _offsetAdvDebugMin && selInt <= _offsetAdvDebugMax)
+	{
+		return &_settingsAdvDebug[idx][selInt - 1 - _offsetAdvDebugMin];
 	}
 	else
 	{
@@ -421,6 +442,11 @@ void OptionsAdvancedState::lstOptionsClick(Action *action)
 		else if (i == &Options::oxceAutoNightVisionThreshold) {
 			min = 0;
 			max = 15;
+		}
+		else if (i == &Options::oxceDataViewStringTrunc)
+		{
+			min = 0;
+			max = 50;
 		}
 		else if (i == &Options::oxceNightVisionColor)
 		{
