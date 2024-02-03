@@ -171,6 +171,15 @@ Craft *Transfer::getCraft()
 }
 
 /**
+ * Gets the craft being transferred.
+ * @return a Pointer to craft.
+ */
+Craft *Transfer::getCraft() const
+{
+	return _craft;
+}
+
+/**
  * Returns the items being transferred.
  * @return Item ID.
  */
@@ -309,6 +318,7 @@ void Transfer::advance(Base *base)
 			base->getCrafts()->push_back(_craft);
 			_craft->setBase(base);
 			_craft->checkup();
+			base->syncCraftSlots();
 		}
 		else if (_itemQty != 0)
 		{
