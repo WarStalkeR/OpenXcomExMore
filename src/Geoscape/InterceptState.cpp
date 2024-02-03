@@ -52,9 +52,15 @@ namespace OpenXcom
  */
 InterceptState::InterceptState(Globe *globe, bool useCustomSound, Base *base, Target *target) : _globe(globe), _base(base), _target(target)
 {
+	const bool SHOW_RANGE = Mod::GEO_SHOW_TARGET_COURSE_RANGE;
+	const double RANGE_MULT = Mod::GEO_TARGET_COURSE_RANGE_MULT;
+	const int RNG_COL_OFFSET = Mod::GEO_TARGET_RANGE_COL_OFFSET;
+	const int HALF_OFFSET = SHOW_RANGE ? (RNG_COL_OFFSET / 2) : 0;
+	const int BASE_OFFSET = SHOW_RANGE ? 8 : 0;
+
 	const int WIDTH_CRAFT = 72;
-	const int WIDTH_STATUS = 94;
-	const int WIDTH_BASE = 74;
+	const int WIDTH_STATUS = 94 + (SHOW_RANGE ? RNG_COL_OFFSET : 0);
+	const int WIDTH_BASE = 74 - (SHOW_RANGE ? RNG_COL_OFFSET : 0);
 	const int WIDTH_WEAPONS = 48;
 	_screen = false;
 
@@ -84,7 +90,7 @@ InterceptState::InterceptState(Globe *globe, bool useCustomSound, Base *base, Ta
 		x += WIDTH_CRAFT;
 		_txtStatus = new Text(WIDTH_STATUS, 9, x, 70 - offset);
 		x += WIDTH_STATUS;
-		_txtBase = new Text(WIDTH_BASE, 9, x, 70 - offset);
+		_txtBase = new Text(WIDTH_BASE, 9 + BASE_OFFSET, x, 70 - offset - BASE_OFFSET);
 		x += WIDTH_BASE;
 		_txtWeapons = new Text(WIDTH_WEAPONS+4, 17, x-4, 62 - offset);
 		_lstCrafts = new TextList(290, 64 + extraHeight, 12, 78 - offset);
@@ -97,7 +103,7 @@ InterceptState::InterceptState(Globe *globe, bool useCustomSound, Base *base, Ta
 		_txtTitle = new Text(300, 17, 10, 46 - offset);
 		_txtCraft = new Text(86, 9, 14, 70 - offset);
 		_txtStatus = new Text(70, 9, 100, 70 - offset);
-		_txtBase = new Text(80, 9, 170, 70 - offset);
+		_txtBase = new Text(80, 9 + BASE_OFFSET, 170, 70 - offset - BASE_OFFSET);
 		_txtWeapons = new Text(80, 17, 238, 62 - offset);
 		_lstCrafts = new TextList(288, 64 + extraHeight, 8, 78 - offset);
 	}
@@ -137,7 +143,10 @@ InterceptState::InterceptState(Globe *globe, bool useCustomSound, Base *base, Ta
 
 	_txtStatus->setText(tr("STR_STATUS"));
 
-	_txtBase->setText(tr("STR_BASE"));
+	// Base name or distance header
+	if (target != nullptr && SHOW_RANGE)
+		_txtBase->setText(tr("STR_BASE_DISTANCE"));
+	else _txtBase->setText(tr("STR_BASE"));
 
 	if (Options::oxceInterceptGuiMaintenanceTime > 0)
 	{
@@ -147,7 +156,7 @@ InterceptState::InterceptState(Globe *globe, bool useCustomSound, Base *base, Ta
 
 	if (Options::oxceInterceptGuiMaintenanceTime > 0)
 	{
-		_lstCrafts->setColumns(4, WIDTH_CRAFT, WIDTH_STATUS, WIDTH_BASE, WIDTH_WEAPONS);
+		_lstCrafts->setColumns(4, WIDTH_CRAFT, WIDTH_STATUS, WIDTH_BASE - HALF_OFFSET, WIDTH_WEAPONS + HALF_OFFSET);
 		_lstCrafts->setAlign(ALIGN_RIGHT, 3);
 	}
 	else
@@ -339,7 +348,15 @@ InterceptState::InterceptState(Globe *globe, bool useCustomSound, Base *base, Ta
 				ss << 0;
 			}
 			_crafts.push_back(xcraft);
-			_lstCrafts->addRow(4, xcraft->getName(_game->getLanguage()).c_str(), ssStatus.str().c_str(), xbase->getName().c_str(), ss.str().c_str());
+
+			// Base name distance switch
+			std::ostringstream ssDistBase;
+			if (target != nullptr && SHOW_RANGE)
+				ssDistBase << xbase->getName().c_str() << ", " << Unicode::formatNumber((int64_t)
+					(xcraft->getDistance(target) * EARTH_RADIUS_KM * RANGE_MULT));
+			else ssDistBase << xbase->getName().c_str();
+			_lstCrafts->addRow(4, xcraft->getName(_game->getLanguage()).c_str(), ssStatus.str().c_str(), ssDistBase.str().c_str(), ss.str().c_str());
+
 			if (hasEnoughPilots && status == "STR_READY")
 			{
 				_lstCrafts->setCellColor(row, 1, _lstCrafts->getSecondaryColor());
