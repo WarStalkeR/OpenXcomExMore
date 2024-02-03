@@ -34,8 +34,13 @@ class RuleResearch;
 class RuleManufacture;
 class RuleBaseFacility;
 class RuleCraft;
+class RuleArcScript;
+class RuleEventScript;
+class RuleMissionScript;
+class SavedGame;
 
-enum TTVMode { TTV_NONE, TTV_RESEARCH, TTV_MANUFACTURING, TTV_FACILITIES, TTV_ITEMS, TTV_CRAFTS };
+enum TTVMode { TTV_NONE, TTV_RESEARCH, TTV_MANUFACTURING, TTV_FACILITIES, TTV_ITEMS, TTV_CRAFTS, TTV_ARCS, TTV_EVENTS, TTV_MISSIONS };
+enum GameDifficulty : int;
 
 /**
  * TechTreeViewer screen, where you can browse the Tech Tree.
@@ -56,13 +61,35 @@ private:
 	std::unordered_set<std::string> _disabledResearch;
 	std::unordered_set<std::string> _alreadyAvailableResearch, _alreadyAvailableManufacture, _alreadyAvailableFacilities, _alreadyAvailableCrafts;
 	std::unordered_set<std::string> _protectedItems, _alreadyAvailableItems;
+	std::unordered_set<std::string> _listArcScripts, _listEventScripts, _listMissionScripts;
+	int _currMonth, _currScore;
+	GameDifficulty _currDiff;
+	int64_t _currFunds;
+	SavedGame *_save;
 	void initLists();
+	void handleResearchData();
+	void handleManufactureData();
+	void handleFacilityData();
+	void handleItemData();
+	void handleCraftData();
+	void handleArcScript();
+	void handleEventScript();
+	void handleMissionScript();
+	bool isValidMonthTrigger(const RuleArcScript *ruleArc = 0, const RuleEventScript *ruleEvent = 0, const RuleMissionScript *ruleMission = 0) const;
+	bool isValidDiffTrigger(const RuleArcScript *ruleArc = 0, const RuleEventScript *ruleEvent = 0, const RuleMissionScript *ruleMission = 0) const;
+	bool isValidScoreTrigger(const RuleArcScript *ruleArc = 0, const RuleEventScript *ruleEvent = 0, const RuleMissionScript *ruleMission = 0) const;
+	bool isValidFundsTrigger(const RuleArcScript *ruleArc = 0, const RuleEventScript *ruleEvent = 0, const RuleMissionScript *ruleMission = 0) const;
+	bool isValidCounterTrigger(const RuleArcScript *ruleArc = 0, const RuleEventScript *ruleEvent = 0, const RuleMissionScript *ruleMission = 0) const;
+	bool isPossibleArc(const RuleArcScript* ruleArc) const;
+	bool isPossibleEvent(const RuleEventScript* ruleEvent) const;
+	bool isPossibleMission(const RuleMissionScript* ruleMission) const;
 	void onSelectLeftTopic(Action *action);
 	void onSelectRightTopic(Action *action);
 	void onSelectFullTopic(Action *action);
 public:
 	/// Creates the Tech Tree Viewer state.
-	TechTreeViewerState(const RuleResearch *r = 0, const RuleManufacture *m = 0, const RuleBaseFacility *f = 0, const RuleCraft *c = 0);
+	TechTreeViewerState(const RuleResearch *r = 0, const RuleManufacture *m = 0, const RuleBaseFacility *f = 0, const RuleCraft *c = 0,
+		const RuleArcScript *as = 0, const RuleEventScript *es = 0, const RuleMissionScript *ms = 0);
 	/// Cleans up the Tech Tree Viewer state.
 	~TechTreeViewerState();
 	/// Initializes the state.
@@ -77,6 +104,7 @@ public:
 	void setSelectedTopic(const std::string &selectedTopic, TTVMode topicType);
 	/// Gets the color coding for the given research topic.
 	Uint8 getResearchColor(const std::string &topic) const;
+	/// Gets the alternative color coding for the given research topic.
 	Uint8 getAltResearchColor(const std::string &topic) const;
 	/// Is given research topic discovered/available?
 	bool isDiscoveredResearch(const std::string &topic) const;
@@ -90,6 +118,16 @@ public:
 	bool isProtectedAndDiscoveredItem(const std::string &topic) const;
 	/// Is given craft discovered/available for both purchase and usage/equipment?
 	bool isDiscoveredCraft(const std::string &topic) const;
+	/// Are all basic triggers of the Arc valid?
+	bool isGuaranteedArc(const std::string &strArc) const;
+	/// Are all basic triggers of the Event valid?
+	bool isGuaranteedEvent(const std::string &strEvent) const;
+	/// Are all basic triggers of the Mission valid?
+	bool isGuaranteedMission(const std::string &strMission) const;
+	/// Processes string based on options and appends it to stream.
+	void strPush(std::ostringstream& refStream, const std::string& origString);
+	/// Replaces all underscores with spaces for better word wrapping.
+	const std::string cleanStr(const std::string& origString);
 };
 
 }
