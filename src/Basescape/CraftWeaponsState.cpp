@@ -165,6 +165,7 @@ void CraftWeaponsState::btnCancelClick(Action *)
  */
 void CraftWeaponsState::lstWeaponsClick(Action *)
 {
+	bool sizeChanged = false;
 	CraftWeapon *current = _craft->getWeapons()->at(_weapon);
 
 	const RuleCraftWeapon* refWeapon = _weapons[_lstWeapons->getSelectedRow()];
@@ -177,6 +178,20 @@ void CraftWeaponsState::lstWeaponsClick(Action *)
 		int diffCraftSize = (refWeaponCraftSize - currWeaponCraftSize);
 		if (diffCraftSize)
 		{
+			// Check, if there is suitable hangar slot for the new craft size.
+			if (!_base->allowCraftRefit(_craft, _craft->getCraftSize() + diffCraftSize))
+			{
+				_game->popState();
+				_game->pushState(new ErrorMessageState(
+					tr("STR_NO_FREE_HANGARS_FOR_REFIT"),
+					_palette,
+					_game->getMod()->getInterface("craftWeapons")->getElement("window")->color,
+					"BACK14.SCR",
+					_game->getMod()->getInterface("craftWeapons")->getElement("palette")->color)
+				);
+				return;
+			}
+
 			// Check, if game rules allow craft to change its classification.
 			if ((_game->getMod()->getCraftClassFromSize(_craft->getCraftSize() + diffCraftSize) !=
 				_game->getMod()->getCraftClassFromSize(_craft->getCraftSize()))
@@ -192,6 +207,9 @@ void CraftWeaponsState::lstWeaponsClick(Action *)
 				);
 				return;
 			}
+
+			// Notify game to sync hangar slots, since craft size got changed.
+			sizeChanged = true;
 		}
 	}
 
@@ -260,6 +278,9 @@ void CraftWeaponsState::lstWeaponsClick(Action *)
 		_craft->getWeapons()->at(_weapon) = sel;
 	}
 
+	// Wrap up and finish function execution.
+	if (sizeChanged)
+		_base->syncCraftSlots();
 	_craft->checkup();
 	_game->popState();
 }

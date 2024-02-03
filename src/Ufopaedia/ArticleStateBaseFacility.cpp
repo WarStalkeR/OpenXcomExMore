@@ -113,37 +113,135 @@ namespace OpenXcom
 		_txtInfo->setScrollable(true);
 		_txtInfo->setText(tr(defs->getTextForPage(_state->current_page)));
 
-		_lstInfo = new TextList(200, 42, 10, 42);
+		int row = 0;
+		const int maxRows = Options::oxcePediaFacilityRowsCutoff;
+		const bool lockedStats = Options::oxcePediaFacilityLockedStats;
+		const int listDynamicWidth = lockedStats ? 195 : 183;
+		_lstInfo = new TextList(listDynamicWidth, 48, 10, 41);
 		add(_lstInfo);
 
+		const auto& colOffset = Options::oxcePediaFacilityColOffset;
+		const int colStat = (lockedStats ? 135 : 128) - colOffset;
+		const int colValue = (lockedStats ? 60 : 55) + colOffset;
 		_lstInfo->setColor(Palette::blockOffset(13)+10);
-		_lstInfo->setColumns(2, 140, 60);
+		_lstInfo->setColumns(2, colStat, colValue);
+		_lstInfo->setScrolling(!lockedStats, 0);
+		_lstInfo->setWordWrap(!lockedStats);
+		_lstInfo->setCondensed(true);
 		_lstInfo->setDot(true);
 
 		_lstInfo->addRow(2, tr("STR_CONSTRUCTION_TIME").c_str(), tr("STR_DAY", facility->getBuildTime()).c_str());
-		_lstInfo->setCellColor(0, 1, Palette::blockOffset(13)+0);
+		_lstInfo->setCellColor(row, 1, Palette::blockOffset(13)+0);
+		row++;
 
 		std::ostringstream ss;
 		ss << Unicode::formatFunding(facility->getBuildCost());
 		_lstInfo->addRow(2, tr("STR_CONSTRUCTION_COST").c_str(), ss.str().c_str());
-		_lstInfo->setCellColor(1, 1, Palette::blockOffset(13)+0);
+		_lstInfo->setCellColor(row, 1, Palette::blockOffset(13)+0);
+		row++;
 
 		ss.str("");ss.clear();
 		ss << Unicode::formatFunding(facility->getMonthlyCost());
 		_lstInfo->addRow(2, tr("STR_MAINTENANCE_COST").c_str(), ss.str().c_str());
-		_lstInfo->setCellColor(2, 1, Palette::blockOffset(13)+0);
+		_lstInfo->setCellColor(row, 1, Palette::blockOffset(13)+0);
+		row++;
+
+		if (facility->getCrafts() > 0)
+		{
+			if (!lockedStats || (lockedStats && row < maxRows))
+			{
+				ss.str(""); ss.clear();
+				ss << facility->getCrafts();
+				_lstInfo->addRow(2, tr("STR_HANGAR_CRAFT_CAP").c_str(), ss.str().c_str());
+				_lstInfo->setCellColor(row, 1, Palette::blockOffset(13) + 0);
+				row++;
+			}
+
+			if (!lockedStats || (lockedStats && row < maxRows))
+			{
+				ss.str(""); ss.clear();
+				if (facility->getOptionGroups().size() > 0 &&
+					(size_t)facility->getCraftGroupSum() == facility->getCraftOptions().size())
+				{
+					int optionIt = 0;
+					auto optionGroupsIt = facility->getOptionGroups().begin();
+					while (optionGroupsIt != facility->getOptionGroups().end())
+					{
+						std::ostringstream sss;
+						for (int i = 0; i < *optionGroupsIt; ++i)
+						{
+							const int& slotSize = facility->getCraftOptions().at(optionIt).max;
+							const std::string sizeClass = _game->getMod()->getCraftClassFromSize(slotSize);
+							if (sizeClass != _game->getMod()->getCraftClasses()->begin()->second)
+							{
+								// broken slot entry is hidden in ufopaedia, but shown in analysis
+								if (!sss.str().empty()) sss << "~";
+								const std::string slotClass = sizeClass.empty() ?
+									std::to_string(slotSize) : tr(sizeClass + "_UC").c_str();
+								sss << slotClass;
+							}
+							optionIt++;
+						}
+						if (!sss.str().empty())
+						{
+							if (!ss.str().empty()) ss << ", ";
+							ss << sss.str().c_str();
+						}
+						if ((size_t)optionIt >= facility->getCraftOptions().size())
+							optionIt = facility->getCraftOptions().size() - 1;
+						++optionGroupsIt;
+					}
+				}
+				else
+				{
+					const int maxCraftOptions = (size_t)facility->getCrafts() >
+						facility->getCraftOptions().size() ?
+						facility->getCrafts() :
+						facility->getCraftOptions().size();
+					for (int i = 0; i < maxCraftOptions; ++i)
+					{
+						const int& slotSize = facility->getCraftOptions().size() > (size_t)i ?
+							facility->getCraftOptions().at(i).max : 0;
+						const std::string sizeClass = _game->getMod()->getCraftClassFromSize(slotSize);
+						if (sizeClass != _game->getMod()->getCraftClasses()->begin()->second)
+						{
+							// broken slot entry is hidden in ufopaedia, but shown in analysis
+							const std::string slotClass = sizeClass.empty() ?
+								std::to_string(slotSize) : tr(sizeClass + "_UC").c_str();
+							if (!ss.str().empty()) ss << ", ";
+							ss << slotClass;
+						}
+					}
+				}
+				const int valSize = ss.str().size() * 5;
+				const int dynColStat = std::min(colStat, std::max(55, listDynamicWidth - valSize));
+				_lstInfo->setColumns(2, dynColStat, listDynamicWidth - dynColStat);
+				_lstInfo->addRow(2, tr("STR_HANGAR_CRAFT_SLOTS").c_str(), ss.str().c_str());
+				_lstInfo->setCellColor(row, 1, Palette::blockOffset(13) + 0);
+				_lstInfo->setColumns(2, colStat, colValue);
+				row++;
+			}
+		}
 
 		if (facility->getDefenseValue() > 0)
 		{
-			ss.str("");ss.clear();
-			ss << facility->getDefenseValue();
-			_lstInfo->addRow(2, tr("STR_DEFENSE_VALUE").c_str(), ss.str().c_str());
-			_lstInfo->setCellColor(3, 1, Palette::blockOffset(13)+0);
+			if (!lockedStats || (lockedStats && row < maxRows))
+			{
+				ss.str(""); ss.clear();
+				ss << facility->getDefenseValue();
+				_lstInfo->addRow(2, tr("STR_DEFENSE_VALUE").c_str(), ss.str().c_str());
+				_lstInfo->setCellColor(row, 1, Palette::blockOffset(13)+0);
+				row++;
+			}
 
-			ss.str("");ss.clear();
-			ss << Unicode::formatPercentage(facility->getHitRatio());
-			_lstInfo->addRow(2, tr("STR_HIT_RATIO").c_str(), ss.str().c_str());
-			_lstInfo->setCellColor(4, 1, Palette::blockOffset(13)+0);
+			if (!lockedStats || (lockedStats && row < maxRows))
+			{
+				ss.str(""); ss.clear();
+				ss << Unicode::formatPercentage(facility->getHitRatio());
+				_lstInfo->addRow(2, tr("STR_HIT_RATIO").c_str(), ss.str().c_str());
+				_lstInfo->setCellColor(row, 1, Palette::blockOffset(13)+0);
+				row++;
+			}
 		}
 		centerAllSurfaces();
 	}

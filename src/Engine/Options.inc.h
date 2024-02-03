@@ -131,6 +131,10 @@ OPT int oxcePediaFacilityMaxWidth;
 OPT int oxcePediaFacilityMaxHeight;
 OPT int oxcePediaFacilityOffsetX;
 OPT int oxcePediaFacilityOffsetY;
+OPT bool oxcePediaFacilityLockedStats;
+OPT int oxcePediaFacilityColOffset;
+OPT int oxcePediaFacilityRowsCutoff;
+OPT bool oxceBasescapeShortHangarLinks;
 
 // Flags and other stuff that don't need OptionInfo's.
 OPT bool mute, reload, newOpenGL, newScaleFilter, newHQXFilter, newXBRZFilter, newRootWindowedMode, newFullscreen, newAllowResize, newBorderless;
