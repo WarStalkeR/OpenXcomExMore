@@ -280,6 +280,10 @@ void create()
 	_info.push_back(OptionInfo("oxcePediaFacilityMaxHeight", &oxcePediaFacilityMaxHeight, 2, "", "HIDDEN"));
 	_info.push_back(OptionInfo("oxcePediaFacilityOffsetX", &oxcePediaFacilityOffsetX, 0, "", "HIDDEN"));
 	_info.push_back(OptionInfo("oxcePediaFacilityOffsetY", &oxcePediaFacilityOffsetY, 0, "", "HIDDEN"));
+	_info.push_back(OptionInfo("oxcePediaFacilityLockedStats", &oxcePediaFacilityLockedStats, true, "", "HIDDEN"));
+	_info.push_back(OptionInfo("oxcePediaFacilityColOffset", &oxcePediaFacilityColOffset, 0, "", "HIDDEN"));
+	_info.push_back(OptionInfo("oxcePediaFacilityRowsCutoff", &oxcePediaFacilityRowsCutoff, 5, "", "HIDDEN"));
+	_info.push_back(OptionInfo("oxceBasescapeShortHangarLinks", &oxceBasescapeShortHangarLinks, false, "", "HIDDEN"));
 
 	// controls
 	_info.push_back(OptionInfo("keyOk", &keyOk, SDLK_RETURN, "STR_OK", "STR_GENERAL"));

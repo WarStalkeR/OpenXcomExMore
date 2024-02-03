@@ -150,6 +150,7 @@ productionProgress_e Production::step(Base * b, SavedGame * g, const Mod *m, Lan
 				craft->initFixedWeapons(m);
 				craft->checkup();
 				b->getCrafts()->push_back(craft);
+				b->syncCraftSlots();
 			}
 			else
 			{
@@ -306,6 +307,7 @@ void Production::startItem(Base * b, SavedGame * g, const Mod *m) const
 			{
 				Craft *craft = c;
 				b->removeCraft(craft, true);
+				b->syncCraftSlots();
 				delete craft;
 				break;
 			}
