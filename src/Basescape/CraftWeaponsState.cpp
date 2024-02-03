@@ -34,6 +34,8 @@
 #include "../Savegame/Base.h"
 #include "../Savegame/SavedGame.h"
 #include "../Ufopaedia/Ufopaedia.h"
+#include "../Menu/ErrorMessageState.h"
+#include "../Mod/RuleInterface.h"
 
 namespace OpenXcom
 {
@@ -164,6 +166,54 @@ void CraftWeaponsState::btnCancelClick(Action *)
 void CraftWeaponsState::lstWeaponsClick(Action *)
 {
 	CraftWeapon *current = _craft->getWeapons()->at(_weapon);
+
+	const RuleCraftWeapon* refWeapon = _weapons[_lstWeapons->getSelectedRow()];
+	const RuleCraftWeapon* currWeapon = current ? current->getRules() : nullptr;
+
+	// Validate soldier capacity after refit.
+	{
+		int refCapBonusSoldiers = refWeapon ? refWeapon->getBonusStats().soldiers : 0;
+		int currCapBonusSoldiers = currWeapon ? currWeapon->getBonusStats().soldiers : 0;
+		int diffSoldiers = (refCapBonusSoldiers - currCapBonusSoldiers);
+		if (diffSoldiers)
+		{
+			if ((_craft->getMaxUnits() - _craft->getSpaceUsed() + diffSoldiers) < 0)
+			{
+				_game->popState();
+				_game->pushState(new ErrorMessageState(
+					tr("STR_NOT_ENOUGH_CARGO_SPACE"),
+					_palette,
+					_game->getMod()->getInterface("craftWeapons")->getElement("window")->color,
+					"BACK14.SCR",
+					_game->getMod()->getInterface("craftWeapons")->getElement("palette")->color)
+				);
+				return;
+			}
+		}
+	}
+
+	// Validate vehicle capacity after refit.
+	{
+		int refCapBonusVehicles = refWeapon ? refWeapon->getBonusStats().vehicles : 0;
+		int currCapBonusVehicles = currWeapon ? currWeapon->getBonusStats().vehicles : 0;
+		int diffVehicles = (refCapBonusVehicles - currCapBonusVehicles);
+		if (diffVehicles)
+		{
+			if ((_craft->getMaxVehiclesAndLargeSoldiers() - _craft->getNumVehiclesAndLargeSoldiers() + diffVehicles) < 0)
+			{
+				_game->popState();
+				_game->pushState(new ErrorMessageState(
+					tr("STR_NOT_ENOUGH_HWP_CAPACITY"),
+					_palette,
+					_game->getMod()->getInterface("craftWeapons")->getElement("window")->color,
+					"BACK14.SCR",
+					_game->getMod()->getInterface("craftWeapons")->getElement("palette")->color)
+				);
+				return;
+			}
+		}
+	}
+
 	// Remove current weapon
 	if (current != 0)
 	{
