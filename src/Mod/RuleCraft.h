@@ -337,7 +337,7 @@ public:
 	/// Is this craft immune to detection by HKs and alien bases?
 	bool isUndetectable() const { return _undetectable; }
 	/// Is this craft a self-destruct missile?
-	bool isMissile() const { return (_missilePower > 0); }
+	bool isMissile() const { return (_missilePower != 0); }
 	/// Gets the missile power.
 	int missilePower() const { return _missilePower; }
 	/// Gets the list weight for this craft.
