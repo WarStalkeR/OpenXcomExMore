@@ -234,6 +234,7 @@ void CraftsState::lstCraftsClick(Action *action)
 			}
 
 			// reload the UI
+			_base->syncCraftSlots();
 			initList(_lstCrafts->getScroll());
 		}
 		if (!shift && row > 0)
@@ -252,6 +253,7 @@ void CraftsState::lstCraftsClick(Action *action)
 			}
 
 			// reload the UI
+			_base->syncCraftSlots();
 			initList(_lstCrafts->getScroll());
 		}
 	}
