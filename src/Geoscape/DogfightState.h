@@ -59,6 +59,7 @@ private:
 	bool _ufoIsAttacking, _missileCraft, _missileImpact;
 	bool _disableDisengage, _disableStandoff, _disableCautious, _disableStandard, _disableAggressive;
 	bool _craftIsDefenseless, _selfDestructPressed;
+    bool _craftSpeedBetter, _craftStandoffBetter, _craftCautiousBetter, _craftCombatBetter, _craftManeuverBetter;
 	int _timeout, _currentDist, _targetDist, _weaponFireInterval[RuleCraft::WeaponMax], _weaponFireCountdown[RuleCraft::WeaponMax];
 	bool _end, _endUfoHandled, _endCraftHandled, _ufoBreakingOff, _destroyUfo, _destroyCraft, _weaponEnabled[RuleCraft::WeaponMax];
 	bool _minimized, _endDogfight, _animatingHit, _waitForPoly, _waitForAltitude;
