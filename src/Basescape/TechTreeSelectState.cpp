@@ -160,64 +160,6 @@ void TechTreeSelectState::initLists()
 	}
 
 	int row = 0;
-	std::unordered_set<std::string> tmpList;
-	if (searchString == "ASCRIPT")
-	{
-		for (auto& arcScriptId : *_game->getMod()->getArcScriptList())
-		{
-			auto* arcScript = _game->getMod()->getArcScript(arcScriptId, false);
-			if (arcScript)
-			{
-				for (auto& trigger : arcScript->getResearchTriggers())
-				{
-					tmpList.insert(trigger.first);
-				}
-			}
-		}
-	}
-	else if (searchString == "ESCRIPT")
-	{
-		for (auto& eventScriptId : *_game->getMod()->getEventScriptList())
-		{
-			auto* eventScript = _game->getMod()->getEventScript(eventScriptId, false);
-			if (eventScript)
-			{
-				for (auto& trigger : eventScript->getResearchTriggers())
-				{
-					tmpList.insert(trigger.first);
-				}
-			}
-		}
-	}
-	else if (searchString == "MSCRIPT")
-	{
-		for (auto& missionScriptId : *_game->getMod()->getMissionScriptList())
-		{
-			auto* missionScript = _game->getMod()->getMissionScript(missionScriptId, false);
-			if (missionScript)
-			{
-				for (auto& trigger : missionScript->getResearchTriggers())
-				{
-					tmpList.insert(trigger.first);
-				}
-			}
-		}
-	}
-	if (!tmpList.empty())
-	{
-		for (auto& tmp : tmpList)
-		{
-			_availableTopics.push_back(tmp);
-			_lstTopics->addRow(1, tr(tmp).c_str());
-			_lstTopics->setRowColor(row, _parent->getResearchColor(tmp));
-			++row;
-		}
-		_firstManufacturingTopicIndex = row;
-		_firstFacilitiesTopicIndex = row;
-		_firstItemTopicIndex = row;
-		_firstCraftTopicIndex = row;
-		return;
-	}
 
 	for (auto& res : _game->getMod()->getResearchList())
 	{
@@ -365,6 +307,96 @@ void TechTreeSelectState::initLists()
 		}
 		++row;
 	}
+
+	if (Options::oxceTechTreeDataView)
+	{
+		_firstArcScriptIndex = row;
+
+		for (auto& arcScript : *_game->getMod()->getArcScriptList())
+		{
+			std::string arcName = arcScript;
+			Unicode::upperCase(arcName);
+			if (searchString == "ASCRIPT")
+			{
+				// Force Add
+			}
+			else if (arcName.find(searchString) == std::string::npos)
+			{
+				continue;
+			}
+
+			_availableTopics.push_back(arcScript);
+			std::ostringstream ss;
+			_parent->strPush(ss, arcScript);
+			ss << tr("STR_AS_FLAG");
+			_lstTopics->addRow(1, ss.str().c_str());
+			if (!_parent->isGuaranteedArc(arcScript))
+			{
+				_lstTopics->setRowColor(row, _lstTopics->getSecondaryColor());
+			}
+			++row;
+		}
+
+		_firstEventScriptIndex = row;
+
+		for (auto& eventScript : *_game->getMod()->getEventScriptList())
+		{
+			std::string eventName = eventScript;
+			Unicode::upperCase(eventName);
+			if (searchString == "ESCRIPT")
+			{
+				// Force Add
+			}
+			else if (eventName.find(searchString) == std::string::npos)
+			{
+				continue;
+			}
+
+			_availableTopics.push_back(eventScript);
+			std::ostringstream ss;
+			_parent->strPush(ss, eventScript);
+			ss << tr("STR_ES_FLAG");
+			_lstTopics->addRow(1, ss.str().c_str());
+			if (!_parent->isGuaranteedEvent(eventScript))
+			{
+				_lstTopics->setRowColor(row, _lstTopics->getSecondaryColor());
+			}
+			++row;
+		}
+
+		_firstMissionScriptIndex = row;
+
+		for (auto& missionScript : *_game->getMod()->getMissionScriptList())
+		{
+			std::string missionName = missionScript;
+			Unicode::upperCase(missionName);
+			if (searchString == "MSCRIPT")
+			{
+				// Force Add
+			}
+			else if (missionName.find(searchString) == std::string::npos)
+			{
+				continue;
+			}
+
+			_availableTopics.push_back(missionScript);
+			std::ostringstream ss;
+			_parent->strPush(ss, missionScript);
+			ss << tr("STR_MS_FLAG");
+			_lstTopics->addRow(1, ss.str().c_str());
+			if (!_parent->isGuaranteedMission(missionScript))
+			{
+				_lstTopics->setRowColor(row, _lstTopics->getSecondaryColor());
+			}
+			++row;
+		}
+	}
+	else
+	{
+		_firstArcScriptIndex = row;
+		_firstEventScriptIndex = row;
+		_firstMissionScriptIndex = row;
+	}
 }
 
 /**
@@ -380,7 +412,20 @@ void TechTreeSelectState::onSelectTopic(Action *)
 	const std::string selectedTopic = _availableTopics[index];
 
 	TTVMode topicType = TTV_RESEARCH;
-	if (index >= _firstCraftTopicIndex)
+
+	if (index >= _firstMissionScriptIndex)
+	{
+		topicType = TTV_MISSIONS;
+	}
+	else if (index >= _firstEventScriptIndex)
+	{
+		topicType = TTV_EVENTS;
+	}
+	else if (index >= _firstArcScriptIndex)
+	{
+		topicType = TTV_ARCS;
+	}
+	else if (index >= _firstCraftTopicIndex)
 	{
 		topicType = TTV_CRAFTS;
 	}
