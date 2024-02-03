@@ -245,7 +245,7 @@ private:
 	std::pair<int, int> _accelerationCoefficientStandoff, _accelerationCoefficientCautious, _accelerationCoefficientCombat, _accelerationCoefficientManeuver;
 	int _ufoTractorBeamSizeModifiers[5];
 	int _escortRange, _drawEnemyRadarCircles;
-	bool _escortsJoinFightAgainstHK, _hunterKillerFastRetarget;
+	bool _escortsJoinFightAgainstHK, _hunterKillerFastRetarget, _craftsCanChangeClass;
 	int _crewEmergencyEvacuationSurvivalChance, _pilotsEmergencyEvacuationSurvivalChance;
 	std::array<int, (size_t)(RANK_COMMANDER + 1)> _soldiersPerRank;
 	int _pilotAccuracyZeroPoint, _pilotAccuracyRange, _pilotReactionsZeroPoint, _pilotReactionsRange;
@@ -276,7 +276,7 @@ private:
 	GameTime _startingTime;
 	int _startingDifficulty;
 	int _baseDefenseMapFromLocation;
-	std::map<int, std::string> _missionRatings, _monthlyRatings;
+	std::map<int, std::string> _missionRatings, _monthlyRatings, _craftClasses;
 	std::map<std::string, std::string> _fixedUserOptions, _recommendedUserOptions;
 	std::vector<std::string> _hiddenMovementBackgrounds;
 	std::vector<std::string> _baseNamesFirst, _baseNamesMiddle, _baseNamesLast;
@@ -1112,6 +1112,13 @@ public:
 	const std::vector<int>& getRetaliationTriggerOdds() { return _retaliationTriggerOdds; }
 	const std::vector<int>& getRetaliationBaseRegionOdds() { return _retaliationBaseRegionOdds; }
 	const std::vector<int>& getAliensFacingCraftOdds() { return _aliensFacingCraftOdds; }
+
+	/// Gets the list of all defined craft classes.
+	const std::map<int, std::string> *getCraftClasses() const;
+	/// Receives craft size as integer and returns relevant craft class string.
+	const std::string getCraftClassFromSize(const int& craftSize) const;
+	/// Crafts can change their class due to change in their size (through systems/weapons)?
+	bool getCraftsCanChangeClass() const { return _craftsCanChangeClass; }
 
 	/// Gets acceleration penalty used in HK Standoff Mode activation formula.
 	int getAccelerationPenaltyStandoff() const { return _accelerationPenaltyStandoff; }
