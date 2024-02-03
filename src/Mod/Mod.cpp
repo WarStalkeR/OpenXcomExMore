@@ -202,6 +202,9 @@ bool Mod::CRAFT_LIST_SHOW_CLASS;
 bool Mod::CRAFT_LIST_CLASS_SHORT;
 bool Mod::CRAFT_SIZE_USE_SIZE_CLASS;
 bool Mod::CRAFT_SIZE_ALLOW_RECLASS;
+bool Mod::GEO_SHOW_TARGET_COURSE_RANGE;
+double Mod::GEO_TARGET_COURSE_RANGE_MULT;
+int Mod::GEO_TARGET_RANGE_COL_OFFSET;
 bool Mod::EXTENDED_ITEM_RELOAD_COST;
 bool Mod::EXTENDED_INVENTORY_SLOT_SORTING;
 bool Mod::EXTENDED_RUNNING_COST;
@@ -340,6 +343,10 @@ void Mod::resetGlobalStatics()
 
 	CRAFT_SIZE_USE_SIZE_CLASS = false; // use size-based classification instead
 	CRAFT_SIZE_ALLOW_RECLASS = false; // allow crafts size changes beyond class
+
+	GEO_SHOW_TARGET_COURSE_RANGE = false; // show range to target in set course
+	GEO_TARGET_COURSE_RANGE_MULT = 1.0; // multiplier for distance conversion
+	GEO_TARGET_RANGE_COL_OFFSET = -10; // range column offset in set course
 
 	EXTENDED_ITEM_RELOAD_COST = false;
 	EXTENDED_INVENTORY_SLOT_SORTING = false;
@@ -2956,6 +2963,9 @@ void Mod::loadConstants(const YAML::YamlNodeReader &reader)
 	reader.tryRead("pediaFacilityLockedStats", PEDIA_FACILITY_LOCKED_STATS);
 	reader.tryRead("pediaFacilityRowsCutoff", PEDIA_FACILITY_ROWS_CUTOFF);
 	reader.tryRead("pediaFacilityColOffset", PEDIA_FACILITY_COL_OFFSET);
+	reader.tryRead("geoShowTargetCourseRange", GEO_SHOW_TARGET_COURSE_RANGE);
+	reader.tryRead("geoTargetCourseRangeMult", GEO_TARGET_COURSE_RANGE_MULT);
+	reader.tryRead("geoTargetRangeColOffset", GEO_TARGET_RANGE_COL_OFFSET);
 	reader.tryRead("extendedItemReloadCost", EXTENDED_ITEM_RELOAD_COST);
 	reader.tryRead("extendedInventorySlotSorting", EXTENDED_INVENTORY_SLOT_SORTING);
 	reader.tryRead("extendedRunningCost", EXTENDED_RUNNING_COST);
