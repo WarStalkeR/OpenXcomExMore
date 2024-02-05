@@ -283,6 +283,8 @@ void create()
 	_info.push_back(OptionInfo("oxceShowBaseNameInPopups", &oxceShowBaseNameInPopups, false, "", "HIDDEN"));
 	_info.push_back(OptionInfo("oxceGeoscapeDebugLogMaxEntries", &oxceGeoscapeDebugLogMaxEntries, 1000, "", "HIDDEN"));
 	_info.push_back(OptionInfo("oxceGeoscapeEventsInstantDelivery", &oxceGeoscapeEventsInstantDelivery, true, "", "HIDDEN"));
+	_info.push_back(OptionInfo("oxceBaseCraftListShowClass", &oxceBaseCraftListShowClass, false, "", "HIDDEN"));
+	_info.push_back(OptionInfo("oxceBaseCraftListClassShort", &oxceBaseCraftListClassShort, false, "", "HIDDEN"));
 	_info.push_back(OptionInfo("oxcePediaFacilityMaxWidth", &oxcePediaFacilityMaxWidth, 2, "", "HIDDEN"));
 	_info.push_back(OptionInfo("oxcePediaFacilityMaxHeight", &oxcePediaFacilityMaxHeight, 2, "", "HIDDEN"));
 	_info.push_back(OptionInfo("oxcePediaFacilityOffsetX", &oxcePediaFacilityOffsetX, 0, "", "HIDDEN"));

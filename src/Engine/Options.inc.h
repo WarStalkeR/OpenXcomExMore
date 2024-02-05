@@ -134,6 +134,8 @@ OPT bool oxceDisableInventoryTuCost;
 OPT bool oxceShowBaseNameInPopups;
 OPT int oxceGeoscapeDebugLogMaxEntries;
 OPT bool oxceGeoscapeEventsInstantDelivery;
+OPT bool oxceBaseCraftListShowClass;
+OPT bool oxceBaseCraftListClassShort;
 OPT int oxcePediaFacilityMaxWidth;
 OPT int oxcePediaFacilityMaxHeight;
 OPT int oxcePediaFacilityOffsetX;
