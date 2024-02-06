@@ -32,10 +32,11 @@ Uses modified code from SDL\_gfx (LGPL) with permission from author.
 11\. Game Data Viewer option switch for Tech Tree Data Viewer.  
 
 **Note**: features that already implemented in the latest commit of the main
-branch, are marked with [OXCE] tag in the list.  
+branch, are marked with [OXCE] tag in the list. If you're playing vanilla
+OXCE, please refer to the official OXCE documentation.  
 
 ## Configurable Ufopaedia Facilities Preview
-**Global values for script files (example with default values below):**  
+**User Option Values (enforceable via 'fixedUserOptions'):**  
 `oxcePediaFacilityMaxWidth: 2` Horizontal tiles limit for rendering facilities
 preview in Ufopaedia.  
 `oxcePediaFacilityMaxHeight: 2` Vertical tiles limit for rendering facilities
@@ -43,7 +44,7 @@ preview in Ufopaedia.
 `oxcePediaFacilityOffsetX: 0` Horizontal offset for re-centering rendered
 facilities preview in Ufopaedia.  
 `oxcePediaFacilityOffsetY: 0` Vertical offset for re-centering rendered
-facilities preview in Ufopaedia.
+facilities preview in Ufopaedia.  
 **Note**: for example, if you're to set both `Max` to `3` and both `Offset`
 to `-16`, you will end up with 3x3 facilities preview being rendered in
 Ufopaedia, whilst being centered at exactly same place.  
@@ -79,14 +80,13 @@ hunter killer. **Combat** defines if you have **Standard** mode available vs
 hunter killer. And **Maneuver** defines if in **Standard** mode will you be
 holding enemy craft at distance of your weapons or not. Only **Disengage**
 and **Postpone** behavior didn't change. They still require original
-`Craft_Speed > HK_Speed` to be `true`.  
+`Craft_Speed > HK_Speed` to be `true`.
 
 ## Multi-Craft Hangars, Craft Sizes and Craft Classifications
 **Facility values for script files (with example below):**  
 `facilities:`  
 `  - type: NEW_FANCY_HANGAR`  
-`    crafts: 3` Original code for sake of max
-backwards compatibility.  
+`    crafts: 3` Original code for sake of max backwards compatibility.  
 `    craftsHidden: false` Flag to render or not render housed crafts in
 base view.  
 `    craftOptions:` More explanations below in **Usage** section.  
@@ -130,7 +130,7 @@ classify what size ranges belong to what classes.
 In this example `craftSize` of `6` means that once this weapon is equipped,
 craft's size will be increased by 6. If crafts aren't allowed to change class
 (via option) or has no suitable hangar slot after such change, player will
-get notification that it can't be equipped.  
+get notification that it can't be equipped.
 
 **Global values for script files (with example below):**  
 `craftClasses:`  
@@ -159,10 +159,25 @@ Small Submarine-class into Small Aircraft-class). By default this enforcement
 is enabled, in order to disable it, set value to `true`. If `craftClasses`
 value isn't defined/declared, the option will be ignored.
 
-`pediaFacilityColOffset: 5` adjusts column (in Facility's Ufopaedia entries).
+**User Option Values (enforceable via 'fixedUserOptions'):**  
+`oxceBaseCraftListShowClass: true` defines if class column is shown in vessel
+list menu that is accessible from the base view. Default value is `false`.  
+`oxceBaseCraftListClassShort: false` defines if class column uses short class
+abbreviation instead of full classification name. Default value is `false`.  
+`oxceBasescapeShortHangarLinks: true` defines if additional 'CRAFT>' text is
+hidden in the basescape, while mouse is over hangar facility with craft.
+Default value is `false`.  
+`oxcePediaFacilityLockedStats: true` defines, if amount of shown stat rows in
+in Facility's Ufopaedia entries is limited via this option. Default value
+is `false`, because vanilla never had more than 5 parameters.  
+`oxcePediaFacilityRowsCutoff: 5` limits how much stat rows will be shown in
+Facility's Ufopaedia entries, if option `oxcePediaFacilityLockedStats`
+is enabled.  
+`oxcePediaFacilityColOffset: 10` adjusts column in Facility's Ufopaedia entries.
 Useful, if you have hangars with many types of slots. Number indicates by how
 much column will be moved to the left.  
 
+**Strings Localization Guide (with references below):**  
 For each string, in localization files you need to define two entries: 
 standard and short.  
 `en-US:`  
@@ -194,6 +209,7 @@ suitable hangar slot to house it."`
 `  STR_NO_CRAFT_CLASS_CHANGE: "CRAFT CAN'T CHANGE CLASS!{SMALLLINE}After
 refitting craft with selected weapon, system or utility, its size will
 change beyond the limits defined by the classification."`  
+  `STR_CRAFT_CLASS: "CLASS"`  
 
 ## Bigger Craft Spites (for Base View and Refit Screen)
 **Craft values for script files (with example below):**  
@@ -203,22 +219,23 @@ change beyond the limits defined by the classification."`
 Now it is possible to define new sprite size for crafts with bigger sprites
 in order to still keep them centered at original coordinates. The `spriteSize`
 values should be exactly as as vertical and horizontal size of your image in
-pixels.  Any change to the sprite size should be even: i.e. you can't use 35x45
+pixels. Any change to the sprite size should be even: i.e. you can't use 35x45
 pixels sprite.
 
 ## Base Attack/Missile Strikes Debug Triggers
 Only works when in `options.cfg` the option `debug: true` is set. In
 **Geoscape**, if you hold SHIFT, while clicking any of your bases, it will
 trigger base invasion with random race/faction. If you do so, whilst holding
-CTRL, missile strike against selected base will be triggered.  
+CTRL, missile strike against selected base will be triggered.
 
 **Note**: If your mod has no `ufos:` rules with `missilePower`, then no missile
 strike will be triggered. In addition, all relevant missions, races and UFOs
 should be properly linked together, so they can be triggered and spawned
 normally by the game, otherwise nothing will spawn and you will get error
-message in log what is missing.  
+message in log what is missing.
 
 ## Soldier/Vehicle Capacity as Craft Stats
+**Note:** This feature is implemented in the main OXCE branch.  
 **Craft values for script files (with example below):**  
 `crafts:`  
 `  - type: NEW_BIG_TRANSPORT`  
@@ -231,6 +248,7 @@ exceed amount of available spawning locations on map). By default,
 if `maxUnitsLimit` isn't set, it will have same value as `soldiers`, which
 means, equipment that increases `soldiers` parameter won't have any effect.
 
+**Strings Localization Guide (with references below):**  
 _Technical Localization Strings: (saved in **\Language\Technical** folder)_  
 `en-US:`  
 `  maxUnitsLimit:` `"Max cargo space"`  
@@ -244,6 +262,7 @@ your craft has crew assigned to it, please remove them to free occupied
 space."`  
 
 ## Bigger Facility Sprites over Shapes
+**Note:** This feature is implemented in the main OXCE branch.  
 **Facility values for script files (with example below):**  
 `facilities:`  
 `  - type: NEW_BIG_FACILITY`  
