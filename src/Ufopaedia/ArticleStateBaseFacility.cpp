@@ -65,10 +65,10 @@ namespace OpenXcom
 		// build preview image
 		int tile_size = 32;
 		_image = new Surface(
-			tile_size * std::max(1, Options::oxcePediaFacilityMaxWidth),
-			tile_size * std::max(1, Options::oxcePediaFacilityMaxHeight),
-			232 + Options::oxcePediaFacilityOffsetX,
-			16 + Options::oxcePediaFacilityOffsetY);
+			tile_size * std::max(1, Mod::PEDIA_FACILITY_RENDER_PARAMETERS[0]),
+			tile_size * std::max(1, Mod::PEDIA_FACILITY_RENDER_PARAMETERS[1]),
+			232 + Mod::PEDIA_FACILITY_RENDER_PARAMETERS[2],
+			16 + Mod::PEDIA_FACILITY_RENDER_PARAMETERS[3]);
 		add(_image);
 
 		SurfaceSet *graphic = _game->getMod()->getSurfaceSet("BASEBITS.PCK");
@@ -78,8 +78,8 @@ namespace OpenXcom
 		int num;
 
 		// calculate preview offset
-		x_offset = (tile_size * std::max(0, Options::oxcePediaFacilityMaxWidth - facility->getSize())) / 2;
-		y_offset = (tile_size * std::max(0, Options::oxcePediaFacilityMaxHeight - facility->getSize())) / 2;
+		x_offset = (tile_size * std::max(0, Mod::PEDIA_FACILITY_RENDER_PARAMETERS[0] - facility->getSize())) / 2;
+		y_offset = (tile_size * std::max(0, Mod::PEDIA_FACILITY_RENDER_PARAMETERS[1] - facility->getSize())) / 2;
 
 		// render build preview
 		num = 0;
