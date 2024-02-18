@@ -36,18 +36,15 @@ branch, are marked with [OXCE] tag in the list. If you're playing vanilla
 OXCE, please refer to the official OXCE documentation.  
 
 ## Configurable Ufopaedia Facilities Preview
-**User Option Values (enforceable via 'fixedUserOptions'):**  
-`oxcePediaFacilityMaxWidth: 2` Horizontal tiles limit for rendering facilities
-preview in Ufopaedia.  
-`oxcePediaFacilityMaxHeight: 2` Vertical tiles limit for rendering facilities
-preview in Ufopaedia.  
-`oxcePediaFacilityOffsetX: 0` Horizontal offset for re-centering rendered
-facilities preview in Ufopaedia.  
-`oxcePediaFacilityOffsetY: 0` Vertical offset for re-centering rendered
-facilities preview in Ufopaedia.  
-**Note**: for example, if you're to set both `Max` to `3` and both `Offset`
-to `-16`, you will end up with 3x3 facilities preview being rendered in
-Ufopaedia, whilst being centered at exactly same place.  
+**Constants values for script files (with example below):**  
+`constants:`  
+`  extendedPediaFacilityParams: [2, 2, 0, 0]` first and second values are
+horizontal and vertical tiles limit for rendering facilities preview in
+Ufopaedia, third and forth values are horizontal and vertical offsets (in
+pixels) for re-centering rendered facilities preview in Ufopaedia.  
+**Note**: for example, if you're to set first part of values to `3` and
+second pair of values to `-16`, you will end up with 3x3 facilities preview
+being rendered in Ufopaedia, whilst being centered at exactly same place.  
 
 ## Advanced Craft vs Hunter Killer Dogfight
 **Global values for script files (example with default values below):**  
