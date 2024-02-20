@@ -23,6 +23,7 @@
 #include "../Mod/Mod.h"
 #include "../Mod/RuleBaseFacility.h"
 #include "../Engine/Game.h"
+#include "../Engine/Font.h"
 #include "../Engine/Palette.h"
 #include "../Engine/Surface.h"
 #include "../Engine/SurfaceSet.h"
@@ -116,13 +117,13 @@ namespace OpenXcom
 		int row = 0;
 		const int maxRows = Options::oxcePediaFacilityRowsCutoff;
 		const bool lockedStats = Options::oxcePediaFacilityLockedStats;
-		const int listDynamicWidth = lockedStats ? 195 : 183;
-		_lstInfo = new TextList(listDynamicWidth, 48, 10, 41);
+		const int listDynamicWidth = lockedStats ? 190 : 180;
+		_lstInfo = new TextList(listDynamicWidth + 3, 48, 10, 41);
 		add(_lstInfo);
 
 		const auto& colOffset = Options::oxcePediaFacilityColOffset;
-		const int colStat = (lockedStats ? 135 : 128) - colOffset;
-		const int colValue = (lockedStats ? 60 : 55) + colOffset;
+		const int colStat = (lockedStats ? 130 : 125) + colOffset;
+		const int colValue = (lockedStats ? 60 : 55) - colOffset;
 		_lstInfo->setColor(Palette::blockOffset(13)+10);
 		_lstInfo->setColumns(2, colStat, colValue);
 		_lstInfo->setScrolling(!lockedStats, 0);
@@ -134,14 +135,24 @@ namespace OpenXcom
 		_lstInfo->setCellColor(row, 1, Palette::blockOffset(13)+0);
 		row++;
 
+		int valPad = 1;
+		int valSize = 0;
+		int dynColStat = 0;
 		std::ostringstream ss;
+
 		ss << Unicode::formatFunding(facility->getBuildCost());
+		valSize = getTextWidth(&ss);
+		dynColStat = std::min(colStat, std::max(colValue, listDynamicWidth - valSize));
+		_lstInfo->setColumns(2, dynColStat, listDynamicWidth - dynColStat + valPad);
 		_lstInfo->addRow(2, tr("STR_CONSTRUCTION_COST").c_str(), ss.str().c_str());
 		_lstInfo->setCellColor(row, 1, Palette::blockOffset(13)+0);
 		row++;
 
 		ss.str("");ss.clear();
 		ss << Unicode::formatFunding(facility->getMonthlyCost());
+		valSize = getTextWidth(&ss);
+		dynColStat = std::min(colStat, std::max(colValue, listDynamicWidth - valSize));
+		_lstInfo->setColumns(2, dynColStat, listDynamicWidth - dynColStat + valPad);
 		_lstInfo->addRow(2, tr("STR_MAINTENANCE_COST").c_str(), ss.str().c_str());
 		_lstInfo->setCellColor(row, 1, Palette::blockOffset(13)+0);
 		row++;
@@ -152,6 +163,9 @@ namespace OpenXcom
 			{
 				ss.str(""); ss.clear();
 				ss << facility->getCrafts();
+				valSize = getTextWidth(&ss);
+				dynColStat = std::min(colStat, std::max(colValue, listDynamicWidth - valSize));
+				_lstInfo->setColumns(2, dynColStat, listDynamicWidth - dynColStat + valPad);
 				_lstInfo->addRow(2, tr("STR_HANGAR_CRAFT_CAP").c_str(), ss.str().c_str());
 				_lstInfo->setCellColor(row, 1, Palette::blockOffset(13) + 0);
 				row++;
@@ -213,12 +227,11 @@ namespace OpenXcom
 						}
 					}
 				}
-				const int valSize = ss.str().size() * 5;
-				const int dynColStat = std::min(colStat, std::max(55, listDynamicWidth - valSize));
-				_lstInfo->setColumns(2, dynColStat, listDynamicWidth - dynColStat);
+				valSize = getTextWidth(&ss);
+				dynColStat = std::min(colStat, std::max(colValue, listDynamicWidth - valSize));
+				_lstInfo->setColumns(2, dynColStat, listDynamicWidth - dynColStat + valPad);
 				_lstInfo->addRow(2, tr("STR_HANGAR_CRAFT_SLOTS").c_str(), ss.str().c_str());
 				_lstInfo->setCellColor(row, 1, Palette::blockOffset(13) + 0);
-				_lstInfo->setColumns(2, colStat, colValue);
 				row++;
 			}
 		}
@@ -229,6 +242,9 @@ namespace OpenXcom
 			{
 				ss.str(""); ss.clear();
 				ss << facility->getDefenseValue();
+				valSize = getTextWidth(&ss);
+				dynColStat = std::min(colStat, std::max(colValue, listDynamicWidth - valSize));
+				_lstInfo->setColumns(2, dynColStat, listDynamicWidth - dynColStat + valPad);
 				_lstInfo->addRow(2, tr("STR_DEFENSE_VALUE").c_str(), ss.str().c_str());
 				_lstInfo->setCellColor(row, 1, Palette::blockOffset(13)+0);
 				row++;
@@ -238,6 +254,9 @@ namespace OpenXcom
 			{
 				ss.str(""); ss.clear();
 				ss << Unicode::formatPercentage(facility->getHitRatio());
+				valSize = getTextWidth(&ss);
+				dynColStat = std::min(colStat, std::max(colValue, listDynamicWidth - valSize));
+				_lstInfo->setColumns(2, dynColStat, listDynamicWidth - dynColStat + valPad);
 				_lstInfo->addRow(2, tr("STR_HIT_RATIO").c_str(), ss.str().c_str());
 				_lstInfo->setCellColor(row, 1, Palette::blockOffset(13)+0);
 				row++;
@@ -249,4 +268,16 @@ namespace OpenXcom
 	ArticleStateBaseFacility::~ArticleStateBaseFacility()
 	{}
 
+	int ArticleStateBaseFacility::getTextWidth(std::ostringstream *strStream) const
+	{
+		int textWidth = 0;
+		UString text = Unicode::convUtf8ToUtf32(strStream->str());
+
+		for (UString::const_iterator i = text.begin(); i < text.end(); ++i)
+		{
+			textWidth += _txtInfo->getFont()->getCharSize(*i).w;
+		}
+
+		return textWidth;
+	}
 }

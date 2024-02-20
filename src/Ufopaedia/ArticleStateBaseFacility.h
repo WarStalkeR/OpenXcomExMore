@@ -37,6 +37,8 @@ namespace OpenXcom
 	public:
 		ArticleStateBaseFacility(ArticleDefinitionBaseFacility *article_defs, std::shared_ptr<ArticleCommonState> state);
 		virtual ~ArticleStateBaseFacility();
+		/// Gets width of the text (in pixels) from stream.
+		int getTextWidth(std::ostringstream *strStream) const;
 
 	protected:
 		Surface *_image;
