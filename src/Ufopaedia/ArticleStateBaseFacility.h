@@ -39,6 +39,8 @@ namespace OpenXcom
 		virtual ~ArticleStateBaseFacility();
 		/// Gets width of the text (in pixels) from stream.
 		int getTextWidth(std::ostringstream *strStream) const;
+		/// Adds row to the stats list based on received parameters.
+		void addToStatList(std::ostringstream *sStream, std::ostringstream *vStream, int colStat, int colValue, int row);
 
 	protected:
 		Surface *_image;
