@@ -304,6 +304,19 @@ Since it is quite spoiler-y, it can be completely disabled in mods via
 facilities.  
 5\. Geoscape base engagement with targets at range (similar to dogfight)?  
 
+# OpenXcom Extended More Far Fetched Plans
+1\. Real-Time (with Pause) Geoscape Combat: inspired by X-COM: Apocalypse
+cityscape real-time combat. But in this case it will occur on geoscape and
+beside crafts vs UFOs, bases (both player's and hostile's) will join the
+fray. In addition, capability for bases to shoot passing-by UFOs will add
+to strategic complexity and variety.  
+2\. Real-Time (with Pause) Battlescape Combat: inspired by X-COM: Apocalypse
+real-time mode alternative to turn-based for battlescape. This one will be
+pretty much copy-paste from X-COM: Apocalypse. The only issue is that massive
+AI rework will be required to ensure that AI can handle real-time combat
+just as good as player and without cheating, but by using all the tools that
+player can use, such as scanners & etc.  
+
 ## Scanner Change Ideas
 `scannerResolution: 2` - 1 is default one. 2 will allow you to see at
 longer range, but with reduced precision.  
