@@ -19,7 +19,7 @@ and the [wiki](https://www.ufopaedia.org/index.php/OpenXcom).
 Uses modified code from SDL\_gfx (LGPL) with permission from author.
 
 # OpenXcom Extended More Features
-1\. Configurable Ufopaedia facilities preview.  
+1\. [OXCE] Configurable Ufopaedia facilities preview.  
 2\. [OXCE] Multi-sprite rendering mode for bigger facilities.  
 3\. Advanced craft vs hunter killer dogfight behavior.  
 4\. [OXCE] Soldiers and vehicles as modifiable craft stats.  
