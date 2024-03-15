@@ -187,6 +187,8 @@ int Mod::UNIT_RESPONSE_SOUNDS_FREQUENCY[4];
 int Mod::PEDIA_FACILITY_RENDER_PARAMETERS[4];
 int Mod::ACCELERATION_PENALTY[4];
 std::pair<int, int> Mod::ACCELERATION_COEFF[4];
+bool Mod::CRAFT_LIST_SHOW_CLASS;
+bool Mod::CRAFT_LIST_CLASS_SHORT;
 bool Mod::EXTENDED_ITEM_RELOAD_COST;
 bool Mod::EXTENDED_RUNNING_COST;
 bool Mod::EXTENDED_HWP_LOAD_ORDER;
@@ -299,6 +301,9 @@ void Mod::resetGlobalStatics()
 	ACCELERATION_COEFF[1] = {15, 35}; // cautious +/- acceleration coefficient
 	ACCELERATION_COEFF[2] = {20, 50}; // combat +/- acceleration coefficient
 	ACCELERATION_COEFF[3] = {25, 70}; // maneuver +/- acceleration coefficient
+
+	CRAFT_LIST_SHOW_CLASS = false; // show class column in base craft list
+	CRAFT_LIST_CLASS_SHORT = false; // show short class name in class column
 
 	EXTENDED_ITEM_RELOAD_COST = false;
 	EXTENDED_RUNNING_COST = false;
@@ -2666,6 +2671,8 @@ void Mod::loadConstants(const YAML::Node &node)
 			++k;
 		}
 	}
+	CRAFT_LIST_SHOW_CLASS = node["baseCraftListShowClass"].as<bool>(CRAFT_LIST_SHOW_CLASS);
+	CRAFT_LIST_CLASS_SHORT = node["baseCraftListClassShort"].as<bool>(CRAFT_LIST_CLASS_SHORT);
 	EXTENDED_ITEM_RELOAD_COST = node["extendedItemReloadCost"].as<bool>(EXTENDED_ITEM_RELOAD_COST);
 	EXTENDED_RUNNING_COST = node["extendedRunningCost"].as<bool>(EXTENDED_RUNNING_COST);
 	EXTENDED_HWP_LOAD_ORDER = node["extendedHwpLoadOrder"].as<bool>(EXTENDED_HWP_LOAD_ORDER);

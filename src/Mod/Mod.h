@@ -424,6 +424,8 @@ public:
 	static int PEDIA_FACILITY_RENDER_PARAMETERS[4];
 	static int ACCELERATION_PENALTY[4];
 	static std::pair<int, int> ACCELERATION_COEFF[4];
+	static bool CRAFT_LIST_SHOW_CLASS;
+	static bool CRAFT_LIST_CLASS_SHORT;
 	static bool EXTENDED_ITEM_RELOAD_COST;
 	static bool EXTENDED_RUNNING_COST;
 	static bool EXTENDED_HWP_LOAD_ORDER;

@@ -53,7 +53,7 @@ CraftsState::CraftsState(Base *base) : _base(base)
 	_txtTitle = new Text(298, 17, 16, 8);
 
 	// Handle headers, list and button
-	if (Options::oxceBaseCraftListShowClass)
+	if (Mod::CRAFT_LIST_SHOW_CLASS)
 	{
 		_txtBase = new Text(298, 17, 16, 24);
 		_txtName = new Text(94, 9, 16, 40);
@@ -111,7 +111,7 @@ CraftsState::CraftsState(Base *base) : _base(base)
 	_txtWeapon->setWordWrap(true);
 
 	// Handle columns name and width
-	if (Options::oxceBaseCraftListShowClass)
+	if (Mod::CRAFT_LIST_SHOW_CLASS)
 	{
 		std::ostringstream ss;
 		ss << tr("STR_CREW") << ",\n" << tr("STR_HWPS");
@@ -156,10 +156,10 @@ void CraftsState::init()
 	{
 		std::ostringstream ss, ss2, ss3;
 		ss << craft->getNumWeapons() << "/" << craft->getRules()->getWeapons();
-		if (Options::oxceBaseCraftListShowClass)
+		if (Mod::CRAFT_LIST_SHOW_CLASS)
 		{
 			ss2 << craft->getNumTotalSoldiers() << ", " << craft->getNumTotalVehicles();
-			if (Options::oxceBaseCraftListClassShort)
+			if (Mod::CRAFT_LIST_CLASS_SHORT)
 				ss3 << tr(_game->getMod()->getCraftClassFromSize(craft->getCraftSize()) + "_UC");
 			else ss3 << tr(_game->getMod()->getCraftClassFromSize(craft->getCraftSize()));
 		}
