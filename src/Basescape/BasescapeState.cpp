@@ -572,7 +572,7 @@ void BasescapeState::viewMouseWheelUp(Action *)
 	{
 		std::ostringstream ss;
 		ss << tr(f->getRules()->getType());
-		if (Options::oxceBasescapeShortHangarLinks) ss << " > "
+		if (Mod::BASE_SHORT_HANGAR_LINKS) ss << " > "
 			<< f->getCraftForDrawing()->getName(_game->getLanguage());
 		else ss << " " << tr("STR_CRAFT_").arg(f->getCraftForDrawing()->
 			getName(_game->getLanguage()));
@@ -621,7 +621,7 @@ void BasescapeState::viewMouseWheelDown(Action *)
 	{
 		std::ostringstream ss;
 		ss << tr(f->getRules()->getType());
-		if (Options::oxceBasescapeShortHangarLinks) ss << " > "
+		if (Mod::BASE_SHORT_HANGAR_LINKS) ss << " > "
 			<< f->getCraftForDrawing()->getName(_game->getLanguage());
 		else ss << " " << tr("STR_CRAFT_").arg(f->getCraftForDrawing()->
 			getName(_game->getLanguage()));
@@ -648,7 +648,7 @@ void BasescapeState::viewMouseOver(Action *)
 			ss << tr(f->getRules()->getType());
 			if (f->getCraftForDrawing() != 0)
 			{
-				if (Options::oxceBasescapeShortHangarLinks) ss << " > "
+				if (Mod::BASE_SHORT_HANGAR_LINKS) ss << " > "
 					<< f->getCraftForDrawing()->getName(_game->getLanguage());
 				else ss << " " << tr("STR_CRAFT_").arg(f->getCraftForDrawing()->
 					getName(_game->getLanguage()));

@@ -134,10 +134,6 @@ OPT bool oxceDisableInventoryTuCost;
 OPT bool oxceShowBaseNameInPopups;
 OPT int oxceGeoscapeDebugLogMaxEntries;
 OPT bool oxceGeoscapeEventsInstantDelivery;
-OPT bool oxcePediaFacilityLockedStats;
-OPT int oxcePediaFacilityColOffset;
-OPT int oxcePediaFacilityRowsCutoff;
-OPT bool oxceBasescapeShortHangarLinks;
 
 // Flags and other stuff that don't need OptionInfo's.
 OPT bool mute, reload, newOpenGL, newScaleFilter, newHQXFilter, newXBRZFilter, newRootWindowedMode, newFullscreen, newAllowResize, newBorderless;

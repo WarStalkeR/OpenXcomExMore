@@ -115,9 +115,9 @@ namespace OpenXcom
 		_txtInfo->setText(tr(defs->getTextForPage(_state->current_page)));
 
 		int row = 0;
-		const int maxRows = Options::oxcePediaFacilityRowsCutoff;
-		const bool lockedStats = Options::oxcePediaFacilityLockedStats;
-		const auto& colOffset = Options::oxcePediaFacilityColOffset;
+		const int maxRows = Mod::PEDIA_FACILITY_ROWS_CUTOFF;
+		const bool lockedStats = Mod::PEDIA_FACILITY_LOCKED_STATS;
+		const auto& colOffset = Mod::PEDIA_FACILITY_COL_OFFSET;
 		const int colStat = (lockedStats ? 130 : 125) + colOffset;
 		const int colValue = (lockedStats ? 60 : 55) - colOffset;
 		_lstInfo = new TextList(colStat + colValue + 3, 48, 10, 41);

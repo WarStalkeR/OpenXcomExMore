@@ -426,6 +426,10 @@ public:
 	static std::pair<int, int> ACCELERATION_COEFF[4];
 	static bool CRAFT_LIST_SHOW_CLASS;
 	static bool CRAFT_LIST_CLASS_SHORT;
+	static bool BASE_SHORT_HANGAR_LINKS;
+	static bool PEDIA_FACILITY_LOCKED_STATS;
+	static int PEDIA_FACILITY_ROWS_CUTOFF;
+	static int PEDIA_FACILITY_COL_OFFSET;
 	static bool EXTENDED_ITEM_RELOAD_COST;
 	static bool EXTENDED_RUNNING_COST;
 	static bool EXTENDED_HWP_LOAD_ORDER;
