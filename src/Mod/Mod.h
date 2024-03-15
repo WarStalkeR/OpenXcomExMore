@@ -241,8 +241,6 @@ private:
 
 	std::string _loseMoney, _loseRating, _loseDefeat;
 	int _ufoGlancingHitThreshold, _ufoBeamWidthParameter;
-	int _accelerationPenaltyStandoff, _accelerationPenaltyCautious, _accelerationPenaltyCombat, _accelerationPenaltyManeuver;
-	std::pair<int, int> _accelerationCoefficientStandoff, _accelerationCoefficientCautious, _accelerationCoefficientCombat, _accelerationCoefficientManeuver;
 	int _ufoTractorBeamSizeModifiers[5];
 	int _escortRange, _drawEnemyRadarCircles;
 	bool _escortsJoinFightAgainstHK, _hunterKillerFastRetarget, _craftsCanChangeClass;
@@ -424,6 +422,8 @@ public:
 	static int DIFFICULTY_BASED_RETAL_DELAY[5];
 	static int UNIT_RESPONSE_SOUNDS_FREQUENCY[4];
 	static int PEDIA_FACILITY_RENDER_PARAMETERS[4];
+	static int ACCELERATION_PENALTY[4];
+	static std::pair<int, int> ACCELERATION_COEFF[4];
 	static bool EXTENDED_ITEM_RELOAD_COST;
 	static bool EXTENDED_RUNNING_COST;
 	static bool EXTENDED_HWP_LOAD_ORDER;
@@ -1119,23 +1119,6 @@ public:
 	const std::string getCraftClassFromSize(const int& craftSize) const;
 	/// Crafts can change their class due to change in their size (through systems/weapons)?
 	bool getCraftsCanChangeClass() const { return _craftsCanChangeClass; }
-
-	/// Gets acceleration penalty used in HK Standoff Mode activation formula.
-	int getAccelerationPenaltyStandoff() const { return _accelerationPenaltyStandoff; }
-	/// Gets acceleration penalty used in HK Cautious/Evasion Mode switch formula.
-	int getAccelerationPenaltyCautious() const { return _accelerationPenaltyCautious; }
-	/// Gets acceleration penalty used in HK Standard Mode activation formula.
-	int getAccelerationPenaltyCombat() const { return _accelerationPenaltyCombat; }
-	/// Gets acceleration penalty used to check if HK or player dictates range in Standard Mode.
-	int getAccelerationPenaltyManeuver() const { return _accelerationPenaltyManeuver; }
-	/// Gets acceleration coefficient used in HK Standoff Mode activation formula.
-	const std::pair<int, int> getAccelerationCoefficientStandoff() const { return _accelerationCoefficientStandoff; }
-	/// Gets acceleration coefficient used in HK Cautious/Evasion Mode switch formula.
-	const std::pair<int, int> getAccelerationCoefficientCautious() const { return _accelerationCoefficientCautious; }
-	/// Gets acceleration coefficient used in HK Standard Mode activation formula.
-	const std::pair<int, int> getAccelerationCoefficientCombat() const { return _accelerationCoefficientCombat; }
-	/// Gets acceleration coefficient used to check if HK or player dictates range in Standard Mode.
-	const std::pair<int, int> getAccelerationCoefficientManeuver() const { return _accelerationCoefficientManeuver; }
 
 };
 

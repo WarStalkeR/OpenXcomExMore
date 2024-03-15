@@ -291,37 +291,37 @@ DogfightState::DogfightState(GeoscapeState *state, Craft *craft, Ufo *ufo, bool 
 	}
 
 	// Craft can hold HK in Standoff Mode?
-	const int coefficientStandoff = _craft->getCraftStats().accel >= _game->getMod()->getAccelerationPenaltyStandoff() ?
-		_game->getMod()->getAccelerationCoefficientStandoff().second : _game->getMod()->getAccelerationCoefficientStandoff().first;
-	if (_craft->getCraftStats().speedMax > std::max(1, (_ufo->getCraftStats().speedMax *
-		(1000 + coefficientStandoff * (_game->getMod()->getAccelerationPenaltyStandoff() - _craft->getCraftStats().accel))) / 1000))
+	const int coefficientStandoff = _craft->getCraftStats().accel >= Mod::ACCELERATION_PENALTY[0] ?
+		Mod::ACCELERATION_COEFF[0].first : Mod::ACCELERATION_COEFF[0].second;
+	if (_craft->getCraftStats().speedMax > std::max(1, (_ufo->getCraftStats().speedMax * (1000 +
+		coefficientStandoff * (Mod::ACCELERATION_PENALTY[0] - _craft->getCraftStats().accel))) / 1000))
 	{
 		_craftStandoffBetter = true;
 	}
 
 	// Craft can keep HK at range in Cautious Mode?
-	const int coefficientCautious = _craft->getCraftStats().accel >= _game->getMod()->getAccelerationPenaltyCautious() ?
-		_game->getMod()->getAccelerationCoefficientCautious().second : _game->getMod()->getAccelerationCoefficientCautious().first;
-	if (_craft->getCraftStats().speedMax > std::max(1, (_ufo->getCraftStats().speedMax *
-		(1000 + coefficientCautious * (_game->getMod()->getAccelerationPenaltyCautious() - _craft->getCraftStats().accel))) / 1000))
+	const int coefficientCautious = _craft->getCraftStats().accel >= Mod::ACCELERATION_PENALTY[1] ?
+		Mod::ACCELERATION_COEFF[1].first : Mod::ACCELERATION_COEFF[1].second;
+	if (_craft->getCraftStats().speedMax > std::max(1, (_ufo->getCraftStats().speedMax * (1000 +
+		coefficientCautious * (Mod::ACCELERATION_PENALTY[1] - _craft->getCraftStats().accel))) / 1000))
 	{
 		_craftCautiousBetter = true;
 	}
 
 	// Craft can fight HK in Combat Mode?
-	const int coefficientCombat = _craft->getCraftStats().accel >= _game->getMod()->getAccelerationPenaltyCombat() ?
-		_game->getMod()->getAccelerationCoefficientCombat().second : _game->getMod()->getAccelerationCoefficientCombat().first;
-	if (_craft->getCraftStats().speedMax > std::max(1, (_ufo->getCraftStats().speedMax *
-		(1000 + coefficientCombat * (_game->getMod()->getAccelerationPenaltyCombat() - _craft->getCraftStats().accel))) / 1000))
+	const int coefficientCombat = _craft->getCraftStats().accel >= Mod::ACCELERATION_PENALTY[2] ?
+		Mod::ACCELERATION_COEFF[2].first : Mod::ACCELERATION_COEFF[2].second;
+	if (_craft->getCraftStats().speedMax > std::max(1, (_ufo->getCraftStats().speedMax * (1000 +
+		coefficientCombat * (Mod::ACCELERATION_PENALTY[2] - _craft->getCraftStats().accel))) / 1000))
 	{
 		_craftCombatBetter = true;
 	}
 
 	// Craft can outmaneuver HK in Combat Mode?
-	const int coefficientManeuver = _craft->getCraftStats().accel >= _game->getMod()->getAccelerationPenaltyManeuver() ?
-		_game->getMod()->getAccelerationCoefficientManeuver().second : _game->getMod()->getAccelerationCoefficientManeuver().first;
-	if (_craft->getCraftStats().speedMax > std::max(1, (_ufo->getCraftStats().speedMax *
-		(1000 + coefficientManeuver * (_game->getMod()->getAccelerationPenaltyManeuver() - _craft->getCraftStats().accel))) / 1000))
+	const int coefficientManeuver = _craft->getCraftStats().accel >= Mod::ACCELERATION_PENALTY[3] ?
+		Mod::ACCELERATION_COEFF[3].first : Mod::ACCELERATION_COEFF[3].second;
+	if (_craft->getCraftStats().speedMax > std::max(1, (_ufo->getCraftStats().speedMax * (1000 +
+		coefficientManeuver * (Mod::ACCELERATION_PENALTY[3] - _craft->getCraftStats().accel))) / 1000))
 	{
 		_craftManeuverBetter = true;
 	}

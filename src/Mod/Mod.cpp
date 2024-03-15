@@ -185,6 +185,8 @@ int Mod::SELL_PRICE_COEFFICIENT[5];
 int Mod::DIFFICULTY_BASED_RETAL_DELAY[5];
 int Mod::UNIT_RESPONSE_SOUNDS_FREQUENCY[4];
 int Mod::PEDIA_FACILITY_RENDER_PARAMETERS[4];
+int Mod::ACCELERATION_PENALTY[4];
+std::pair<int, int> Mod::ACCELERATION_COEFF[4];
 bool Mod::EXTENDED_ITEM_RELOAD_COST;
 bool Mod::EXTENDED_RUNNING_COST;
 bool Mod::EXTENDED_HWP_LOAD_ORDER;
@@ -287,6 +289,16 @@ void Mod::resetGlobalStatics()
 	PEDIA_FACILITY_RENDER_PARAMETERS[1] = 2; // pedia facility max height
 	PEDIA_FACILITY_RENDER_PARAMETERS[2] = 0; // pedia facility X offset
 	PEDIA_FACILITY_RENDER_PARAMETERS[3] = 0; // pedia facility Y offset
+
+	ACCELERATION_PENALTY[0] = 10; // standoff acceleration penalty
+	ACCELERATION_PENALTY[1] = 10; // cautious acceleration penalty
+	ACCELERATION_PENALTY[2] = 10; // combat acceleration penalty
+	ACCELERATION_PENALTY[3] = 10; // maneuver acceleration penalty
+
+	ACCELERATION_COEFF[0] = {10, 20}; // standoff +/- acceleration coefficient
+	ACCELERATION_COEFF[1] = {15, 35}; // cautious +/- acceleration coefficient
+	ACCELERATION_COEFF[2] = {20, 50}; // combat +/- acceleration coefficient
+	ACCELERATION_COEFF[3] = {25, 70}; // maneuver +/- acceleration coefficient
 
 	EXTENDED_ITEM_RELOAD_COST = false;
 	EXTENDED_RUNNING_COST = false;
@@ -411,8 +423,6 @@ Mod::Mod() :
 	_manaEnabled(false), _manaBattleUI(false), _manaTrainingPrimary(false), _manaTrainingSecondary(false), _manaReplenishAfterMission(true),
 	_loseMoney("loseGame"), _loseRating("loseGame"), _loseDefeat("loseGame"),
 	_ufoGlancingHitThreshold(0), _ufoBeamWidthParameter(1000),
-	_accelerationPenaltyStandoff(10), _accelerationPenaltyCautious(10), _accelerationPenaltyCombat(10), _accelerationPenaltyManeuver(10),
-	_accelerationCoefficientStandoff(20, 10), _accelerationCoefficientCautious(35, 15), _accelerationCoefficientCombat(50, 20), _accelerationCoefficientManeuver(70, 25),
 	_escortRange(20), _drawEnemyRadarCircles(1), _escortsJoinFightAgainstHK(true), _hunterKillerFastRetarget(true), _craftsCanChangeClass(false),
 	_crewEmergencyEvacuationSurvivalChance(100), _pilotsEmergencyEvacuationSurvivalChance(100),
 	_soldiersPerRank({-1, -1, 5, 11, 23, 30}),
@@ -2638,6 +2648,24 @@ void Mod::loadConstants(const YAML::Node &node)
 			++k;
 		}
 	}
+	if (node["accelerationPenalty"])
+	{
+		int k = 0;
+		for (YAML::const_iterator j = node["accelerationPenalty"].begin(); j != node["accelerationPenalty"].end() && k < 4; ++j)
+		{
+			ACCELERATION_PENALTY[k] = (*j).as<int>(ACCELERATION_PENALTY[k]);
+			++k;
+		}
+	}
+	if (node["accelerationCoefficient"])
+	{
+		int k = 0;
+		for (YAML::const_iterator j = node["accelerationCoefficient"].begin(); j != node["accelerationCoefficient"].end() && k < 4; ++j)
+		{
+			ACCELERATION_COEFF[k] = (*j).as<std::pair<int, int>>(ACCELERATION_COEFF[k]);
+			++k;
+		}
+	}
 	EXTENDED_ITEM_RELOAD_COST = node["extendedItemReloadCost"].as<bool>(EXTENDED_ITEM_RELOAD_COST);
 	EXTENDED_RUNNING_COST = node["extendedRunningCost"].as<bool>(EXTENDED_RUNNING_COST);
 	EXTENDED_HWP_LOAD_ORDER = node["extendedHwpLoadOrder"].as<bool>(EXTENDED_HWP_LOAD_ORDER);
@@ -3251,14 +3279,6 @@ void Mod::loadFile(const FileMap::FileRecord &filerec, ModScript &parsers)
 	}
 	_craftClasses = doc["craftClasses"].as<std::map<int, std::string> >(_craftClasses);
 	_craftsCanChangeClass = doc["craftsCanChangeClass"].as<bool>(_craftsCanChangeClass);
-	_accelerationPenaltyStandoff = doc["accelerationPenaltyStandoff"].as<int>(_accelerationPenaltyStandoff);
-	_accelerationPenaltyCautious = doc["accelerationPenaltyCautious"].as<int>(_accelerationPenaltyCautious);
-	_accelerationPenaltyCombat = doc["accelerationPenaltyCombat"].as<int>(_accelerationPenaltyCombat);
-	_accelerationPenaltyManeuver = doc["accelerationPenaltyManeuver"].as<int>(_accelerationPenaltyManeuver);
-	_accelerationCoefficientStandoff = doc["accelerationCoefficientStandoff"].as<std::pair<int, int>>(_accelerationCoefficientStandoff);
-	_accelerationCoefficientCautious = doc["accelerationCoefficientCautious"].as<std::pair<int, int>>(_accelerationCoefficientCautious);
-	_accelerationCoefficientCombat = doc["accelerationCoefficientCombat"].as<std::pair<int, int>>(_accelerationCoefficientCombat);
-	_accelerationCoefficientManeuver = doc["accelerationCoefficientManeuver"].as<std::pair<int, int>>(_accelerationCoefficientManeuver);
 
 
 
