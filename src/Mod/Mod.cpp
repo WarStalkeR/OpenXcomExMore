@@ -304,10 +304,10 @@ void Mod::resetGlobalStatics()
 	ACCELERATION_PENALTY[2] = 10; // combat acceleration penalty
 	ACCELERATION_PENALTY[3] = 10; // maneuver acceleration penalty
 
-	ACCELERATION_COEFF[0] = {10, 20}; // standoff +/- acceleration coefficient
-	ACCELERATION_COEFF[1] = {15, 35}; // cautious +/- acceleration coefficient
-	ACCELERATION_COEFF[2] = {20, 50}; // combat +/- acceleration coefficient
-	ACCELERATION_COEFF[3] = {25, 70}; // maneuver +/- acceleration coefficient
+	ACCELERATION_COEFF[0] = { 10, 20 }; // standoff +/- acceleration coefficient
+	ACCELERATION_COEFF[1] = { 15, 35 }; // cautious +/- acceleration coefficient
+	ACCELERATION_COEFF[2] = { 20, 50 }; // combat +/- acceleration coefficient
+	ACCELERATION_COEFF[3] = { 25, 70 }; // maneuver +/- acceleration coefficient
 
 	CRAFT_LIST_SHOW_CLASS = false; // show class column in base craft list
 	CRAFT_LIST_CLASS_SHORT = false; // show short class name in class column
