@@ -36,6 +36,7 @@ branch, are marked with [OXCE] tag in the list. If you're playing vanilla
 OXCE, please refer to the official OXCE documentation.  
 
 ## Configurable Ufopaedia Facilities Preview
+**Note:** This feature is implemented in the main OXCE branch.  
 **Constants values for script files (with example below):**  
 `constants:`  
 `  extendedPediaFacilityParams: [2, 2, 0, 0]` first and second values are
@@ -47,30 +48,21 @@ second pair of values to `-16`, you will end up with 3x3 facilities preview
 being rendered in Ufopaedia, whilst being centered at exactly same place.  
 
 ## Advanced Craft vs Hunter Killer Dogfight
-**Global values for script files (example with default values below):**  
-`accelerationPenaltyStandoff: 10` Acceleration penalty for negative/positive
-`Standoff` formula.  
-`accelerationPenaltyCautious: 10` Acceleration penalty for negative/positive
-`Cautious` formula.  
-`accelerationPenaltyCombat: 10` Acceleration penalty for negative/positive
-`Combat` formula.  
-`accelerationPenaltyManeuver: 10` Acceleration penalty for negative/positive
-`Maneuver` formula.  
-`accelerationCoefficientStandoff: [20, 10]` Acceleration negative/positive
-effect coefficient for `Standoff` formula.  
-`accelerationCoefficientCautious: [35, 15]` Acceleration negative/positive
-effect coefficient for `Cautious` formula.  
-`accelerationCoefficientCombat: [50, 20]` Acceleration negative/positive
-effect coefficient for `Combat` formula.  
-`accelerationCoefficientManeuver: [70, 25]` Acceleration negative/positive
-effect coefficient for `Maneuver` formula.  
+**Constants values for script files (with example below):**  
+`constants:`  
+`  accelerationPenalty: [10, 10, 10, 10]`  
+`  accelerationCoefficient: [[10, 20], [15, 35], [20, 50], [25, 70]]`  
+The `accelerationPenalty` is list of acceleration penalties for
+various dogfight modes: `Standoff`, `Cautious`, `Combat` and `Maneuver`.  
+The `accelerationCoefficient` is list of positive and negative acceleration
+coefficients for `Standoff`, `Cautious`, `Combat` and `Maneuver` modes.
 **Note**: if `Craft_Acceleration >= Acceleration_Penalty` positive coefficient
 is applied.  
-**Formula**: `Craft_Speed > HK_Speed * (1 + Acceleration_Coefficient/1000 *
-(Acceleration_Penalty - Craft_Acceleration))`  
-Defines, if dogfight mode is available versus hunter killer. It should be
-noted although `Craft_Speed > HK_Speed` can be `false`, but due to high
-**acceleration** it is possible to outmaneuver hunter killer. **Standoff**
+**Formula** `Craft_Speed > HK_Speed * (1 + Acceleration_Coefficient/1000 *
+(Acceleration_Penalty - Craft_Acceleration))` defines, if dogfight mode is
+available versus hunter killer. It should be noted although
+`Craft_Speed > HK_Speed` can be `false`, but due to high **acceleration**
+it is possible to outmaneuver hunter killer. **Standoff**
 defines if you can keep enemy HK at 'safe' non-firing distance. **Cautious**
 defines if you get **Evasion Maneuvers** or **Cautious/Long Range** mode vs
 hunter killer. **Combat** defines if you have **Standard** mode available vs
@@ -156,21 +148,22 @@ Small Submarine-class into Small Aircraft-class). By default this enforcement
 is enabled, in order to disable it, set value to `true`. If `craftClasses`
 value isn't defined/declared, the option will be ignored.
 
-**User Option Values (enforceable via 'fixedUserOptions'):**  
-`oxceBaseCraftListShowClass: true` defines if class column is shown in vessel
+**Constants values for script files (with example below):**    
+`constants:`  
+`  baseCraftListShowClass: true` defines if class column is shown in vessel
 list menu that is accessible from the base view. Default value is `false`.  
-`oxceBaseCraftListClassShort: false` defines if class column uses short class
+`  baseCraftListClassShort: false` defines if class column uses short class
 abbreviation instead of full classification name. Default value is `false`.  
-`oxceBasescapeShortHangarLinks: true` defines if additional 'CRAFT>' text is
+`  baseShortHangarLinks: true` defines if additional 'CRAFT>' text is
 hidden in the basescape, while mouse is over hangar facility with craft.
 Default value is `false`.  
-`oxcePediaFacilityLockedStats: true` defines, if amount of shown stat rows in
+`  pediaFacilityLockedStats: true` defines, if amount of shown stat rows in
 in Facility's Ufopaedia entries is limited via this option. Default value
 is `false`, because vanilla never had more than 5 parameters.  
-`oxcePediaFacilityRowsCutoff: 5` limits how much stat rows will be shown in
+`  pediaFacilityRowsCutoff: 5` limits how much stat rows will be shown in
 Facility's Ufopaedia entries, if option `oxcePediaFacilityLockedStats`
 is enabled.  
-`oxcePediaFacilityColOffset: 10` adjusts column in Facility's Ufopaedia entries.
+`  pediaFacilityColOffset: 10` adjusts column in Facility's Ufopaedia entries.
 Useful, if you have hangars with many types of slots. Number indicates by how
 much column will be moved to the left.  
 
@@ -278,10 +271,27 @@ Once you're in Soldiers list (that is accessible from Base View), hovering
 over soldier in list and clicking inventory hotkey (default `I`) now will
 open inventory of that soldier and not of first one in list.  
 
-## Distance to Interception Target from Crafts
-In **Geoscape** in target's menu, if you're to hold ALT, while clicking the
-`Set the Course` button, instead of base names column, you will see column 
-with ranges (in KM) between crafts in list and current target.  
+## Distance to Course Target from Crafts
+Allows to enable range measurement in **Geoscape** target list, when you
+select 'Set The Course' option. In additional column near base name you will
+get calculated range to target (by default in KM).   
+
+**Constants values for script files (with example below):**   
+`constants:`  
+`  geoShowTargetCourseRange: true` defines if option is enabled or not.
+Default value is `false`.  
+`  geoTargetCourseRangeMult: 1.8` allows to convert default unit (KM)
+into anything you want. Default value is `1.0` (for KM).  
+`  geoTargetRangeColOffset: -15` allows to adjust range column to specific
+localization via offset.  
+
+_Standard Localization Strings: (saved in **\Language** folder)_  
+`en-US:`  
+`  STR_BASE_DISTANCE:` `"HIDEOUT,{NEWLINE}DISTANCE (KM)"`  
+
+**Reminder:** Please don't forget to modify `STR_BASE_DISTANCE` localization
+string to ensure that it related to the chosen `geoTargetCourseRangeMult` for
+correct distance measurement with new units.  
 
 ## Game Data Viewer Mode for Tech Tree Viewer
 Helps to debug and analyze **Arc Scripts**, **Event Scripts** and **Mission
