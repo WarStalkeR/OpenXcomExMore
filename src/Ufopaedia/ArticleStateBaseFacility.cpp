@@ -175,7 +175,7 @@ namespace OpenXcom
 						{
 							const int& slotSize = facility->getCraftOptions().at(optionIt).max;
 							const std::string sizeClass = _game->getMod()->getCraftClassFromSize(slotSize);
-							if (sizeClass != _game->getMod()->getCraftClasses()->begin()->second)
+							if (sizeClass != _game->getMod()->getCraftSizeClassMap()->begin()->second)
 							{
 								// broken slot entry is hidden in ufopaedia, but shown in analysis
 								if (!sss.str().empty()) sss << "~";
@@ -206,7 +206,7 @@ namespace OpenXcom
 						const int& slotSize = facility->getCraftOptions().size() > (size_t)i ?
 							facility->getCraftOptions().at(i).max : 0;
 						const std::string sizeClass = _game->getMod()->getCraftClassFromSize(slotSize);
-						if (sizeClass != _game->getMod()->getCraftClasses()->begin()->second)
+						if (sizeClass != _game->getMod()->getCraftSizeClassMap()->begin()->second)
 						{
 							// broken slot entry is hidden in ufopaedia, but shown in analysis
 							const std::string slotClass = sizeClass.empty() ?
