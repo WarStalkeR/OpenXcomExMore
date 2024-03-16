@@ -195,7 +195,7 @@ void CraftWeaponsState::lstWeaponsClick(Action *)
 			// Check, if game rules allow craft to change its classification.
 			if ((_game->getMod()->getCraftClassFromSize(_craft->getCraftSize() + diffCraftSize) !=
 				_game->getMod()->getCraftClassFromSize(_craft->getCraftSize()))
-				&& !_game->getMod()->getCraftsCanChangeClass())
+				&& !_game->getMod()->getCraftAllowClassChange())
 			{
 				_game->popState();
 				_game->pushState(new ErrorMessageState(

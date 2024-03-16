@@ -444,7 +444,7 @@ Mod::Mod() :
 	_manaEnabled(false), _manaBattleUI(false), _manaTrainingPrimary(false), _manaTrainingSecondary(false), _manaReplenishAfterMission(true),
 	_loseMoney("loseGame"), _loseRating("loseGame"), _loseDefeat("loseGame"),
 	_ufoGlancingHitThreshold(0), _ufoBeamWidthParameter(1000),
-	_escortRange(20), _drawEnemyRadarCircles(1), _escortsJoinFightAgainstHK(true), _hunterKillerFastRetarget(true), _craftsCanChangeClass(false),
+	_escortRange(20), _drawEnemyRadarCircles(1), _escortsJoinFightAgainstHK(true), _hunterKillerFastRetarget(true), _craftAllowClassChange(false),
 	_crewEmergencyEvacuationSurvivalChance(100), _pilotsEmergencyEvacuationSurvivalChance(100),
 	_soldiersPerRank({-1, -1, 5, 11, 23, 30}),
 	_pilotAccuracyZeroPoint(55), _pilotAccuracyRange(40), _pilotReactionsZeroPoint(55), _pilotReactionsRange(60),
@@ -3561,10 +3561,10 @@ void Mod::loadFile(const FileMap::FileRecord &filerec, ModScript &parsers)
 	}
 
 	// craft classification variables
-	if (const YAML::Node &classification = loadDocInfoHelper("craftClassification"))
+	if (const YAML::Node &craftClasses = loadDocInfoHelper("craftClasses"))
 	{
-		_craftClasses = classification["sizeClassMap"].as<std::map<int, std::string>>(_craftClasses);
-		_craftsCanChangeClass = classification["allowClassChange"].as<bool>(_craftsCanChangeClass);
+		_craftSizeClassMap = craftClasses["sizeClassMap"].as<std::map<int, std::string>>(_craftSizeClassMap);
+		_craftAllowClassChange = craftClasses["allowClassChange"].as<bool>(_craftAllowClassChange);
 	}
 }
 
@@ -5227,19 +5227,19 @@ const std::vector<int> &Mod::getFlagByKills() const
 	return _flagByKills;
 }
 
-const std::map<int, std::string> *Mod::getCraftClasses() const
+const std::map<int, std::string> *Mod::getCraftSizeClassMap() const
 {
-	return &_craftClasses;
+	return &_craftSizeClassMap;
 }
 
 const std::string Mod::getCraftClassFromSize(const int& craftSize) const
 {
-	if (getCraftClasses()->empty())
+	if (getCraftSizeClassMap()->empty())
 		return "";
 
 	int temp = INT_MIN;
 	std::string craftClass = "";
-	const auto* craftClassMap = getCraftClasses();
+	const auto* craftClassMap = getCraftSizeClassMap();
 	for (const auto& [intSize, strClass] : *craftClassMap)
 	{
 		if (intSize > temp && craftSize >= intSize)
