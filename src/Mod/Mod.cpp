@@ -3307,8 +3307,6 @@ void Mod::loadFile(const FileMap::FileRecord &filerec, ModScript &parsers)
 	{
 		_flagByKills = doc["flagByKills"].as<std::vector<int> >(_flagByKills);
 	}
-	_craftClasses = doc["craftClasses"].as<std::map<int, std::string> >(_craftClasses);
-	_craftsCanChangeClass = doc["craftsCanChangeClass"].as<bool>(_craftsCanChangeClass);
 
 
 
@@ -3560,6 +3558,13 @@ void Mod::loadFile(const FileMap::FileRecord &filerec, ModScript &parsers)
 		_maxStaticLightDistance = lighting["maxStatic"].as<int>(_maxStaticLightDistance);
 		_maxDynamicLightDistance = lighting["maxDynamic"].as<int>(_maxDynamicLightDistance);
 		_enhancedLighting = lighting["enhanced"].as<int>(_enhancedLighting);
+	}
+
+	// craft classification variables
+	if (const YAML::Node &classification = loadDocInfoHelper("craftClassification"))
+	{
+		_craftClasses = classification["sizeClassMap"].as<std::map<int, std::string>>(_craftClasses);
+		_craftsCanChangeClass = classification["allowClassChange"].as<bool>(_craftsCanChangeClass);
 	}
 }
 
