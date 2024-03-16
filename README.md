@@ -121,7 +121,7 @@ craft's size will be increased by 6. If crafts aren't allowed to change class
 (via option) or has no suitable hangar slot after such change, player will
 get notification that it can't be equipped.
 
-**Craft Classification values for script files (with example below):**  
+**Craft Class values for script files (with example below):**  
 `craftClasses:` is a new global value for craft class settings.  
 `  sizeClassMap:`  
 `    250: STR_CLASS_MAX` Size range `250` and above.  Custom upper limit.  
