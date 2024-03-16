@@ -121,18 +121,19 @@ craft's size will be increased by 6. If crafts aren't allowed to change class
 (via option) or has no suitable hangar slot after such change, player will
 get notification that it can't be equipped.
 
-**Global values for script files (with example below):**  
-`craftClasses:`  
-`  250: STR_CLASS_MAX` Size range `250` and above.  Custom upper limit.  
-`  190: STR_CLASS_AIR_LARGE` Size range `190 ~ 249` for large aircrafts.  
-`  130: STR_CLASS_SUB_LARGE` Size range `130 ~ 189` for large submarines.  
-`  70: STR_CLASS_CAR_LARGE` Size range `70 ~ 129` for large vehicles.  
-`  50: STR_CLASS_AIR_SMALL` Size range `50 ~ 69` for small aircrafts.  
-`  30: STR_CLASS_SUB_SMALL` Size range `30 ~ 49` for small submarines.  
-`  10: STR_CLASS_CAR_SMALL` Size range `10 ~ 29` for small vehicles.  
-`  1: STR_CLASS_TEAM` Size range `1 ~ 9` for human teams.  
-`  0: STR_CLASS_NA` Size `0` is compatibility value. Always leave it as is.  
-`  -1: STR_CLASS_NO` Size range `-1` and below. Custom bottom limit.  
+**Craft Classification values for script files (with example below):**  
+`craftClassification:` is a new global value for craft class settings.  
+`  sizeClassMap:`  
+`    250: STR_CLASS_MAX` Size range `250` and above.  Custom upper limit.  
+`    190: STR_CLASS_AIR_LARGE` Size range `190 ~ 249` for large aircrafts.  
+`    130: STR_CLASS_SUB_LARGE` Size range `130 ~ 189` for large submarines.  
+`    70: STR_CLASS_CAR_LARGE` Size range `70 ~ 129` for large vehicles.  
+`    50: STR_CLASS_AIR_SMALL` Size range `50 ~ 69` for small aircrafts.  
+`    30: STR_CLASS_SUB_SMALL` Size range `30 ~ 49` for small submarines.  
+`    10: STR_CLASS_CAR_SMALL` Size range `10 ~ 29` for small vehicles.  
+`    1: STR_CLASS_TEAM` Size range `1 ~ 9` for human teams.  
+`    0: STR_CLASS_NA` Size `0` is compatibility value. Always leave it as is.  
+`    -1: STR_CLASS_NO` Size range `-1` and below. Custom bottom limit.  
 This feature allows to assigns custom strings to selected craft size ranges.
 Last entry in the list, i.e. `STR_CLASS_NO` will not be rendered or shown in
 Ufopaedia (Analysis will show it anyway in numerical format). In conjunction
@@ -141,11 +142,11 @@ example only small sub or large aircraft. The `0` value is reserved for
 backwards compatibility, since all aircrafts with undefined craft size have
 their `craftSize` set to `0`, but you can assign any string to it.
 
-`craftsCanChangeClass: false` Allows to enforce craft size changes to be within
-boundaries declared in the `craftClasses` (i.e. you won't be able install
+`  allowClassChange: false` Allows to enforce craft size changes to be within
+boundaries declared in the `sizeClassMap` (i.e. you won't be able install
 equipment which size stat increases size of modified craft for example from
 Small Submarine-class into Small Aircraft-class). By default this enforcement
-is enabled, in order to disable it, set value to `true`. If `craftClasses`
+is enabled, in order to disable it, set value to `true`. If `sizeClassMap`
 value isn't defined/declared, the option will be ignored.
 
 **Constants values for script files (with example below):**    
