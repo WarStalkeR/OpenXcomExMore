@@ -561,11 +561,11 @@ void BaseView::draw()
 					if (craftSlotIt->craft != nullptr && !craftSlotIt->hidden && craftSlotIt->craft->getStatus() != "STR_OUT")
 					{
 						Craft* slotCraft = craftSlotIt->craft;
-						const RuleCraft* slotRules = slotCraft->getRules();
+						const RuleCraft* craftRules = slotCraft->getRules();
 						Surface* frame = _texture->getFrame(slotCraft->getSkinSprite() + 33);
 						frame->blitNShade(this,
-							craftSlotIt->x + slotRules->getSizeOffsetX(),
-							craftSlotIt->y + slotRules->getSizeOffsetY());
+							craftSlotIt->x + craftRules->getSizeOffsetX(),
+							craftSlotIt->y + craftRules->getSizeOffsetY());
 					}
 					++craftSlotIt;
 				}
