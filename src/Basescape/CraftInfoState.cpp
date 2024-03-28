@@ -113,7 +113,22 @@ CraftInfoState::CraftInfoState(Base *base, size_t craftId) : _base(base), _craft
 		_txtWName[i] = new Text(95, 16, x - d, y);
 		_txtWAmmo[i] = new Text(75, 24, x, y + 16);
 	}
-	_sprite = new InteractiveSurface(32, 40, 144, 56);
+
+	// Handle custom sprite size
+	const RuleCraft* craftRule = _craft->getRules();
+	if (craftRule->getSizeOffsetX() != 0 || craftRule->getSizeOffsetY() != 0)
+	{
+		_sprite = new InteractiveSurface(
+			32 + std::abs(craftRule->getSizeOffsetX()) * 2,
+			40 + std::abs(craftRule->getSizeOffsetY()) * 2,
+			144 + craftRule->getSizeOffsetX(),
+			56 + craftRule->getSizeOffsetY());
+	}
+	else
+	{
+		_sprite = new InteractiveSurface(32, 40, 144, 56);
+	}
+
 	for (int i = 0; i < _weaponNum; ++i)
 	{
 		const int x = i % 2 ? 184 : 121;
