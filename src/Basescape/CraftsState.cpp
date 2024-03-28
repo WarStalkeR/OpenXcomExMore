@@ -51,13 +51,28 @@ CraftsState::CraftsState(Base *base) : _base(base)
 	_window = new Window(this, 320, 200, 0, 0);
 	_btnOk = new TextButton(288, 16, 16, 176);
 	_txtTitle = new Text(298, 17, 16, 8);
-	_txtBase = new Text(298, 17, 16, 24);
-	_txtName = new Text(94, 9, 16, 40);
-	_txtStatus = new Text(50, 9, 110, 40);
-	_txtWeapon = new Text(50, 17, 160, 40);
-	_txtCrew = new Text(58, 9, 210, 40);
-	_txtHwp = new Text(46, 9, 268, 40);
-	_lstCrafts = new TextList(288, 112, 8, 58);
+
+	// Handle headers, list and button
+	if (Mod::CRAFT_LIST_SHOW_CLASS)
+	{
+		_txtBase = new Text(298, 17, 16, 24);
+		_txtName = new Text(94, 9, 16, 40);
+		_txtStatus = new Text(50, 9, 110, 40);
+		_txtWeapon = new Text(50, 17, 160, 40);
+		_txtCrew = new Text(48, 17, 210, 40);
+		_txtHwp = new Text(56, 9, 258, 40);
+		_lstCrafts = new TextList(304, 112, 8, 58);
+	}
+	else
+	{
+		_txtBase = new Text(298, 17, 16, 24);
+		_txtName = new Text(94, 9, 16, 40);
+		_txtStatus = new Text(50, 9, 110, 40);
+		_txtWeapon = new Text(50, 17, 160, 40);
+		_txtCrew = new Text(58, 9, 210, 40);
+		_txtHwp = new Text(46, 9, 268, 40);
+		_lstCrafts = new TextList(288, 112, 8, 58);
+	}
 
 	// Set palette
 	setInterface("craftSelect");
@@ -95,13 +110,27 @@ CraftsState::CraftsState(Base *base) : _base(base)
 	_txtWeapon->setText(tr("STR_WEAPON_SYSTEMS"));
 	_txtWeapon->setWordWrap(true);
 
-	_txtCrew->setText(tr("STR_CREW"));
+	// Handle columns name and width
+	if (Mod::CRAFT_LIST_SHOW_CLASS)
+	{
+		std::ostringstream ss;
+		ss << tr("STR_CREW") << ",\n" << tr("STR_HWPS");
+		_txtCrew->setText(ss.str().c_str());
+		_txtCrew->setWordWrap(true);
+		_txtHwp->setText(tr("STR_CRAFT_CLASS"));
+		_lstCrafts->setColumns(5, 94, 68, 40, 40, 54);
+		_lstCrafts->setMargin(8);
+	}
+	else
+	{
+		_txtCrew->setText(tr("STR_CREW"));
+		_txtHwp->setText(tr("STR_HWPS"));
+		_lstCrafts->setColumns(5, 94, 68, 44, 46, 28);
+		_lstCrafts->setMargin(8);
+	}
 
-	_txtHwp->setText(tr("STR_HWPS"));
-	_lstCrafts->setColumns(5, 94, 68, 44, 46, 28);
 	_lstCrafts->setSelectable(true);
 	_lstCrafts->setBackground(_window);
-	_lstCrafts->setMargin(8);
 	_lstCrafts->onMouseClick((ActionHandler)&CraftsState::lstCraftsClick);
 	_lstCrafts->onMouseClick((ActionHandler)&CraftsState::lstCraftsClick, SDL_BUTTON_RIGHT);
 	_lstCrafts->onMouseClick((ActionHandler)&CraftsState::lstCraftsClick, SDL_BUTTON_MIDDLE);
@@ -136,8 +165,18 @@ void CraftsState::initList(size_t scrl)
 	{
 		std::ostringstream ss, ss2, ss3;
 		ss << craft->getNumWeapons() << "/" << craft->getRules()->getWeapons();
-		ss2 << craft->getNumTotalSoldiers();
-		ss3 << craft->getNumTotalVehicles();
+		if (Mod::CRAFT_LIST_SHOW_CLASS)
+		{
+			ss2 << craft->getNumTotalSoldiers() << ", " << craft->getNumTotalVehicles();
+			if (Mod::CRAFT_LIST_CLASS_SHORT)
+				ss3 << tr(_game->getMod()->getCraftClassFromSize(craft->getCraftSize()) + "_UC");
+			else ss3 << tr(_game->getMod()->getCraftClassFromSize(craft->getCraftSize()));
+		}
+		else
+		{
+			ss2 << craft->getNumTotalSoldiers();
+			ss3 << craft->getNumTotalVehicles();
+		}
 		_lstCrafts->addRow(5, craft->getName(_game->getLanguage()).c_str(), tr(craft->getStatus()).c_str(), ss.str().c_str(), ss2.str().c_str(), ss3.str().c_str());
 	}
 

@@ -191,6 +191,8 @@ int Mod::UNIT_RESPONSE_SOUNDS_FREQUENCY[4];
 int Mod::PEDIA_FACILITY_RENDER_PARAMETERS[4];
 int Mod::ACCELERATION_PENALTY[4];
 std::pair<int, int> Mod::ACCELERATION_COEFF[4];
+bool Mod::CRAFT_LIST_SHOW_CLASS;
+bool Mod::CRAFT_LIST_CLASS_SHORT;
 bool Mod::EXTENDED_ITEM_RELOAD_COST;
 bool Mod::EXTENDED_INVENTORY_SLOT_SORTING;
 bool Mod::EXTENDED_RUNNING_COST;
@@ -313,6 +315,9 @@ void Mod::resetGlobalStatics()
 	ACCELERATION_COEFF[1] = { 15, 35 }; // cautious +/- acceleration coefficient
 	ACCELERATION_COEFF[2] = { 20, 50 }; // combat +/- acceleration coefficient
 	ACCELERATION_COEFF[3] = { 25, 70 }; // maneuver +/- acceleration coefficient
+
+	CRAFT_LIST_SHOW_CLASS = false; // show class column in base craft list
+	CRAFT_LIST_CLASS_SHORT = false; // show short class name in class column
 
 	EXTENDED_ITEM_RELOAD_COST = false;
 	EXTENDED_INVENTORY_SLOT_SORTING = false;
@@ -441,7 +446,7 @@ Mod::Mod() :
 	_manaEnabled(false), _manaBattleUI(false), _manaTrainingPrimary(false), _manaTrainingSecondary(false), _manaReplenishAfterMission(true),
 	_loseMoney("loseGame"), _loseRating("loseGame"), _loseDefeat("loseGame"),
 	_ufoGlancingHitThreshold(0), _ufoBeamWidthParameter(1000),
-	_escortRange(20), _drawEnemyRadarCircles(1), _escortsJoinFightAgainstHK(true), _hunterKillerFastRetarget(true),
+	_escortRange(20), _drawEnemyRadarCircles(1), _escortsJoinFightAgainstHK(true), _hunterKillerFastRetarget(true), _craftAllowClassChange(false),
 	_crewEmergencyEvacuationSurvivalChance(100), _pilotsEmergencyEvacuationSurvivalChance(100),
 	_soldiersPerRank({-1, -1, 5, 11, 23, 30}),
 	_pilotAccuracyZeroPoint(55), _pilotAccuracyRange(40), _pilotReactionsZeroPoint(55), _pilotReactionsRange(60),
@@ -2664,6 +2669,8 @@ void Mod::loadConstants(const YAML::YamlNodeReader &reader)
 	if (const auto& arrayReader = reader["accelerationCoefficient"])
 		for (size_t j = 0; j < std::size(ACCELERATION_COEFF); j++)
 			arrayReader[j].tryReadVal(ACCELERATION_COEFF[j]);
+	reader.tryRead("baseCraftListShowClass", CRAFT_LIST_SHOW_CLASS);
+	reader.tryRead("baseCraftListClassShort", CRAFT_LIST_CLASS_SHORT);
 	reader.tryRead("extendedItemReloadCost", EXTENDED_ITEM_RELOAD_COST);
 	reader.tryRead("extendedInventorySlotSorting", EXTENDED_INVENTORY_SLOT_SORTING);
 	reader.tryRead("extendedRunningCost", EXTENDED_RUNNING_COST);
@@ -3507,6 +3514,13 @@ void Mod::loadFile(const FileMap::FileRecord &filerec, ModScript &parsers)
 		lighting.tryRead("maxStatic", _maxStaticLightDistance);
 		lighting.tryRead("maxDynamic", _maxDynamicLightDistance);
 		lighting.tryRead("enhanced", _enhancedLighting);
+	}
+
+	// craft classification variables
+	if (const auto& craftClasses = loadDocInfoHelper("craftClasses"))
+	{
+		craftClasses.tryRead("sizeClassMap", _craftSizeClassMap);
+		craftClasses.tryRead("allowClassChange", _craftAllowClassChange);
 	}
 }
 
@@ -5196,6 +5210,30 @@ const std::vector<std::string> &Mod::getHiddenMovementBackgrounds() const
 const std::vector<int> &Mod::getFlagByKills() const
 {
 	return _flagByKills;
+}
+
+const std::map<int, std::string> *Mod::getCraftSizeClassMap() const
+{
+	return &_craftSizeClassMap;
+}
+
+const std::string Mod::getCraftClassFromSize(const int& craftSize) const
+{
+	if (getCraftSizeClassMap()->empty())
+		return "";
+
+	int temp = INT_MIN;
+	std::string craftClass = "";
+	const auto* craftClassMap = getCraftSizeClassMap();
+	for (const auto& [intSize, strClass] : *craftClassMap)
+	{
+		if (intSize > temp && craftSize >= intSize)
+		{
+			craftClass = strClass;
+			temp = intSize;
+		}
+	}
+	return craftClass;
 }
 
 namespace
