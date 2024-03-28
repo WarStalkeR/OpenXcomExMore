@@ -277,6 +277,16 @@ int RuleCraft::getMarker() const
 }
 
 /**
+ * Gets the craft's hull size
+ * for placing in hangars.
+ * @return The size in integer value.
+ */
+int RuleCraft::getCraftSize() const
+{
+	return _stats.craftSize;
+}
+
+/**
  * Gets the craft's sprite horizontal offset.
  * @return The offset in integer value.
  */
