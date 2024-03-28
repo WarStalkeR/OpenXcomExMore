@@ -407,6 +407,7 @@ en-US:
   BFRCT_GEOSCAPE: "go to Geoscape"
 #
   costRent: "Rent cost"
+  craftSize: "Craft size"
   soldiers: "Cargo space"
   maxUnitsLimit: "Max cargo space"
   pilots: "Cockpit size"
