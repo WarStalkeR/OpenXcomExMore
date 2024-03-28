@@ -581,7 +581,9 @@ void BaseView::draw()
 					Surface *frame = _texture->getFrame((*craftIt)->getSkinSprite() + 33);
 					int fx = (fac->getX() * GRID_SIZE + (fac->getRules()->getSizeX() - 1) * GRID_SIZE / 2 + 2);
 					int fy = (fac->getY() * GRID_SIZE + (fac->getRules()->getSizeY() - 1) * GRID_SIZE / 2 - 4);
-					frame->blitNShade(this, fx, fy);
+					frame->blitNShade(this,
+						fx + (*craftIt)->getRules()->getSizeOffsetX(),
+						fy + (*craftIt)->getRules()->getSizeOffsetY());
 					fac->setCraftForDrawing(*craftIt);
 				}
 				++craftIt;
