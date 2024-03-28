@@ -60,9 +60,12 @@ en-US:
   STR_CRAFT_DEPLOYMENT_PREVIEW_BRIEFING_DUMMY: "This feature allows you to preview and modify the deployment table of this craft type. Any changes will apply to all your current craft and also to any craft you buy or manufacture later in the campaign. You start with the maximum number of soldiers. Each soldier represents one row in the deployment table. Soldier names correspond to row numbers. To provide space for a 2x2 unit, place 4 soldiers in a 2x2 square. If space is not provided, the 2x2 unit will be missing in a real battle."
   STR_BASE_DEFENSE_BRIEFING_PREVIEW: "This feature allows you to preview your base.{NEWLINE}Have fun!{NEWLINE}{NEWLINE}Click on the 'End Turn' icon to exit the preview."
 #CraftWeaponsState.cpp
+  STR_NO_CRAFT_CLASS_CHANGE: "CRAFT CAN'T CHANGE CLASS!{SMALLLINE}After refitting craft with selected module, its size will change beyond the limits defined by the classification."
   STR_NOT_ENOUGH_CARGO_SPACE: "NOT ENOUGH CARGO SPACE AVAILABLE!{SMALLLINE}Use a different module or reduce the assigned crew."
   STR_NOT_ENOUGH_STORAGE_SPACE_1: "NOT ENOUGH STORAGE SPACE AVAILABLE!{SMALLLINE}Too many items! Use a different module or reduce the assigned equipment."
   STR_NOT_ENOUGH_STORAGE_SPACE_2: "NOT ENOUGH STORAGE SPACE AVAILABLE!{SMALLLINE}The items take up too much space! Use a different module or reduce the size of assigned equipment."
+#CraftWeaponsState.cpp
+  STR_CRAFT_CLASS: "CLASS"
 #DismantleFacilityState.cpp
   STR_REFUND_VALUE: "Sales value> {ALT}{0}"
 #GlobalManufactureState.cpp
@@ -542,6 +545,8 @@ en-US:
   STR_DAMAGE_NONE: "NONE"
   STR_INFO_UFOPEDIA: "INFO"
 #ArticleStateCraft.cpp
+  STR_CRAFT_SIZE_UC: "SIZE>{ALT}{0}{ALT}"
+  STR_CRAFT_CLASS_UC: "CLASS>{ALT}{0}{ALT}"
   STR_COCKPIT_CAPACITY: "PILOTS>{ALT}{0}{ALT}"
   STR_MAXIMUM_RANGE: "MAX RANGE>{ALT}{0}{ALT}"
   STR_MINIMUM_RANGE: "MIN RANGE>{ALT}{0}{ALT}"
