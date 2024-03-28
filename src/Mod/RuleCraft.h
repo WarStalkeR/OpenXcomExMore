@@ -207,6 +207,7 @@ private:
 	int _repairRate, _refuelRate, _transferTime, _score;
 	RuleTerrain *_battlescapeTerrainData;
 	int _maxSkinIndex;
+	std::pair<int, int> _spriteSize;
 	bool _keepCraftAfterFailedMission, _allowLanding, _spacecraft, _notifyWhenRefueled, _autoPatrol, _undetectable;
 	int _listOrder, _maxAltitude;
 	std::string _defaultAltitude;
@@ -248,6 +249,10 @@ public:
 	/// Gets the craft's sprite.
 	int getSprite(int skinIndex) const;
 	const std::vector<int> &getSkinSpritesRaw() const { return _skinSprites; }
+	/// Gets the craft's sprite horizontal offset.
+	int getSizeOffsetX() const;
+	/// Gets the craft's sprite vertical offset.
+	int getSizeOffsetY() const;
 	/// Gets the craft's globe marker.
 	int getMarker() const;
 	/// Gets the craft's maximum fuel.

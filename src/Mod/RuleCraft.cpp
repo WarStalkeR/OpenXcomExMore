@@ -38,7 +38,7 @@ RuleCraft::RuleCraft(const std::string &type, int listOrder) :
 	_maxSmallSoldiers(-1), _maxLargeSoldiers(-1), _maxSmallVehicles(-1), _maxLargeVehicles(-1),
 	_maxSmallUnits(-1), _maxLargeUnits(-1), _maxSoldiers(-1), _maxVehicles(-1),
 	_monthlyBuyLimit(0), _costBuy(0), _costRent(0), _costSell(0), _repairRate(1), _refuelRate(1),
-	_transferTime(24), _score(0), _battlescapeTerrainData(0), _maxSkinIndex(0),
+	_transferTime(24), _score(0), _battlescapeTerrainData(0), _maxSkinIndex(0), _spriteSize(32, 40),
 	_keepCraftAfterFailedMission(false), _allowLanding(true), _spacecraft(false), _notifyWhenRefueled(false), _autoPatrol(false), _undetectable(false),
 	_listOrder(listOrder), _maxAltitude(-1), _defaultAltitude("STR_VERY_LOW"), _onlyOneSoldierGroupAllowed(false), _stats(),
 	_shieldRechargeAtBase(1000),
@@ -143,6 +143,7 @@ void RuleCraft::load(const YAML::YamlNodeReader& node, Mod *mod, const ModScript
 	mod->loadUnorderedInts(_type, _allowedSoldierGroups, reader["allowedSoldierGroups"]);
 	reader.tryRead("onlyOneSoldierGroupAllowed", _onlyOneSoldierGroupAllowed);
 	reader.tryRead("maxSkinIndex", _maxSkinIndex);
+	reader.tryRead("spriteSize", _spriteSize);
 	reader.tryRead("deployment", _deployment);
 	reader.tryRead("keepCraftAfterFailedMission", _keepCraftAfterFailedMission);
 	reader.tryRead("allowLanding", _allowLanding);
@@ -272,6 +273,24 @@ int RuleCraft::getSprite(int skinIndex) const
 int RuleCraft::getMarker() const
 {
 	return _marker;
+}
+
+/**
+ * Gets the craft's sprite horizontal offset.
+ * @return The offset in integer value.
+ */
+int RuleCraft::getSizeOffsetX() const
+{
+	return (32 - _spriteSize.first) / 2;
+}
+
+/**
+ * Gets the craft's sprite vertical offset.
+ * @return The offset in integer value.
+ */
+int RuleCraft::getSizeOffsetY() const
+{
+	return (40 - _spriteSize.second) / 2;
 }
 
 /**
