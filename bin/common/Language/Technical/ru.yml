@@ -407,6 +407,7 @@ ru:
   BFRCT_GEOSCAPE: "Глобус"
 #
   costRent: "Арендная плата"
+  craftSize: "Размер судна"
   soldiers: "Вместимость"
   maxUnitsLimit: "Макс. вместимость"
   pilots: "Размер кабины"
