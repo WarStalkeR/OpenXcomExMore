@@ -164,6 +164,23 @@ void CraftsState::lstCraftsClick(Action *action)
 			_game->pushState(new CraftInfoState(_base, row));
 		}
 	}
+	else if (_game->isShiftPressed() && _game->isRightClick(action))
+	{
+		if (row < (crafts.size() - 1))
+		{
+			// move craft down in the list
+			std::swap(crafts[row], crafts[row + 1]);
+
+			// warp mouse
+			if (row != _lstCrafts->getScroll() && _lstCrafts->getScroll() == 0)
+			{
+				SDL_WarpMouse(action->getLeftBlackBand() + action->getXMouse(), action->getTopBlackBand() + action->getYMouse() + static_cast<Uint16>(8 * action->getYScale()));
+			}
+
+			// reload the UI
+			init();
+		}
+	}
 	else if (_game->isRightClick(action))
 	{
 		if (row > 0)
