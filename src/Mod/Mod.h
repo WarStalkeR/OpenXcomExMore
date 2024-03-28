@@ -243,7 +243,7 @@ private:
 	int _ufoGlancingHitThreshold, _ufoBeamWidthParameter;
 	int _ufoTractorBeamSizeModifiers[5];
 	int _escortRange, _drawEnemyRadarCircles;
-	bool _escortsJoinFightAgainstHK, _hunterKillerFastRetarget;
+	bool _escortsJoinFightAgainstHK, _hunterKillerFastRetarget, _craftAllowClassChange;
 	int _crewEmergencyEvacuationSurvivalChance, _pilotsEmergencyEvacuationSurvivalChance;
 	std::array<int, (size_t)(RANK_COMMANDER + 1)> _soldiersPerRank;
 	int _pilotAccuracyZeroPoint, _pilotAccuracyRange, _pilotReactionsZeroPoint, _pilotReactionsRange;
@@ -274,7 +274,7 @@ private:
 	GameTime _startingTime;
 	int _startingDifficulty;
 	int _baseDefenseMapFromLocation;
-	std::map<int, std::string> _missionRatings, _monthlyRatings;
+	std::map<int, std::string> _missionRatings, _monthlyRatings, _craftSizeClassMap;
 	std::map<std::string, std::string> _fixedUserOptions, _recommendedUserOptions;
 	std::vector<std::string> _hiddenMovementBackgrounds;
 	std::vector<std::string> _baseNamesFirst, _baseNamesMiddle, _baseNamesLast;
@@ -424,6 +424,8 @@ public:
 	static int PEDIA_FACILITY_RENDER_PARAMETERS[4];
 	static int ACCELERATION_PENALTY[4];
 	static std::pair<int, int> ACCELERATION_COEFF[4];
+	static bool CRAFT_LIST_SHOW_CLASS;
+	static bool CRAFT_LIST_CLASS_SHORT;
 	static bool EXTENDED_ITEM_RELOAD_COST;
 	static bool EXTENDED_INVENTORY_SLOT_SORTING;
 	static bool EXTENDED_RUNNING_COST;
@@ -1113,6 +1115,13 @@ public:
 	const std::vector<int>& getRetaliationTriggerOdds() { return _retaliationTriggerOdds; }
 	const std::vector<int>& getRetaliationBaseRegionOdds() { return _retaliationBaseRegionOdds; }
 	const std::vector<int>& getAliensFacingCraftOdds() { return _aliensFacingCraftOdds; }
+
+	/// Gets the list of all defined craft classes.
+	const std::map<int, std::string> *getCraftSizeClassMap() const;
+	/// Receives craft size as integer and returns relevant craft class string.
+	const std::string getCraftClassFromSize(const int& craftSize) const;
+	/// Crafts can change their class due to change in their size (through systems/weapons)?
+	bool getCraftAllowClassChange() const { return _craftAllowClassChange; }
 
 };
 
