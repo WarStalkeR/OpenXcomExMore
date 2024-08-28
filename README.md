@@ -497,6 +497,7 @@ mkdir /opt
 cd /opt
 sudo git clone https://github.com/mxe/mxe.git
 sudo chown -R `whoami`: mxe
+sudo make MXE_TARGETS=x86_64-w64-mingw32.static JOBS=8 gcc cmake sdl sdl_gfx sdl_mixer sdl_image yaml-cpp
 cd ~/Desktop
 mkdir -p ~/Desktop/OpenXcomExM
 sudo vmhgfs-fuse .host:/OpenXcomExMore ~/Desktop/OpenXcomExM -o allow_other -o auto_unmount
