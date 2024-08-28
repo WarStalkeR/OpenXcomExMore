@@ -482,3 +482,46 @@ It's also been tested on a variety of other tools on Windows/Mac/Linux. More
 detailed compiling instructions are available at the
 [wiki](https://ufopaedia.org/index.php/Compiling_(OpenXcom)), along with
 pre-compiled dependency packages.
+
+## Compilation
+
+Custom compilation instructions from under `Ubuntu 20.04 LTS x64` **VMware** virtual machine only (yes, its weird that I compile windows executable under linux, but it allows to compile everything into a single file). Current instructions for now are only for windows 64-bit executable. Later I will add instructions for linux, android and iOS as well.
+
+**Note**: make sure that you have enabled 'OpenXcomExMore' VM shared folder and linked it to the actual path, where all OXCE related files reside, such as: `C:\Path\To\Cloned\Git\Folder\OpenXcomExMore`
+
+If you're compiling the executable for the first time in the virtual machine, follow these instructions.
+```
+sudo apt update
+sudo apt-get install autoconf automake autopoint bash bison bzip2 flex g++ g++-multilib gettext git gperf intltool libc6-dev-i386 libgdk-pixbuf2.0-dev libltdl-dev libgl-dev libssl-dev libtool-bin libxml-parser-perl zip lzip make openssl p7zip-full patch perl python3 python3-mako python3-pkg-resources python-is-python3 ruby sed unzip wget xz-utils -y
+mkdir /opt
+cd /opt
+sudo git clone https://github.com/mxe/mxe.git
+sudo chown -R `whoami`: mxe
+cd ~/Desktop
+mkdir -p ~/Desktop/OpenXcomExM
+sudo vmhgfs-fuse .host:/OpenXcomExMore ~/Desktop/OpenXcomExM -o allow_other -o auto_unmount
+mkdir -p ~/Desktop/OpenXcomExM/build
+cd ~/Desktop/OpenXcomExM/build
+export PATH=/opt/mxe/usr/bin:$PATH
+/opt/mxe/usr/bin/x86_64-w64-mingw32.static-cmake -DCMAKE_BUILD_TYPE=Release -DDEV_BUILD=OFF -DBUILD_PACKAGE=OFF ..
+make -j8
+/opt/mxe/usr/bin/x86_64-w64-mingw32.static-strip -d ~/Desktop/OpenXcomExM/build/bin/openxcom.exe
+mv ~/Desktop/OpenXcomExM/build/bin/openxcom.exe ~/Desktop/OpenXcomExM/build/bin/OpenXcomExM.exe
+```
+
+If you're re-compiling the executable after shutting down or restarting virtual machine, follow these instructions:
+```
+sudo vmhgfs-fuse .host:/OpenXcomExMore ~/Desktop/OpenXcomExM -o allow_other -o auto_unmount
+cd ~/Desktop/OpenXcomExM/build
+export PATH=/opt/mxe/usr/bin:$PATH
+make -j8
+/opt/mxe/usr/bin/x86_64-w64-mingw32.static-strip -d ~/Desktop/OpenXcomExM/build/bin/openxcom.exe
+mv ~/Desktop/OpenXcomExM/build/bin/openxcom.exe ~/Desktop/OpenXcomExM/build/bin/OpenXcomExM.exe
+```
+
+If you're re-compiling the executable within the same virtual machine session, follow these instructions:
+```
+make -j8
+/opt/mxe/usr/bin/x86_64-w64-mingw32.static-strip -d ~/Desktop/OpenXcomExM/build/bin/openxcom.exe
+mv ~/Desktop/OpenXcomExM/build/bin/openxcom.exe ~/Desktop/OpenXcomExM/build/bin/OpenXcomExM.exe
+```
