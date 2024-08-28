@@ -493,10 +493,11 @@ If you're compiling the executable for the first time in the virtual machine, fo
 ```
 sudo apt update
 sudo apt-get install autoconf automake autopoint bash bison bzip2 flex g++ g++-multilib gettext git gperf intltool libc6-dev-i386 libgdk-pixbuf2.0-dev libltdl-dev libgl-dev libssl-dev libtool-bin libxml-parser-perl zip lzip make openssl p7zip-full patch perl python3 python3-mako python3-pkg-resources python-is-python3 ruby sed unzip wget xz-utils -y
-mkdir /opt
+mkdir -p /opt
 cd /opt
 sudo git clone https://github.com/mxe/mxe.git
 sudo chown -R `whoami`: mxe
+cd /opt/mxe
 sudo make MXE_TARGETS=x86_64-w64-mingw32.static JOBS=8 gcc cmake sdl sdl_gfx sdl_mixer sdl_image yaml-cpp
 cd ~/Desktop
 mkdir -p ~/Desktop/OpenXcomExM
