@@ -330,6 +330,7 @@ set ( mod_src
   Mod/RuleSoldier.cpp
   Mod/RuleSoldierBonus.cpp
   Mod/RuleSoldierTransformation.cpp
+  Mod/RuleStartingBaseSet.cpp
   Mod/RuleStartingCondition.cpp
   Mod/RuleStatBonus.cpp
   Mod/RuleTerrain.cpp
