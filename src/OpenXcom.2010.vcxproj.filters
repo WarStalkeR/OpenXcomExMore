@@ -1139,6 +1139,9 @@
     <ClCompile Include="Interface\ProgressBar.cpp">
       <Filter>Interface</Filter>
     </ClCompile>
+    <ClCompile Include="Mod\RuleStartingBaseSet.cpp">
+      <Filter>Mod</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h" />
@@ -2341,6 +2344,9 @@
     </ClInclude>
     <ClInclude Include="Interface\ProgressBar.h">
       <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="Mod\RuleStartingBaseSet.h">
+      <Filter>Mod</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

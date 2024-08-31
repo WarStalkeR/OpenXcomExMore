@@ -66,6 +66,9 @@ interfaces: #done
         color: 239
       - id: button
         color: 1
+      - id: list
+        color: 1
+        color2: 239
   - type: endGameStatistics
     backgroundImage: BACK01.SCR
     elements:
