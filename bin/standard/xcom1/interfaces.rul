@@ -66,6 +66,9 @@ interfaces:
         color: 138   # yellow
       - id: button
         color: 133   # minty green
+      - id: list
+        color: 138   # yellow
+        color2: 133   # minty green
   - type: endGameStatistics
     backgroundImage: BACK01.SCR
     elements:
