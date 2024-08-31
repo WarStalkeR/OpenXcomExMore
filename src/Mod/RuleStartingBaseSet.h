@@ -19,7 +19,7 @@
  */
 #include <string>
 #include <yaml-cpp/yaml.h>
-#include "../Engine/Functions.h"
+#include "ModScript.h"
 
 namespace OpenXcom
 {
