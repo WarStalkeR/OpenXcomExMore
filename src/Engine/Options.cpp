@@ -565,6 +565,9 @@ void createAdvancedOptionsOTHER()
 	
 	// Force screen to work in 32-bit mode to allow multi-palette rendering.
 	_info.push_back(OptionInfo(OPTION_OTHER, "oxceForce32bitMode", &oxceForce32bitMode, false, "STR_FORCE_32BIT_MODE", "STR_GENERAL"));
+	
+	// Enable/disable trigger for starting base selection interface.
+	_info.push_back(OptionInfo(OPTION_OTHER, "oxceStartingBaseSelection", &oxceStartingBaseSelection, false, "STR_SHOW_BASE_SELECTION", "STR_GENERAL"));
 }
 
 void createControlsOTHER()

@@ -342,6 +342,8 @@ en-GB:
   STR_VSYNC_FOR_OPENGL_DESC: "Turn off for maximum enemy hidden movement speed and (optionally) soldier movement speed. DO NOT set FPS limit to 0. Only applies to OpenGL rendering."
   STR_FORCE_32BIT_MODE: "Force 32-bit mode screen"
   STR_FORCE_32BIT_MODE_DESC: "Force screen to work in 32-bit mode to allow multi-palette rendering. When enabled, sub-surfaces with custom palettes will render in their true colors."
+  STR_SHOW_BASE_SELECTION: "Starting base selection"
+  STR_SHOW_BASE_SELECTION_DESC: "Allows to select some other starting base layout beside default one, given they were added by the mods."
 #==== General ===============
   STR_UPDATE_CHECK: "Automatic update check"
   STR_UPDATE_CHECK_DESC: "If enabled, OpenXcom will automatically check for updates and give you an option to update itself by a single button click."
@@ -555,6 +557,10 @@ en-GB:
   STR_OPEN_MODS_FOLDER: "Open"
 #NewBattleState.cpp
   STR_GLOBE_TEXTURE: "Globe Texture"
+#NewGameState.cpp
+  STR_STARTING_BASE_LIST: "Starting Base"
+  STR_INIT_BASE_DEFAULT: "Default Base"
+  STR_INIT_BASE_DEFAULT_DESC: "Default starting base. It is as default as it gets and you can't possibly find anything more default than that. If you don't see anything else in the list, you probably enabled this feature by mistake and should turn it off."
 #NotesState.cpp
   STR_NOTES: "Notes"
   STR_NEW_NOTE: "<NEW NOTE>"
