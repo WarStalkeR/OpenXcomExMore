@@ -1139,6 +1139,9 @@
     <ClCompile Include="Interface\ProgressBar.cpp">
       <Filter>Interface</Filter>
     </ClCompile>
+    <ClCompile Include="Mod\RuleStartingBaseSet.cpp">
+      <Filter>Mod</Filter>
+    </ClCompile>
     <ClCompile Include="Basescape\SoldierDiaryLightState.cpp">
       <Filter>Basescape</Filter>
     </ClCompile>
@@ -2353,6 +2356,9 @@
     </ClInclude>
     <ClInclude Include="Interface\ProgressBar.h">
       <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="Mod\RuleStartingBaseSet.h">
+      <Filter>Mod</Filter>
     </ClInclude>
     <ClInclude Include="Basescape\SoldierDiaryLightState.h">
       <Filter>Basescape</Filter>
