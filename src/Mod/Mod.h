@@ -104,6 +104,7 @@ class ModScriptGlobal;
 class ScriptParserBase;
 class ScriptGlobal;
 struct StatAdjustment;
+struct RuleStartingBaseSet;
 
 enum GameDifficulty : int;
 
@@ -204,6 +205,7 @@ private:
 	std::map<std::string, RuleMissionScript*> _missionScripts;
 	std::map<std::string, std::vector<ExtraSprites *> > _extraSprites;
 	std::map<std::string, CustomPalettes *> _customPalettes;
+	std::map<std::string, RuleStartingBaseSet *> _startingBaseSets;
 	std::vector<std::pair<std::string, ExtraSounds *> > _extraSounds;
 	std::map<std::string, ExtraStrings *> _extraStrings;
 	std::vector<StatString*> _statStrings;
@@ -269,6 +271,7 @@ private:
 
 	std::string _destroyedFacility;
 	YAML::Node _startingBaseDefault, _startingBaseBeginner, _startingBaseExperienced, _startingBaseVeteran, _startingBaseGenius, _startingBaseSuperhuman;
+	RuleStartingBaseSet _defaultStartingBaseSet;
 	Collections::NamesToIndex _baseFunctionNames;
 
 	GameTime _startingTime;
@@ -300,6 +303,7 @@ private:
 	std::vector<std::string> _aliensIndex, _enviroEffectsIndex, _startingConditionsIndex, _deploymentsIndex, _armorsIndex, _ufopaediaIndex, _ufopaediaCatIndex, _researchIndex, _manufactureIndex;
 	std::vector<std::string> _skillsIndex, _soldiersIndex, _soldierTransformationIndex, _soldierBonusIndex;
 	std::vector<std::string> _alienMissionsIndex, _terrainIndex, _customPalettesIndex, _arcScriptIndex, _eventScriptIndex, _eventIndex, _missionScriptIndex;
+	std::vector<std::string> _startingBaseSetsIndex;
 	std::vector<std::vector<int> > _alienItemLevels;
 	std::vector<std::array<SDL_Color, TransparenciesOpacityLevels>> _transparencies;
 	int _facilityListOrder, _craftListOrder, _itemCategoryListOrder, _itemListOrder, _researchListOrder,  _manufactureListOrder;
@@ -1041,6 +1045,8 @@ public:
 	/// Gets the player starting base.
 	const YAML::Node &getDefaultStartingBase() const;
 	const YAML::Node &getStartingBase(GameDifficulty diff) const;
+	/// Overrides the player starting base from set.
+	void setStartingBase(const RuleStartingBaseSet baseSet);
 	/// Gets the game starting time.
 	const GameTime &getStartingTime() const;
 	/// Gets the game starting difficulty.

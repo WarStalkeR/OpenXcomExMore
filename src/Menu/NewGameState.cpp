@@ -40,18 +40,39 @@ namespace OpenXcom
  */
 NewGameState::NewGameState()
 {
+	_customBaseMode = true;
+
 	// Create objects
-	_window = new Window(this, 192, 180, 64, 10, POPUP_VERTICAL);
-	_btnBeginner = new TextButton(160, 18, 80, 32);
-	_btnExperienced = new TextButton(160, 18, 80, 52);
-	_btnVeteran = new TextButton(160, 18, 80, 72);
-	_btnGenius = new TextButton(160, 18, 80, 92);
-	_btnSuperhuman = new TextButton(160, 18, 80, 112);
-	_btnIronman = new ToggleTextButton(78, 18, 80, 138);
-	_btnOk = new TextButton(78, 16, 80, 164);
-	_btnCancel = new TextButton(78, 16, 162, 164);
-	_txtTitle = new Text(192, 9, 64, 20);
-	_txtIronman = new Text(90, 24, 162, 135);
+	if (_customBaseMode)
+	{
+		_window = new Window(this, 300, 200, 10, 0, POPUP_VERTICAL);
+		_winBaseSel = new Window(this, 125, 155, 185, 0, POPUP_NONE);
+		_winBaseDesc = new Window(this, 300, 50, 10, 150, POPUP_NONE);
+		_btnBeginner = new TextButton(160, 16, 20, 21);
+		_btnExperienced = new TextButton(160, 16, 20, 39);
+		_btnVeteran = new TextButton(160, 16, 20, 57);
+		_btnGenius = new TextButton(160, 16, 20, 75);
+		_btnSuperhuman = new TextButton(160, 16, 20, 93);
+		_btnIronman = new ToggleTextButton(78, 16, 20, 111);
+		_btnOk = new TextButton(78, 16, 20, 129);
+		_btnCancel = new TextButton(78, 16, 102, 129);
+		_txtTitle = new Text(192, 9, 4, 9);
+		_txtIronman = new Text(90, 24, 102, 107);
+	}
+	else
+	{
+		_window = new Window(this, 192, 180, 64, 10, POPUP_VERTICAL);
+		_btnBeginner = new TextButton(160, 18, 80, 32);
+		_btnExperienced = new TextButton(160, 18, 80, 52);
+		_btnVeteran = new TextButton(160, 18, 80, 72);
+		_btnGenius = new TextButton(160, 18, 80, 92);
+		_btnSuperhuman = new TextButton(160, 18, 80, 112);
+		_btnIronman = new ToggleTextButton(78, 18, 80, 138);
+		_btnOk = new TextButton(78, 16, 80, 164);
+		_btnCancel = new TextButton(78, 16, 162, 164);
+		_txtTitle = new Text(192, 9, 64, 20);
+		_txtIronman = new Text(90, 24, 162, 135);
+	}
 
 	switch (_game->getMod()->getStartingDifficulty())
 	{
@@ -79,6 +100,11 @@ NewGameState::NewGameState()
 	setInterface("newGameMenu");
 
 	add(_window, "window", "newGameMenu");
+	if (_customBaseMode)
+	{
+		add(_winBaseSel, "window", "newGameMenu");
+		add(_winBaseDesc, "window", "newGameMenu");
+	}
 	add(_btnBeginner, "button", "newGameMenu");
 	add(_btnExperienced, "button", "newGameMenu");
 	add(_btnVeteran, "button", "newGameMenu");
@@ -94,6 +120,11 @@ NewGameState::NewGameState()
 
 	// Set up objects
 	setWindowBackground(_window, "newGameMenu");
+	if (_customBaseMode)
+	{
+		setWindowBackground(_winBaseSel, "newGameMenu");
+		setWindowBackground(_winBaseDesc, "newGameMenu");
+	}
 
 	_btnBeginner->setText(tr("STR_1_BEGINNER"));
 	_btnBeginner->setGroup(&_difficulty);

@@ -39,8 +39,9 @@ private:
 	TextButton *_difficulty;
 	ToggleTextButton *_btnIronman;
 	TextButton *_btnOk, *_btnCancel;
-	Window *_window;
+	Window *_window, *_winBaseSel, *_winBaseDesc;
 	Text *_txtTitle, *_txtIronman;
+	bool _customBaseMode;
 public:
 	/// Creates the New Game state.
 	NewGameState();

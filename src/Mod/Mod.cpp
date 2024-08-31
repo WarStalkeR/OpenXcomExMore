@@ -108,6 +108,7 @@
 #include "RuleConverter.h"
 #include "RuleSoldierTransformation.h"
 #include "RuleSoldierBonus.h"
+#include "RuleStartingBaseSet.h"
 
 #define ARRAYLEN(x) (std::size(x))
 
@@ -2295,6 +2296,7 @@ void Mod::loadAll()
 	afterLoadHelper("craftWeapons", this, _craftWeapons, &RuleCraftWeapon::afterLoad);
 	afterLoadHelper("countries", this, _countries, &RuleCountry::afterLoad);
 	afterLoadHelper("crafts", this, _crafts, &RuleCraft::afterLoad);
+	afterLoadHelper("startingBaseSets", this, _startingBaseSets, &RuleStartingBaseSet::afterLoad);
 
 	for (auto& a : _armors)
 	{
@@ -2391,6 +2393,27 @@ void Mod::loadAll()
 		{
 			ruleNew->breakDown(this, shortcutPair.second);
 		}
+	}
+
+	// create default starting base set from pre-defined starting base rules
+	{
+		_defaultStartingBaseSet = RuleStartingBaseSet("STR_INIT_BASE_DEFAULT");
+		_defaultStartingBaseSet.BaseDefault = _startingBaseDefault;
+
+		if (_startingBaseBeginner && !_startingBaseBeginner.IsNull())
+			_defaultStartingBaseSet.BaseBeginner = _startingBaseBeginner;
+
+		if (_startingBaseExperienced && !_startingBaseExperienced.IsNull())
+			_defaultStartingBaseSet.BaseExperienced = _startingBaseExperienced;
+
+		if (_startingBaseVeteran && !_startingBaseVeteran.IsNull())
+			_defaultStartingBaseSet.BaseVeteran = _startingBaseVeteran;
+
+		if (_startingBaseGenius && !_startingBaseGenius.IsNull())
+			_defaultStartingBaseSet.BaseGenius = _startingBaseGenius;
+
+		if (_startingBaseSuperhuman && !_startingBaseSuperhuman.IsNull())
+			_defaultStartingBaseSet.BaseSuperhuman = _startingBaseSuperhuman;
 	}
 
 	// recommended user options
@@ -2983,6 +3006,14 @@ void Mod::loadFile(const FileMap::FileRecord &filerec, ModScript &parsers)
 		if (rule != 0)
 		{
 			rule->load(*i, this);
+		}
+	}
+	for (YAML::const_iterator i : iterateRules("startingBaseSets", "name"))
+	{
+		RuleStartingBaseSet *rule = loadRule(*i, &_startingBaseSets, &_startingBaseSetsIndex, "name");
+		if (rule != 0)
+		{
+			rule->load(*i);
 		}
 	}
 
@@ -4777,6 +4808,37 @@ const YAML::Node &Mod::getStartingBase(GameDifficulty diff) const
 	}
 
 	return _startingBaseDefault;
+}
+
+/**
+ * Overrides custom starting bases data with ones from set.
+ */
+void Mod::setStartingBase(const RuleStartingBaseSet baseSet)
+{
+	if (baseSet.BaseDefault && !baseSet.BaseDefault.IsNull())
+	{
+		_startingBaseDefault = baseSet.BaseDefault;
+	}
+	if (baseSet.BaseBeginner && !baseSet.BaseBeginner.IsNull())
+	{
+		_startingBaseBeginner = baseSet.BaseBeginner;
+	}
+	if (baseSet.BaseExperienced && !baseSet.BaseExperienced.IsNull())
+	{
+		_startingBaseExperienced = baseSet.BaseExperienced;
+	}
+	if (baseSet.BaseVeteran && !baseSet.BaseVeteran.IsNull())
+	{
+		_startingBaseVeteran = baseSet.BaseVeteran;
+	}
+	if (baseSet.BaseGenius && !baseSet.BaseGenius.IsNull())
+	{
+		_startingBaseGenius = baseSet.BaseGenius;
+	}
+	if (baseSet.BaseSuperhuman && !baseSet.BaseSuperhuman.IsNull())
+	{
+		_startingBaseSuperhuman = baseSet.BaseSuperhuman;
+	}
 }
 
 /**
