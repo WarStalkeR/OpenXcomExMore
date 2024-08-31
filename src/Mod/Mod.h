@@ -272,7 +272,6 @@ private:
 
 	std::string _destroyedFacility;
 	YAML::Node _startingBaseDefault, _startingBaseBeginner, _startingBaseExperienced, _startingBaseVeteran, _startingBaseGenius, _startingBaseSuperhuman;
-	RuleStartingBaseSet _defaultStartingBaseSet;
 	Collections::NamesToIndex _baseFunctionNames;
 
 	GameTime _startingTime;
@@ -290,6 +289,7 @@ private:
 	std::vector<int> _flagByKills;
 	int _pediaReplaceCraftFuelWithRangeType;
 	std::vector<StatAdjustment> _statAdjustment;
+	RuleStartingBaseSet _defaultStartingBaseSet;
 
 	// overrides for DIFFICULTY_COEFFICIENT[]
 	std::vector<int> _monthlyRatingThresholds;

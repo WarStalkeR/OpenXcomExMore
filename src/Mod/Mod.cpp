@@ -2415,20 +2415,6 @@ void Mod::loadAll()
 			_defaultStartingBaseSet.BaseSuperhuman = _startingBaseSuperhuman;
 	}
 
-	// Load testing, nothing special... Remove once done.
-	{
-		for (auto& baseSet : _startingBaseSets)
-		{
-			Log(LOG_DEBUG) << "Starting Base Set '" << baseSet.second->Name << "' Dump:";
-			Log(LOG_DEBUG) << "  BaseDefault: " << "\n" << baseSet.second->BaseDefault;
-			Log(LOG_DEBUG) << "  BaseBeginner: " << "\n" << baseSet.second->BaseBeginner;
-			Log(LOG_DEBUG) << "  BaseExperienced: " << "\n" << baseSet.second->BaseExperienced;
-			Log(LOG_DEBUG) << "  BaseVeteran: " << "\n" << baseSet.second->BaseVeteran;
-			Log(LOG_DEBUG) << "  BaseGenius: " << "\n" << baseSet.second->BaseGenius;
-			Log(LOG_DEBUG) << "  BaseSuperhuman: " << "\n" << baseSet.second->BaseSuperhuman;
-		}
-	}
-
 	// recommended user options
 	if (!_recommendedUserOptions.empty() && !Options::oxceRecommendedOptionsWereSet)
 	{
