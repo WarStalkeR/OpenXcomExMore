@@ -108,6 +108,7 @@
 #include "RuleConverter.h"
 #include "RuleSoldierTransformation.h"
 #include "RuleSoldierBonus.h"
+#include "RuleStartingBaseSet.h"
 
 #define ARRAYLEN(x) (std::size(x))
 
@@ -468,7 +469,7 @@ Mod::Mod() :
 	_tuRecoveryWakeUpNewTurn(100), _shortRadarRange(0), _buildTimeReductionScaling(100),
 	_defeatScore(0), _defeatFunds(0), _difficultyDemigod(false), _startingTime(6, 1, 1, 1999, 12, 0, 0), _startingDifficulty(0),
 	_baseDefenseMapFromLocation(0), _disableUnderwaterSounds(false), _enableUnitResponseSounds(false), _pediaReplaceCraftFuelWithRangeType(-1),
-	_facilityListOrder(0), _craftListOrder(0), _itemCategoryListOrder(0), _itemListOrder(0),
+	_defaultStartingBaseSet("STR_INIT_BASE_DEFAULT"), _facilityListOrder(0), _craftListOrder(0), _itemCategoryListOrder(0), _itemListOrder(0),
 	_researchListOrder(0),  _manufactureListOrder(0), _soldierBonusListOrder(0), _transformationListOrder(0), _ufopaediaListOrder(0), _invListOrder(0), _soldierListOrder(0),
 	_modCurrent(0), _statePalette(0)
 {
@@ -2295,6 +2296,7 @@ void Mod::loadAll()
 	afterLoadHelper("craftWeapons", this, _craftWeapons, &RuleCraftWeapon::afterLoad);
 	afterLoadHelper("countries", this, _countries, &RuleCountry::afterLoad);
 	afterLoadHelper("crafts", this, _crafts, &RuleCraft::afterLoad);
+	afterLoadHelper("startingBaseSets", this, _startingBaseSets, &RuleStartingBaseSet::afterLoad);
 
 	for (auto& a : _armors)
 	{
@@ -2391,6 +2393,26 @@ void Mod::loadAll()
 		{
 			ruleNew->breakDown(this, shortcutPair.second);
 		}
+	}
+
+	// create default starting base set from pre-defined starting base rules
+	{
+		_defaultStartingBaseSet.BaseDefault = YAML::Clone(_startingBaseDefault);
+
+		if (_startingBaseBeginner && !_startingBaseBeginner.IsNull())
+			_defaultStartingBaseSet.BaseBeginner = YAML::Clone(_startingBaseBeginner);
+
+		if (_startingBaseExperienced && !_startingBaseExperienced.IsNull())
+			_defaultStartingBaseSet.BaseExperienced = YAML::Clone(_startingBaseExperienced);
+
+		if (_startingBaseVeteran && !_startingBaseVeteran.IsNull())
+			_defaultStartingBaseSet.BaseVeteran = YAML::Clone(_startingBaseVeteran);
+
+		if (_startingBaseGenius && !_startingBaseGenius.IsNull())
+			_defaultStartingBaseSet.BaseGenius = YAML::Clone(_startingBaseGenius);
+
+		if (_startingBaseSuperhuman && !_startingBaseSuperhuman.IsNull())
+			_defaultStartingBaseSet.BaseSuperhuman = YAML::Clone(_startingBaseSuperhuman);
 	}
 
 	// recommended user options
@@ -2983,6 +3005,14 @@ void Mod::loadFile(const FileMap::FileRecord &filerec, ModScript &parsers)
 		if (rule != 0)
 		{
 			rule->load(*i, this);
+		}
+	}
+	for (YAML::const_iterator i : iterateRules("startingBaseSets", "name"))
+	{
+		RuleStartingBaseSet *rule = loadRule(*i, &_startingBaseSets, &_startingBaseSetsIndex, "name");
+		if (rule != 0)
+		{
+			rule->load(*i);
 		}
 	}
 
@@ -4372,6 +4402,35 @@ const std::vector<std::string> &Mod::getDeploymentsList() const
 	return _deploymentsIndex;
 }
 
+/**
+ * Returns the rules for the default starting base set.
+ * @return Rules for the starting base set.
+ */
+const RuleStartingBaseSet *Mod::getDefaultStartingBaseSet() const
+{
+	return &_defaultStartingBaseSet;
+}
+
+/**
+ * Returns the rules for the specified starting base set.
+ * @param id Starting base set name.
+ * @return Rules for the starting base set.
+ */
+const RuleStartingBaseSet *Mod::getStartingBaseSet(const std::string &id, bool error) const
+{
+	return getRule(id, "Starting Base Set", _startingBaseSets, error);
+}
+
+/**
+ * Returns the list of all starting base sets
+ * provided by the mod.
+ * @return List of starting base sets.
+ */
+const std::vector<std::string> &Mod::getStartingBaseSetsList() const
+{
+	return _startingBaseSetsIndex;
+}
+
 
 /**
  * Returns the info about a specific armor.
@@ -4777,6 +4836,44 @@ const YAML::Node &Mod::getStartingBase(GameDifficulty diff) const
 	}
 
 	return _startingBaseDefault;
+}
+
+/**
+ * Overrides custom starting bases data with ones from set.
+ */
+void Mod::setStartingBase(const RuleStartingBaseSet* baseSet, bool cleanSet)
+{
+	if (cleanSet)
+	{
+		_startingBaseDefault = YAML::Node();
+		_startingBaseBeginner = YAML::Node();
+		_startingBaseExperienced = YAML::Node();
+		_startingBaseVeteran = YAML::Node();
+		_startingBaseGenius = YAML::Node();
+		_startingBaseSuperhuman = YAML::Node();
+	}
+
+	_startingBaseDefault = YAML::Clone(baseSet->BaseDefault);
+	if (baseSet->BaseBeginner && !baseSet->BaseBeginner.IsNull())
+	{
+		_startingBaseBeginner = YAML::Clone(baseSet->BaseBeginner);
+	}
+	if (baseSet->BaseExperienced && !baseSet->BaseExperienced.IsNull())
+	{
+		_startingBaseExperienced = YAML::Clone(baseSet->BaseExperienced);
+	}
+	if (baseSet->BaseVeteran && !baseSet->BaseVeteran.IsNull())
+	{
+		_startingBaseVeteran = YAML::Clone(baseSet->BaseVeteran);
+	}
+	if (baseSet->BaseGenius && !baseSet->BaseGenius.IsNull())
+	{
+		_startingBaseGenius = YAML::Clone(baseSet->BaseGenius);
+	}
+	if (baseSet->BaseSuperhuman && !baseSet->BaseSuperhuman.IsNull())
+	{
+		_startingBaseSuperhuman = YAML::Clone(baseSet->BaseSuperhuman);
+	}
 }
 
 /**

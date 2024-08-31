@@ -605,6 +605,7 @@
     <ClCompile Include="Mod\RuleSkill.cpp" />
     <ClCompile Include="Mod\RuleSoldierBonus.cpp" />
     <ClCompile Include="Mod\RuleSoldierTransformation.cpp" />
+    <ClCompile Include="Mod\RuleStartingBaseSet.cpp" />
     <ClCompile Include="Mod\RuleStartingCondition.cpp" />
     <ClCompile Include="Mod\RuleStatBonus.cpp" />
     <ClCompile Include="Mod\RuleCommendations.cpp" />
@@ -1005,6 +1006,7 @@
     <ClInclude Include="Mod\RuleSkill.h" />
     <ClInclude Include="Mod\RuleSoldierBonus.h" />
     <ClInclude Include="Mod\RuleSoldierTransformation.h" />
+    <ClInclude Include="Mod\RuleStartingBaseSet.h" />
     <ClInclude Include="Mod\RuleStartingCondition.h" />
     <ClInclude Include="Mod\RuleStatBonus.h" />
     <ClInclude Include="Mod\RuleCommendations.h" />

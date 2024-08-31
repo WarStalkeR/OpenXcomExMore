@@ -101,6 +101,7 @@ OPT int oxceShowAccuracyOnCrosshair;
 OPT bool oxceAutoSell;
 OPT bool oxceAutomaticPromotions;
 OPT bool oxceEnableOffCentreShooting;
+OPT bool oxceStartingBaseSelection;
 OPT bool oxceShowAdvancedDebugOptions;
 
 // OXCE hidden, but can be shown

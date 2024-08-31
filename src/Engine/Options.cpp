@@ -535,6 +535,9 @@ void createAdvancedOptionsOTHER()
 {
 	// your fork's advanced options here
 	
+	// Enable/disable trigger for starting base selection interface.
+	_info.push_back(OptionInfo(OPTION_OTHER, "oxceStartingBaseSelection", &oxceStartingBaseSelection, false, "STR_SHOW_BASE_SELECTION", "STR_GENERAL"));
+
 	// Game Data Viewer enable/disable trigger.
 	_info.push_back(OptionInfo(OPTION_OTHER, "oxceShowAdvancedDebugOptions", &oxceShowAdvancedDebugOptions, false, "STR_SHOW_ADVANCED_DEBUG", "STR_GENERAL"));
 
