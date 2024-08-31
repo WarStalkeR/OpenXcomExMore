@@ -104,6 +104,7 @@ OPT bool oxceAutoSell;
 OPT bool oxceAutomaticPromotions;
 OPT bool oxceEnableOffCentreShooting;
 OPT int oxceCrashedOrLanded;
+OPT bool oxceStartingBaseSelection;
 
 // OXCE hidden, accessible only via options.cfg
 /**

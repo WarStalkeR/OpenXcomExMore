@@ -109,6 +109,7 @@
 #include "RuleConverter.h"
 #include "RuleSoldierTransformation.h"
 #include "RuleSoldierBonus.h"
+#include "RuleStartingBaseSet.h"
 
 #define ARRAYLEN(x) (std::size(x))
 
@@ -472,7 +473,7 @@ Mod::Mod() :
 	_giveScoreAlsoForResearchedArtifacts(false), _statisticalBulletConservation(false), _stunningImprovesMorale(false),
 	_tuRecoveryWakeUpNewTurn(100), _shortRadarRange(0), _buildTimeReductionScaling(100),
 	_defeatScore(0), _defeatFunds(0), _difficultyDemigod(false), _startingTime(6, 1, 1, 1999, 12, 0, 0), _startingDifficulty(0),
-	_baseDefenseMapFromLocation(0), _disableUnderwaterSounds(false), _enableUnitResponseSounds(false), _pediaReplaceCraftFuelWithRangeType(-1),
+	_baseDefenseMapFromLocation(0), _disableUnderwaterSounds(false), _enableUnitResponseSounds(false), _pediaReplaceCraftFuelWithRangeType(-1), _defaultStartingBaseSet("STR_INIT_BASE_DEFAULT"),
 	_facilityListOrder(0), _craftListOrder(0), _itemCategoryListOrder(0), _itemListOrder(0), _armorListOrder(0), _alienRaceListOrder(0),
 	_researchListOrder(0),  _manufactureListOrder(0), _soldierBonusListOrder(0), _transformationListOrder(0), _ufopaediaListOrder(0), _invListOrder(0), _soldierListOrder(0),
 	_modCurrent(0), _statePalette(0)
@@ -2298,6 +2299,7 @@ void Mod::loadAll()
 	afterLoadHelper("craftWeapons", this, _craftWeapons, &RuleCraftWeapon::afterLoad);
 	afterLoadHelper("countries", this, _countries, &RuleCountry::afterLoad);
 	afterLoadHelper("crafts", this, _crafts, &RuleCraft::afterLoad);
+	afterLoadHelper("startingBaseSets", this, _startingBaseSets, &RuleStartingBaseSet::afterLoad);
 
 	for (auto& a : _armors)
 	{
@@ -2394,6 +2396,26 @@ void Mod::loadAll()
 		{
 			ruleNew->breakDown(this, shortcutPair.second);
 		}
+	}
+
+	// create default starting base set from pre-defined starting base rules
+	{
+		_defaultStartingBaseSet.BaseDefault.yaml = _startingBaseDefault.yaml;
+
+		if (!_startingBaseBeginner.yaml.empty())
+			_defaultStartingBaseSet.BaseBeginner.yaml = _startingBaseBeginner.yaml;
+
+		if (!_startingBaseExperienced.yaml.empty())
+			_defaultStartingBaseSet.BaseExperienced.yaml = _startingBaseExperienced.yaml;
+
+		if (!_startingBaseVeteran.yaml.empty())
+			_defaultStartingBaseSet.BaseVeteran.yaml = _startingBaseVeteran.yaml;
+
+		if (!_startingBaseGenius.yaml.empty())
+			_defaultStartingBaseSet.BaseGenius.yaml = _startingBaseGenius.yaml;
+
+		if (!_startingBaseSuperhuman.yaml.empty())
+			_defaultStartingBaseSet.BaseSuperhuman.yaml = _startingBaseSuperhuman.yaml;
 	}
 
 	// recommended user options
@@ -2977,6 +2999,14 @@ void Mod::loadFile(const FileMap::FileRecord &filerec, ModScript &parsers)
 		if (rule != 0)
 		{
 			rule->load(ruleReader, this);
+		}
+	}
+	for (const auto& ruleReader : iterateRules("startingBaseSets", "name"))
+	{
+		RuleStartingBaseSet *rule = loadRule(ruleReader, &_startingBaseSets, &_startingBaseSetsIndex, "name");
+		if (rule != 0)
+		{
+			rule->load(ruleReader);
 		}
 	}
 
@@ -4339,6 +4369,35 @@ const std::vector<std::string> &Mod::getDeploymentsList() const
 	return _deploymentsIndex;
 }
 
+/**
+ * Returns the rules for the default starting base set.
+ * @return Rules for the starting base set.
+ */
+const RuleStartingBaseSet *Mod::getDefaultStartingBaseSet() const
+{
+	return &_defaultStartingBaseSet;
+}
+
+/**
+ * Returns the rules for the specified starting base set.
+ * @param id Starting base set name.
+ * @return Rules for the starting base set.
+ */
+const RuleStartingBaseSet *Mod::getStartingBaseSet(const std::string &id, bool error) const
+{
+	return getRule(id, "Starting Base Set", _startingBaseSets, error);
+}
+
+/**
+ * Returns the list of all starting base sets
+ * provided by the mod.
+ * @return List of starting base sets.
+ */
+const std::vector<std::string> &Mod::getStartingBaseSetsList() const
+{
+	return _startingBaseSetsIndex;
+}
+
 
 /**
  * Returns the info about a specific armor.
@@ -4744,6 +4803,44 @@ const YAML::YamlString& Mod::getStartingBase(GameDifficulty diff) const
 	}
 
 	return _startingBaseDefault;
+}
+
+/**
+ * Overrides custom starting bases data with ones from set.
+ */
+void Mod::setStartingBase(const RuleStartingBaseSet* baseSet, bool cleanSet)
+{
+	if (cleanSet)
+	{
+		_startingBaseDefault.yaml.clear();
+		_startingBaseBeginner.yaml.clear();
+		_startingBaseExperienced.yaml.clear();
+		_startingBaseVeteran.yaml.clear();
+		_startingBaseGenius.yaml.clear();
+		_startingBaseSuperhuman.yaml.clear();
+	}
+
+	_startingBaseDefault.yaml = baseSet->BaseDefault.yaml;
+	if (!baseSet->BaseBeginner.yaml.empty())
+	{
+		_startingBaseBeginner.yaml = baseSet->BaseBeginner.yaml;
+	}
+	if (!baseSet->BaseExperienced.yaml.empty())
+	{
+		_startingBaseExperienced.yaml = baseSet->BaseExperienced.yaml;
+	}
+	if (!baseSet->BaseVeteran.yaml.empty())
+	{
+		_startingBaseVeteran.yaml = baseSet->BaseVeteran.yaml;
+	}
+	if (!baseSet->BaseGenius.yaml.empty())
+	{
+		_startingBaseGenius.yaml = baseSet->BaseGenius.yaml;
+	}
+	if (!baseSet->BaseSuperhuman.yaml.empty())
+	{
+		_startingBaseSuperhuman.yaml = baseSet->BaseSuperhuman.yaml;
+	}
 }
 
 /**

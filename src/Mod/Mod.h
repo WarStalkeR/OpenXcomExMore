@@ -34,6 +34,7 @@
 #include "RuleAlienMission.h"
 #include "RuleBaseFacilityFunctions.h"
 #include "RuleItem.h"
+#include "RuleStartingBaseSet.h"
 
 namespace OpenXcom
 {
@@ -105,6 +106,7 @@ class ModScriptGlobal;
 class ScriptParserBase;
 class ScriptGlobal;
 struct StatAdjustment;
+struct RuleStartingBaseSet;
 
 enum GameDifficulty : int;
 
@@ -207,6 +209,7 @@ private:
 	std::map<std::string, RuleMissionScript*> _missionScripts;
 	std::map<std::string, std::vector<ExtraSprites *> > _extraSprites;
 	std::map<std::string, CustomPalettes *> _customPalettes;
+	std::map<std::string, RuleStartingBaseSet *> _startingBaseSets;
 	std::vector<std::pair<std::string, ExtraSounds *> > _extraSounds;
 	std::map<std::string, ExtraStrings *> _extraStrings;
 	std::vector<StatString*> _statStrings;
@@ -289,6 +292,7 @@ private:
 	std::vector<int> _flagByKills;
 	int _pediaReplaceCraftFuelWithRangeType;
 	std::vector<StatAdjustment> _statAdjustment;
+	RuleStartingBaseSet _defaultStartingBaseSet;
 
 	// overrides for DIFFICULTY_COEFFICIENT[]
 	std::vector<int> _monthlyRatingThresholds;
@@ -303,6 +307,7 @@ private:
 	std::vector<std::string> _aliensIndex, _enviroEffectsIndex, _startingConditionsIndex, _deploymentsIndex, _armorsIndex, _ufopaediaIndex, _ufopaediaCatIndex, _researchIndex, _manufactureIndex;
 	std::vector<std::string> _skillsIndex, _soldiersIndex, _soldierTransformationIndex, _soldierBonusIndex;
 	std::vector<std::string> _alienMissionsIndex, _terrainIndex, _customPalettesIndex, _arcScriptIndex, _eventScriptIndex, _eventIndex, _missionScriptIndex;
+	std::vector<std::string> _startingBaseSetsIndex;
 	std::vector<std::vector<int> > _alienItemLevels;
 	std::vector<std::array<SDL_Color, TransparenciesOpacityLevels>> _transparencies;
 	int _facilityListOrder, _craftListOrder, _itemCategoryListOrder, _itemListOrder, _armorListOrder, _alienRaceListOrder, _researchListOrder,  _manufactureListOrder;
@@ -762,6 +767,13 @@ public:
 	/// Gets the available alien deployments.
 	const std::vector<std::string> &getDeploymentsList() const;
 
+	/// Gets the ruleset for a default starting base.
+	const RuleStartingBaseSet *getDefaultStartingBaseSet() const;
+	/// Gets the ruleset for a starting base set name.
+	const RuleStartingBaseSet *getStartingBaseSet(const std::string &id, bool error = false) const;
+	/// Gets the available starting base sets.
+	const std::vector<std::string> &getStartingBaseSetsList() const;
+
 	/// Gets armor rules.
 	Armor *getArmor(const std::string &name, bool error = false) const;
 	/// Gets the all armors.
@@ -1046,6 +1058,8 @@ public:
 	/// Gets the player starting base.
 	const YAML::YamlString& getDefaultStartingBase() const;
 	const YAML::YamlString& getStartingBase(GameDifficulty diff) const;
+    /// Overrides the player starting base from set.
+    void setStartingBase(const RuleStartingBaseSet* baseSet, bool cleanSet = true);
 	/// Gets the game starting time.
 	const GameTime &getStartingTime() const;
 	/// Gets the game starting difficulty.
