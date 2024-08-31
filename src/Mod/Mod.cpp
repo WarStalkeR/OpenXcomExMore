@@ -4402,6 +4402,26 @@ const std::vector<std::string> &Mod::getDeploymentsList() const
 	return _deploymentsIndex;
 }
 
+/**
+ * Returns the rules for the specified starting base set.
+ * @param id Starting base set name.
+ * @return Rules for the starting base set.
+ */
+RuleStartingBaseSet *Mod::getStartingBaseSet(const std::string &id, bool error) const
+{
+	return getRule(id, "Starting Base Set", _startingBaseSets, error);
+}
+
+/**
+ * Returns the list of all starting base sets
+ * provided by the mod.
+ * @return List of starting base sets.
+ */
+const std::vector<std::string> &Mod::getStartingBaseSetsList() const
+{
+	return _startingBaseSetsIndex;
+}
+
 
 /**
  * Returns the info about a specific armor.

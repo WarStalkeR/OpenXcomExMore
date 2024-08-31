@@ -762,6 +762,11 @@ public:
 	/// Gets the available alien deployments.
 	const std::vector<std::string> &getDeploymentsList() const;
 
+	/// Gets the ruleset for a starting base set name.
+	RuleStartingBaseSet *getStartingBaseSet(const std::string &id, bool error = false) const;
+	/// Gets the available starting base sets.
+	const std::vector<std::string> &getStartingBaseSetsList() const;
+
 	/// Gets armor rules.
 	Armor *getArmor(const std::string &name, bool error = false) const;
 	/// Gets the all armors.

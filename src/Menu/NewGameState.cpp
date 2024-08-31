@@ -40,7 +40,7 @@ namespace OpenXcom
  */
 NewGameState::NewGameState()
 {
-	_customBaseMode = true;
+	_customBaseMode = Options::oxceStartingBaseSelection;
 
 	// Create objects
 	if (_customBaseMode)
@@ -56,8 +56,8 @@ NewGameState::NewGameState()
 		_btnIronman = new ToggleTextButton(78, 16, 20, 111);
 		_btnOk = new TextButton(78, 16, 20, 129);
 		_btnCancel = new TextButton(78, 16, 102, 129);
-		_txtTitle = new Text(192, 9, 4, 9);
-		_txtIronman = new Text(90, 24, 102, 107);
+		_txtTitle = new Text(160, 9, 20, 9);
+		_txtIronman = new Text(83, 24, 102, 107);
 	}
 	else
 	{
