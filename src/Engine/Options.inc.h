@@ -107,6 +107,7 @@ OPT bool oxceAutomaticPromotions;
 OPT bool oxceEnableOffCentreShooting;
 OPT bool oxceUniformShootingSpread;
 OPT int oxceCrashedOrLanded;
+OPT bool oxceStartingBaseSelection;
 
 // OXCE hidden, accessible only via options.cfg
 /**
