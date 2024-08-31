@@ -34,6 +34,7 @@
 #include "RuleAlienMission.h"
 #include "RuleBaseFacilityFunctions.h"
 #include "RuleItem.h"
+#include "RuleStartingBaseSet.h"
 
 namespace OpenXcom
 {
@@ -1046,7 +1047,7 @@ public:
 	const YAML::Node &getDefaultStartingBase() const;
 	const YAML::Node &getStartingBase(GameDifficulty diff) const;
 	/// Overrides the player starting base from set.
-	void setStartingBase(const RuleStartingBaseSet baseSet);
+	void setStartingBase(const RuleStartingBaseSet* baseSet, bool cleanSet = true);
 	/// Gets the game starting time.
 	const GameTime &getStartingTime() const;
 	/// Gets the game starting difficulty.

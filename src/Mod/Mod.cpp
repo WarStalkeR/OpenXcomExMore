@@ -469,7 +469,7 @@ Mod::Mod() :
 	_tuRecoveryWakeUpNewTurn(100), _shortRadarRange(0), _buildTimeReductionScaling(100),
 	_defeatScore(0), _defeatFunds(0), _difficultyDemigod(false), _startingTime(6, 1, 1, 1999, 12, 0, 0), _startingDifficulty(0),
 	_baseDefenseMapFromLocation(0), _disableUnderwaterSounds(false), _enableUnitResponseSounds(false), _pediaReplaceCraftFuelWithRangeType(-1),
-	_facilityListOrder(0), _craftListOrder(0), _itemCategoryListOrder(0), _itemListOrder(0),
+	_defaultStartingBaseSet("STR_INIT_BASE_DEFAULT"), _facilityListOrder(0), _craftListOrder(0), _itemCategoryListOrder(0), _itemListOrder(0),
 	_researchListOrder(0),  _manufactureListOrder(0), _soldierBonusListOrder(0), _transformationListOrder(0), _ufopaediaListOrder(0), _invListOrder(0), _soldierListOrder(0),
 	_modCurrent(0), _statePalette(0)
 {
@@ -2397,7 +2397,6 @@ void Mod::loadAll()
 
 	// create default starting base set from pre-defined starting base rules
 	{
-		_defaultStartingBaseSet = RuleStartingBaseSet("STR_INIT_BASE_DEFAULT");
 		_defaultStartingBaseSet.BaseDefault = _startingBaseDefault;
 
 		if (_startingBaseBeginner && !_startingBaseBeginner.IsNull())
@@ -2414,6 +2413,20 @@ void Mod::loadAll()
 
 		if (_startingBaseSuperhuman && !_startingBaseSuperhuman.IsNull())
 			_defaultStartingBaseSet.BaseSuperhuman = _startingBaseSuperhuman;
+	}
+
+	// Load testing, nothing special... Remove once done.
+	{
+		for (auto& baseSet : _startingBaseSets)
+		{
+			Log(LOG_DEBUG) << "Starting Base Set '" << baseSet.second->Name << "' Dump:";
+			Log(LOG_DEBUG) << "  BaseDefault: " << "\n" << baseSet.second->BaseDefault;
+			Log(LOG_DEBUG) << "  BaseBeginner: " << "\n" << baseSet.second->BaseBeginner;
+			Log(LOG_DEBUG) << "  BaseExperienced: " << "\n" << baseSet.second->BaseExperienced;
+			Log(LOG_DEBUG) << "  BaseVeteran: " << "\n" << baseSet.second->BaseVeteran;
+			Log(LOG_DEBUG) << "  BaseGenius: " << "\n" << baseSet.second->BaseGenius;
+			Log(LOG_DEBUG) << "  BaseSuperhuman: " << "\n" << baseSet.second->BaseSuperhuman;
+		}
 	}
 
 	// recommended user options
@@ -4813,31 +4826,38 @@ const YAML::Node &Mod::getStartingBase(GameDifficulty diff) const
 /**
  * Overrides custom starting bases data with ones from set.
  */
-void Mod::setStartingBase(const RuleStartingBaseSet baseSet)
+void Mod::setStartingBase(const RuleStartingBaseSet* baseSet, bool cleanSet)
 {
-	if (baseSet.BaseDefault && !baseSet.BaseDefault.IsNull())
+	if (cleanSet)
 	{
-		_startingBaseDefault = baseSet.BaseDefault;
+		_startingBaseDefault = YAML::Node();
+		_startingBaseBeginner = YAML::Node();
+		_startingBaseExperienced = YAML::Node();
+		_startingBaseVeteran = YAML::Node();
+		_startingBaseGenius = YAML::Node();
+		_startingBaseSuperhuman = YAML::Node();
 	}
-	if (baseSet.BaseBeginner && !baseSet.BaseBeginner.IsNull())
+
+	_startingBaseDefault = baseSet->BaseDefault;
+	if (baseSet->BaseBeginner && !baseSet->BaseBeginner.IsNull())
 	{
-		_startingBaseBeginner = baseSet.BaseBeginner;
+		_startingBaseBeginner = baseSet->BaseBeginner;
 	}
-	if (baseSet.BaseExperienced && !baseSet.BaseExperienced.IsNull())
+	if (baseSet->BaseExperienced && !baseSet->BaseExperienced.IsNull())
 	{
-		_startingBaseExperienced = baseSet.BaseExperienced;
+		_startingBaseExperienced = baseSet->BaseExperienced;
 	}
-	if (baseSet.BaseVeteran && !baseSet.BaseVeteran.IsNull())
+	if (baseSet->BaseVeteran && !baseSet->BaseVeteran.IsNull())
 	{
-		_startingBaseVeteran = baseSet.BaseVeteran;
+		_startingBaseVeteran = baseSet->BaseVeteran;
 	}
-	if (baseSet.BaseGenius && !baseSet.BaseGenius.IsNull())
+	if (baseSet->BaseGenius && !baseSet->BaseGenius.IsNull())
 	{
-		_startingBaseGenius = baseSet.BaseGenius;
+		_startingBaseGenius = baseSet->BaseGenius;
 	}
-	if (baseSet.BaseSuperhuman && !baseSet.BaseSuperhuman.IsNull())
+	if (baseSet->BaseSuperhuman && !baseSet->BaseSuperhuman.IsNull())
 	{
-		_startingBaseSuperhuman = baseSet.BaseSuperhuman;
+		_startingBaseSuperhuman = baseSet->BaseSuperhuman;
 	}
 }
 
