@@ -2397,22 +2397,22 @@ void Mod::loadAll()
 
 	// create default starting base set from pre-defined starting base rules
 	{
-		_defaultStartingBaseSet.BaseDefault = _startingBaseDefault;
+		_defaultStartingBaseSet.BaseDefault = YAML::Clone(_startingBaseDefault);
 
 		if (_startingBaseBeginner && !_startingBaseBeginner.IsNull())
-			_defaultStartingBaseSet.BaseBeginner = _startingBaseBeginner;
+			_defaultStartingBaseSet.BaseBeginner = YAML::Clone(_startingBaseBeginner);
 
 		if (_startingBaseExperienced && !_startingBaseExperienced.IsNull())
-			_defaultStartingBaseSet.BaseExperienced = _startingBaseExperienced;
+			_defaultStartingBaseSet.BaseExperienced = YAML::Clone(_startingBaseExperienced);
 
 		if (_startingBaseVeteran && !_startingBaseVeteran.IsNull())
-			_defaultStartingBaseSet.BaseVeteran = _startingBaseVeteran;
+			_defaultStartingBaseSet.BaseVeteran = YAML::Clone(_startingBaseVeteran);
 
 		if (_startingBaseGenius && !_startingBaseGenius.IsNull())
-			_defaultStartingBaseSet.BaseGenius = _startingBaseGenius;
+			_defaultStartingBaseSet.BaseGenius = YAML::Clone(_startingBaseGenius);
 
 		if (_startingBaseSuperhuman && !_startingBaseSuperhuman.IsNull())
-			_defaultStartingBaseSet.BaseSuperhuman = _startingBaseSuperhuman;
+			_defaultStartingBaseSet.BaseSuperhuman = YAML::Clone(_startingBaseSuperhuman);
 	}
 
 	// recommended user options
@@ -4403,11 +4403,20 @@ const std::vector<std::string> &Mod::getDeploymentsList() const
 }
 
 /**
+ * Returns the rules for the default starting base set.
+ * @return Rules for the starting base set.
+ */
+const RuleStartingBaseSet *Mod::getDefaultStartingBaseSet() const
+{
+	return &_defaultStartingBaseSet;
+}
+
+/**
  * Returns the rules for the specified starting base set.
  * @param id Starting base set name.
  * @return Rules for the starting base set.
  */
-RuleStartingBaseSet *Mod::getStartingBaseSet(const std::string &id, bool error) const
+const RuleStartingBaseSet *Mod::getStartingBaseSet(const std::string &id, bool error) const
 {
 	return getRule(id, "Starting Base Set", _startingBaseSets, error);
 }
@@ -4844,26 +4853,26 @@ void Mod::setStartingBase(const RuleStartingBaseSet* baseSet, bool cleanSet)
 		_startingBaseSuperhuman = YAML::Node();
 	}
 
-	_startingBaseDefault = baseSet->BaseDefault;
+	_startingBaseDefault = YAML::Clone(baseSet->BaseDefault);
 	if (baseSet->BaseBeginner && !baseSet->BaseBeginner.IsNull())
 	{
-		_startingBaseBeginner = baseSet->BaseBeginner;
+		_startingBaseBeginner = YAML::Clone(baseSet->BaseBeginner);
 	}
 	if (baseSet->BaseExperienced && !baseSet->BaseExperienced.IsNull())
 	{
-		_startingBaseExperienced = baseSet->BaseExperienced;
+		_startingBaseExperienced = YAML::Clone(baseSet->BaseExperienced);
 	}
 	if (baseSet->BaseVeteran && !baseSet->BaseVeteran.IsNull())
 	{
-		_startingBaseVeteran = baseSet->BaseVeteran;
+		_startingBaseVeteran = YAML::Clone(baseSet->BaseVeteran);
 	}
 	if (baseSet->BaseGenius && !baseSet->BaseGenius.IsNull())
 	{
-		_startingBaseGenius = baseSet->BaseGenius;
+		_startingBaseGenius = YAML::Clone(baseSet->BaseGenius);
 	}
 	if (baseSet->BaseSuperhuman && !baseSet->BaseSuperhuman.IsNull())
 	{
-		_startingBaseSuperhuman = baseSet->BaseSuperhuman;
+		_startingBaseSuperhuman = YAML::Clone(baseSet->BaseSuperhuman);
 	}
 }
 

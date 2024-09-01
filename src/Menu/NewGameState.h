@@ -26,6 +26,7 @@ class TextButton;
 class ToggleTextButton;
 class Window;
 class Text;
+class TextList;
 
 /**
  * New Game window that displays a list
@@ -40,8 +41,12 @@ private:
 	ToggleTextButton *_btnIronman;
 	TextButton *_btnOk, *_btnCancel;
 	Window *_window, *_winBaseSel, *_winBaseDesc;
-	Text *_txtTitle, *_txtIronman;
+	Text *_txtTitle, *_txtIronman, *_txtBaseTitle, *_txtBaseDesc;
+	TextList *_lstBaseSets;
 	bool _customBaseMode;
+	int _lastRow;
+
+	void initList(size_t scrl);
 public:
 	/// Creates the New Game state.
 	NewGameState();
@@ -51,6 +56,8 @@ public:
 	void btnOkClick(Action *action);
 	/// Handler for clicking the Cancel button.
 	void btnCancelClick(Action *action);
+	/// Handler for clicking the Starting Base list.
+	void lstBaseSetsClick(Action *action);
 };
 
 }

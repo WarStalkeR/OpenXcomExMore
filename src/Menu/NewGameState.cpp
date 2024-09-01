@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include <sstream>
 #include "NewGameState.h"
 #include "../Engine/Game.h"
 #include "../Mod/Mod.h"
@@ -23,6 +24,7 @@
 #include "../Interface/ToggleTextButton.h"
 #include "../Interface/Window.h"
 #include "../Interface/Text.h"
+#include "../Interface/TextList.h"
 #include "../Geoscape/GeoscapeState.h"
 #include "../Geoscape/BuildNewBaseState.h"
 #include "../Geoscape/BaseNameState.h"
@@ -58,6 +60,9 @@ NewGameState::NewGameState()
 		_btnCancel = new TextButton(78, 16, 102, 129);
 		_txtTitle = new Text(160, 9, 20, 9);
 		_txtIronman = new Text(83, 24, 102, 107);
+		_txtBaseTitle = new Text(105, 9, 195, 9);
+		_txtBaseDesc = new Text(280, 33, 20, 159);
+		_lstBaseSets = new TextList(115, 120, 190, 25);
 	}
 	else
 	{
@@ -115,6 +120,12 @@ NewGameState::NewGameState()
 	add(_btnCancel, "button", "newGameMenu");
 	add(_txtTitle, "text", "newGameMenu");
 	add(_txtIronman, "ironman", "newGameMenu");
+	if (_customBaseMode)
+	{
+		add(_txtBaseTitle, "text", "newGameMenu");
+		add(_txtBaseDesc, "text", "newGameMenu");
+		add(_lstBaseSets, "list", "newGameMenu");
+	}
 
 	centerAllSurfaces();
 
@@ -157,6 +168,24 @@ NewGameState::NewGameState()
 	_txtIronman->setWordWrap(true);
 	_txtIronman->setVerticalAlign(ALIGN_MIDDLE);
 	_txtIronman->setText(tr("STR_IRONMAN_DESC"));
+
+	if (_customBaseMode)
+	{
+		_txtBaseTitle->setAlign(ALIGN_CENTER);
+		_txtBaseTitle->setText(tr("STR_STARTING_BASE_LIST"));
+
+		_txtBaseDesc->setWordWrap(true);
+		_txtBaseDesc->setText(tr("STR_INIT_BASE_DEFAULT_DESC"));
+
+		_lstBaseSets->setColumns(1, 95);
+		_lstBaseSets->setMargin(5);
+		_lstBaseSets->setSelectable(true);
+		_lstBaseSets->setScrolling(true, -13);
+		_lstBaseSets->setBackground(_window);
+		_lstBaseSets->onMouseClick((ActionHandler)&NewGameState::lstBaseSetsClick);
+
+		NewGameState::initList(0);
+	}
 }
 
 /**
@@ -165,6 +194,29 @@ NewGameState::NewGameState()
 NewGameState::~NewGameState()
 {
 
+}
+
+/**
+ * Shows the crafts in a list at specified offset/scroll.
+ */
+void NewGameState::initList(size_t scrl)
+{
+	_lstBaseSets->clearList();
+
+	// Adding default starting base to the list
+	_lstBaseSets->addRow(1, tr(
+		_game->getMod()->getDefaultStartingBaseSet()->Name).c_str());
+	_lstBaseSets->setRowColor(0, _lstBaseSets->getSecondaryColor());
+	_lastRow = 0;
+
+	// Adding all other starting bases to the list
+	for (const auto& baseSet : _game->getMod()->getStartingBaseSetsList())
+	{
+		_lstBaseSets->addRow(1, tr(_game->getMod()->getStartingBaseSet(baseSet)->Name).c_str());
+	}
+
+	// Setting the initial scroll position
+	if (scrl) _lstBaseSets->scrollTo(scrl);
 }
 
 /**
@@ -197,6 +249,19 @@ void NewGameState::btnOkClick(Action *)
 
 	// Reset touch flags
 	_game->resetTouchButtonFlags();
+
+	// Switch to custom starting base, if relevant
+	if (_customBaseMode)
+	{
+		if (_lastRow > 0)
+			_game->getMod()->setStartingBase(
+				_game->getMod()->getStartingBaseSet(
+					_game->getMod()->getStartingBaseSetsList()
+					.at(_lastRow - 1)));
+		else
+			_game->getMod()->setStartingBase(
+				_game->getMod()->getDefaultStartingBaseSet());
+	}
 
 	SavedGame *save = _game->getMod()->newSave(diff);
 	save->setDifficulty(diff);
@@ -242,6 +307,31 @@ void NewGameState::btnCancelClick(Action *)
 {
 	_game->setSavedGame(0);
 	_game->popState();
+}
+
+/**
+ * Selects starting base from the highlighted row.
+ * @param action Pointer to an action.
+ */
+void NewGameState::lstBaseSetsClick(Action *)
+{
+	if (!_customBaseMode) return;
+	auto row = _lstBaseSets->getSelectedRow();
+
+	if (row == 0)
+	{
+		_txtBaseDesc->setText(tr(
+			_game->getMod()->getDefaultStartingBaseSet()->Name + "_DESC"));
+	}
+	else
+	{
+		_txtBaseDesc->setText(tr(_game->getMod()->getStartingBaseSet(
+			_game->getMod()->getStartingBaseSetsList().at(row - 1))->Name + "_DESC"));
+	}
+
+	_lstBaseSets->setRowColor(_lastRow, _lstBaseSets->getColor());
+	_lstBaseSets->setRowColor(row, _lstBaseSets->getSecondaryColor());
+	_lastRow = row;
 }
 
 }

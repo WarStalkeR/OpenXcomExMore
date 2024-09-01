@@ -762,8 +762,10 @@ public:
 	/// Gets the available alien deployments.
 	const std::vector<std::string> &getDeploymentsList() const;
 
+	/// Gets the ruleset for a default starting base.
+	const RuleStartingBaseSet *getDefaultStartingBaseSet() const;
 	/// Gets the ruleset for a starting base set name.
-	RuleStartingBaseSet *getStartingBaseSet(const std::string &id, bool error = false) const;
+	const RuleStartingBaseSet *getStartingBaseSet(const std::string &id, bool error = false) const;
 	/// Gets the available starting base sets.
 	const std::vector<std::string> &getStartingBaseSetsList() const;
 
