@@ -46,9 +46,6 @@ struct RuleStartingBaseSet
 
 	/// Default constructor.
 	RuleStartingBaseSet(const std::string &name);
-	/// Constructor that allows to create a new starting base data set from existing data.
-	RuleStartingBaseSet(std::string setName, YAML::Node dataDefault, YAML::Node dataBeginner,
-		YAML::Node dataExperienced, YAML::Node dataVeteran, YAML::Node dataGenius, YAML::Node dataSuperhuman);
 	/// Deletes a RuleStartingBaseSet.
 	~RuleStartingBaseSet() = default;
 

@@ -44,7 +44,7 @@ private:
 	Text *_txtTitle, *_txtIronman, *_txtBaseTitle, *_txtBaseDesc;
 	TextList *_lstBaseSets;
 	bool _customBaseMode;
-	int _lastRow;
+	int _lastRow = 0;
 
 	void initList(size_t scrl);
 public:

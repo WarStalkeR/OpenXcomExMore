@@ -35,40 +35,6 @@ RuleStartingBaseSet::RuleStartingBaseSet(const std::string &name) : Name(name),
 }
 
 /**
- * Constructor that allows to create a new starting base data set from existing data.
- * @param unique name of the starting base set.
- * @param raw YAML data for default/fallback starting base.
- * @param raw YAML data for Beginner difficulty starting base.
- * @param raw YAML data for Experienced difficulty starting base.
- * @param raw YAML data for Veteran difficulty starting base.
- * @param raw YAML data for Genius difficulty starting base.
- * @param raw YAML data for Superhuman difficulty starting base.
- */
-RuleStartingBaseSet::RuleStartingBaseSet(std::string setName, YAML::Node dataDefault, YAML::Node dataBeginner,
-	YAML::Node dataExperienced, YAML::Node dataVeteran, YAML::Node dataGenius, YAML::Node dataSuperhuman)
-{
-	Name = setName;
-
-	// If empty, any non-default value will be assigned.
-	BaseDefault = dataDefault;
-
-	// Keep it safe, in case if optional values aren't assigned
-	if (dataBeginner && !dataBeginner.IsNull()) BaseBeginner = dataBeginner;
-	if (dataExperienced && !dataExperienced.IsNull()) BaseExperienced = dataExperienced;
-	if (dataVeteran && !dataVeteran.IsNull()) BaseVeteran = dataVeteran;
-	if (dataGenius && !dataGenius.IsNull()) BaseGenius = dataGenius;
-	if (dataSuperhuman && !dataSuperhuman.IsNull()) BaseSuperhuman = dataSuperhuman;
-
-	// Empty data not allowed, since constructor has no default layouts
-	if (BaseDefault.IsNull() && !BaseBeginner.IsNull()) BaseDefault = BaseBeginner;
-	else if (BaseDefault.IsNull() && !BaseExperienced.IsNull()) BaseDefault = BaseExperienced;
-	else if (BaseDefault.IsNull() && !BaseVeteran.IsNull()) BaseDefault = BaseVeteran;
-	else if (BaseDefault.IsNull() && !BaseGenius.IsNull()) BaseDefault = BaseGenius;
-	else if (BaseDefault.IsNull() && !BaseSuperhuman.IsNull()) BaseDefault = BaseSuperhuman;
-	else throw Exception("Staring base set contains no data!");
-}
-
-/**
  * Loads item data from YAML.
  * @param node Node with data.
  */
@@ -79,12 +45,23 @@ void RuleStartingBaseSet::load(const YAML::Node& node)
 		load(parent);
 	}
 
-	BaseDefault = node["baseDefault"].as<YAML::Node>(BaseDefault);
-	BaseBeginner = node["baseBeginner"].as<YAML::Node>(BaseBeginner);
-	BaseExperienced = node["baseExperienced"].as<YAML::Node>(BaseExperienced);
-	BaseVeteran = node["baseVeteran"].as<YAML::Node>(BaseVeteran);
-	BaseGenius = node["baseGenius"].as<YAML::Node>(BaseGenius);
-	BaseSuperhuman = node["baseSuperhuman"].as<YAML::Node>(BaseSuperhuman);
+	auto loadStartingSetBase = [&](const YAML::Node &srcRef, YAML::Node &destRef)
+	{
+		if (srcRef && srcRef.IsMap())
+		{
+			for (YAML::const_iterator i = srcRef.begin(); i != srcRef.end(); ++i)
+			{
+				destRef[i->first.as<std::string>()] = YAML::Node(i->second);
+			}
+		}
+	};
+
+	loadStartingSetBase(node["baseDefault"], BaseDefault);
+	loadStartingSetBase(node["baseBeginner"], BaseBeginner);
+	loadStartingSetBase(node["baseExperienced"], BaseExperienced);
+	loadStartingSetBase(node["baseVeteran"], BaseVeteran);
+	loadStartingSetBase(node["baseGenius"], BaseGenius);
+	loadStartingSetBase(node["baseSuperhuman"], BaseSuperhuman);
 
 	// Empty data not allowed, since constructor has no default layouts
 	if (BaseDefault.IsNull() && BaseBeginner.IsNull() && BaseExperienced.IsNull() &&
@@ -100,11 +77,16 @@ void RuleStartingBaseSet::load(const YAML::Node& node)
 void RuleStartingBaseSet::afterLoad(const Mod* mod)
 {
 	// Always assign fallback layout from first existing layout
-	if (BaseDefault.IsNull() && !BaseBeginner.IsNull()) BaseDefault = BaseBeginner;
-	else if (BaseDefault.IsNull() && !BaseExperienced.IsNull()) BaseDefault = BaseExperienced;
-	else if (BaseDefault.IsNull() && !BaseVeteran.IsNull()) BaseDefault = BaseVeteran;
-	else if (BaseDefault.IsNull() && !BaseGenius.IsNull()) BaseDefault = BaseGenius;
-	else if (BaseDefault.IsNull() && !BaseSuperhuman.IsNull()) BaseDefault = BaseSuperhuman;
+	if (BaseDefault.IsNull() && !BaseBeginner.IsNull())
+		BaseDefault = YAML::Clone(BaseBeginner);
+	else if (BaseDefault.IsNull() && !BaseExperienced.IsNull())
+		BaseDefault = YAML::Clone(BaseExperienced);
+	else if (BaseDefault.IsNull() && !BaseVeteran.IsNull())
+		BaseDefault = YAML::Clone(BaseVeteran);
+	else if (BaseDefault.IsNull() && !BaseGenius.IsNull())
+		BaseDefault = YAML::Clone(BaseGenius);
+	else if (BaseDefault.IsNull() && !BaseSuperhuman.IsNull())
+		BaseDefault = YAML::Clone(BaseSuperhuman);
 }
 
 } //namespace OpenXcom

@@ -251,16 +251,17 @@ void NewGameState::btnOkClick(Action *)
 	_game->resetTouchButtonFlags();
 
 	// Switch to custom starting base, if relevant
-	if (_customBaseMode)
+	if (_customBaseMode && _lastRow > 0)
 	{
-		if (_lastRow > 0)
-			_game->getMod()->setStartingBase(
-				_game->getMod()->getStartingBaseSet(
-					_game->getMod()->getStartingBaseSetsList()
-					.at(_lastRow - 1)));
-		else
-			_game->getMod()->setStartingBase(
-				_game->getMod()->getDefaultStartingBaseSet());
+		_game->getMod()->setStartingBase(
+			_game->getMod()->getStartingBaseSet(
+				_game->getMod()->getStartingBaseSetsList()
+				.at(_lastRow - 1)));
+	}
+	else
+	{
+		_game->getMod()->setStartingBase(
+			_game->getMod()->getDefaultStartingBaseSet());
 	}
 
 	SavedGame *save = _game->getMod()->newSave(diff);
