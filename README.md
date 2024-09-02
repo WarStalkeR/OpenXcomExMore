@@ -246,13 +246,12 @@ attention to the details and syntax of what you're writing. On the positive
 side you can even force specific longitude and latitude for a starting base.
 
 # OpenXcom Extended More Plans
-1\. Starting base preset selector with per-difficulty configurability.  
-2\. Increase craft weapons/system limit to 6 in code.  
-3\. Add motion-scanner stats, similar to medikit and script integration.  
-4\. More depth to base defense: range (in units) for defense facilities.  
-5\. Prefab kits for fast base deployment. More expensive than normal
+1\. Increase craft weapons/system limit to 6 in code.  
+2\. Add motion-scanner stats, similar to medikit and script integration.  
+3\. More depth to base defense: range (in units) for defense facilities.  
+4\. Prefab kits for fast base deployment. More expensive than normal
 facilities.  
-6\. Geoscape base engagement with targets at range (similar to dogfight)?  
+5\. Geoscape base engagement with targets at range (similar to dogfight)?  
 
 # OpenXcom Extended More Far Fetched Plans
 1\. Real-Time (with Pause) Geoscape Combat: inspired by X-COM: Apocalypse
