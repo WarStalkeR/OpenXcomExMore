@@ -26,6 +26,7 @@ Uses modified code from SDL\_gfx (LGPL) with permission from author.
 5\. Base attacks and missile strikes debug trigger.  
 6\. Option to show distance to target, when selecting crafts.  
 7\. Game Data Viewer option switch for Tech Tree Data Viewer.  
+8\. Base sets and New Game starting base selection.  
 
 # Features Migrated to the Main Branch
 1\. Configurable Ufopaedia facilities preview.  
@@ -167,31 +168,6 @@ standard and short.
 Standard version will be seen in Craft's Ufopaedia entry. Short will be seen
 in Facility's Ufopaedia entry (hangars only).  
 
-_Technical Localization Strings: (saved in **\Language\Technical** folder)_  
-`en-US:`  
-`  craftSize: "Craft size"`  
-`  craftSlotSizes: "Hangar slot sizes"`  
-
-_Standard Localization Strings: (saved in **\Language** folder)_  
-`en-US:`  
-`  STR_CRAFT_SIZE_UC: "SIZE>{ALT}{0}{ALT}"`  
-`  STR_CRAFT_CLASS_UC: "CLASS>{ALT}{0}{ALT}"`  
-`  STR_HANGAR_CRAFT_CAP: "Craft Capacity"`  
-`  STR_NO_FREE_HANGARS: "HANGAR CAPACITY EXCEEDED!{SMALLLINE}The amount of
-crafts we have in {0} exceeds hangar capacity. Transfer or sell the excess
-crafts!"`  
-`  STR_NO_FREE_HANGARS_AFTER_STRIKE: "HANGAR CAPACITY EXCEEDED!{SMALLLINE}After
-missile strike, the amount of crafts we have in {0} exceeds hangar capacity.
-Transfer or sell the excess crafts to avoid losing them!"`  
-`  STR_NO_FREE_HANGARS_FOR_REFIT: "NO SUITABLE HANGAR SLOT AFTER
-REFIT!{SMALLLINE}After refitting craft with selected weapon, system or
-utility, its size will change. However, after such refit there is no
-suitable hangar slot to house it."`  
-`  STR_NO_CRAFT_CLASS_CHANGE: "CRAFT CAN'T CHANGE CLASS!{SMALLLINE}After
-refitting craft with selected weapon, system or utility, its size will
-change beyond the limits defined by the classification."`  
-  `STR_CRAFT_CLASS: "CLASS"`  
-
 ## Bigger Craft Spites (for Base View and Refit Screen)
 **Craft values for script files (with example below):**  
 `crafts:`  
@@ -229,10 +205,6 @@ into anything you want. Default value is `1.0` (for KM).
 `  geoTargetRangeColOffset: -15` allows to adjust range column to specific
 localization via offset.  
 
-_Standard Localization Strings: (saved in **\Language** folder)_  
-`en-US:`  
-`  STR_BASE_DISTANCE:` `"HIDEOUT,{NEWLINE}DISTANCE (KM)"`  
-
 **Reminder:** Please don't forget to modify `STR_BASE_DISTANCE` localization
 string to ensure that it related to the chosen `geoTargetCourseRangeMult` for
 correct distance measurement with new units.  
@@ -249,6 +221,29 @@ game, open Tech Tree Viewer via `Q` hotkey. Typing `ASCRIPT`, `ESCRIPT` or
 Since it is quite spoiler-y, it can be completely disabled in mods via
 `fixedUserOptions` through the `oxceTechTreeDataView: false` and
 `oxceShowAdvancedDebugOptions: false` options.  
+
+## Base Sets and New Game Starting Base Selection
+**Base Set values for script files (with example below):**  
+`startingBaseSets:`  
+`  - name: STR_INIT_BASE_UFO_DEFENSE`  
+`    baseDefault: ...`  
+`    baseBeginner: ...`  
+`    baseExperienced: ...`  
+`    baseVeteran: ...`  
+`    baseGenius: ...`  
+`    baseSuperhuman: ...`  
+Allows to enable option `oxceStartingBaseSelection` that in New Game interface 
+that allows user to select custom starting base with different set of starting
+facilities (of course if there are any beside default ones). Syntax follows
+same pattern that you can observe in `startingBase`, `startingBaseGenius` and
+other global variables.
+
+Do note that game allows to modify 1st depth YAML nodes of the `baseDefault` 
+and others, just like for `startingBase` (i.e. `facilities`, `crafts`, `items` 
+& etc) as whole, but because each of them is treated as raw YAML data, it
+isn't converted to structure and isn't validated. Hence, modders, pay utmost
+attention to the details and syntax of what you're writing. On the positive
+side you can even force specific longitude and latitude for a starting base.
 
 # OpenXcom Extended More Plans
 1\. Starting base preset selector with per-difficulty configurability.  
