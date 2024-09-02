@@ -238,7 +238,7 @@ facilities (of course if there are any beside default ones). Syntax follows
 same pattern that you can observe in `startingBase`, `startingBaseGenius` and
 other global variables.
 
-Do note that game allows to modify 1st depth YAML nodes of the `baseDefault` 
+**Note**: game allows to modify 1st depth YAML nodes of the `baseDefault` 
 and others, just like for `startingBase` (i.e. `facilities`, `crafts`, `items` 
 & etc) as whole, but because each of them is treated as raw YAML data, it
 isn't converted to structure and isn't validated. Hence, modders, pay utmost
