@@ -175,7 +175,8 @@ NewGameState::NewGameState()
 		_txtBaseTitle->setText(tr("STR_STARTING_BASE_LIST"));
 
 		_txtBaseDesc->setWordWrap(true);
-		_txtBaseDesc->setText(tr("STR_INIT_BASE_DEFAULT_DESC"));
+		_txtBaseDesc->setText(tr(
+			_game->getMod()->getDefaultStartingBaseSet()->Name + "_DESC"));
 
 		_lstBaseSets->setColumns(1, 95);
 		_lstBaseSets->setMargin(5);
