@@ -248,10 +248,11 @@ side you can even force specific longitude and latitude for a starting base.
 # OpenXcom Extended More Plans
 1\. Increase craft weapons/system limit to 6 in code.  
 2\. Add motion-scanner stats, similar to medikit and script integration.  
-3\. More depth to base defense: range (in units) for defense facilities.  
+3\. Scripting links between geoscape and battlescape (i.e. fetching craft data).  
 4\. Prefab kits for fast base deployment. More expensive than normal
-facilities.  
-5\. Geoscape base engagement with targets at range (similar to dogfight)?  
+facilities.
+5\. Crafts, UFOs and weapons altitude/depth separation and rework.  
+6\. Geoscape base engagement with targets at range (similar to dogfight).  
 
 # OpenXcom Extended More Far Fetched Plans
 1\. Real-Time (with Pause) Geoscape Combat: inspired by X-COM: Apocalypse
@@ -284,30 +285,55 @@ output (what you see and what you don't). Will be stored as
 addition to custom modes. Irrelevant, if `scannerModes` has no entries,
 because it will be working in default mode anyway.  
 
-## Improved Base Defense
-New `hitRange` parameter. For example, if missile silo has `hitRange: 6` it
-means it will fire 6 times, till UFO will come to base and attack it.  
-If base has Grav Shield facility, it means defense facility with `hitRange: 6`
-will get another chance for fire 6 salvos.  
-If base has different defense facilities, for example, one with `hitRange: 2`
-and one with `hitRange: 11`, first 9 times only long range facility will fire,
-and last 2 times, both will fire.  
-Engagement range of base facilities against UFO begins at range of facility
-with highest `hitRange` parameter.  
-Formatting: by default single `hitRange` unit equals to 10 km and will be shown
-as such in Ufopaedia and Base Defense. Configured via options.  
-The `hitTotal: true/false` parameter will define damage calculation
-(for backwards compatibility).  
-Default `hitTotal` is `true`, when it is set damage per salvo will be calculated
-as `defense/hitRange`.  
-If `hitTotal` is set to `false`, damage of each salvo will be equal to `defense`
-rating.  
-The `ammoPerSalvo: true/false` will define if `ammoItem` is consumed with each
-salvo, or with each volley. Default is `false`.  
-For example, `ammoPerSalvo: true` is valid for single missile, that should be
-consumed with each salvo.  
-While `ammoPerSalvo: false` is valid for flak cannon that uses box of ammo that
-consumed each volley.  
+## Altitude/Depth Rework
+Separate altitude from depth. Allow crafts to have both, allow craft weapons
+to have max altitude and max depth parameters. Implement different speeds for
+depth and altitude (difference between underwater and aerial). Also implement
+similar parameter for UFOs (especially Hunter Killers). In short, proper
+implementation of a framework for different behavior in air and sea.
+
+Maybe add proper pathfinding for the ground-only and submarine-only units (UFOs
+and Crafts alike)? Implementation can be very tricky and will require flag that
+Craft/UFO can't move on the ground or sea level.
+
+## Improved Base Warfare
+Base warfare will be divided into two stages: close-in base warfare (i.e. good
+old base defense), when UFO is directly above the base and long-range base
+warfare, when base can take down UFOs from afar. In case of the close-in mode
+all encounter behavior will stay the same, but weapon handling (including ammo
+consumption, damage and accuracy) will be fetched from referenced base weapon
+rule used by long-range mode. Just like crafts, base defenses will require
+time to reload and rearm after usage.
+
+Long-range base warfare will be performed separately from dogfights and can't
+be mixed with them. Depending on UFO mission, its behavior will change upon
+being fired from base: run away (if weak or scout), proceed/ignore (when the
+mission is priority) and retaliation (moving to base invasion). Any use of the
+base for warfare will make it visible for the UFO that base attacks. Cloaking
+device will reduce risk of exposure based on % (custom parameter). Repulsor
+can be used to slow/ground the UFO based on % (custom parameter).
+
+Base defenses still will allow default parameters for close-in, but if base
+weapon rule is linked, it will fetch all behavior from it and will ignore
+standard parameters. Base weapon rule will include these parameters: optimal
+range, falloff range, accuracy, ammo rack size, rate of fire, salvo size,
+salvo rate, countermeasure (true/false to intercept incoming projectiles),
+ammo per salvo (i.e. for flak), damage (per hit), max altitude, max depth.
+
+UFO will have new optional parameters that will allow them to retaliate for
+long-range base attacks: range, rate of fire, damage (different for base
+weapon damage numbers, since facilities has no health as is). Facilities
+will get new parameter resistance (damage accumulates into build time and
+if goes above, it will downgrade/demolish facility). Since base weapon range
+is different, even if player can start battle, not all weapon will be able to
+fire at UFO, just like UFO won't be able to return fire from far away.
+
+On geoscape, once UFO within range of any weapon, player will be notified 1st
+time and all weapons - 2nd time. It will be possible to enable notification,
+when UFO comes within range of one more weapon. Notifications will also appear,
+when UFO is about to leave range of the weapons (configurable). It will be
+possible to give command to ignore this UFO completely by this base or all
+bases (and let it move as it wants).
 
 # Installation
 
