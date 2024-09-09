@@ -250,7 +250,7 @@ side you can even force specific longitude and latitude for a starting base.
 2\. Add motion-scanner stats, similar to medikit and script integration.  
 3\. Scripting links between geoscape and battlescape (i.e. fetching craft data).  
 4\. Prefab kits for fast base deployment. More expensive than normal
-facilities.
+facilities.  
 5\. Crafts, UFOs and weapons altitude/depth separation and rework.  
 6\. Geoscape base engagement with targets at range (similar to dogfight).  
 
