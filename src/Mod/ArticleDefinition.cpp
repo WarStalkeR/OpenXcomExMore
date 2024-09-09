@@ -28,7 +28,7 @@ namespace OpenXcom
 	 * Constructor.
 	 * @param type_id Article type of this instance.
 	 */
-	ArticleDefinition::ArticleDefinition(UfopaediaTypeId type_id) : customPalette(false), hiddenCommendation(false), _type_id(type_id), _listOrder(0)
+	ArticleDefinition::ArticleDefinition(UfopaediaTypeId type_id) : customPalette(false), hiddenCommendation(false), hiddenByDefault(false), _type_id(type_id), _listOrder(0)
 	{
 		_pages.resize(1);
 	}
@@ -61,6 +61,7 @@ namespace OpenXcom
 		reader.tryRead("requires", _requires);
 		reader.tryRead("disabledBy", disabledBy);
 		reader.tryRead("hiddenCommendation", hiddenCommendation);
+		reader.tryRead("hiddenByDefault", hiddenByDefault);
 		//_type_id = (UfopaediaTypeId)node["type_id"].as<int>(_type_id);
 		reader.tryRead("listOrder", _listOrder);
 		if (!_listOrder)
