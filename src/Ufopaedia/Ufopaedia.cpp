@@ -365,6 +365,8 @@ namespace OpenXcom
 			if (isArticleAvailable(save, article) && article->section != UFOPAEDIA_NOT_AVAILABLE && !isCommendationArticleInvisible(save, article))
 			{
 				shared->articleList.push_back(article);
+				if (article->hiddenByDefault && save->getUfopediaRuleStatus(articleName) == ArticleDefinition::PEDIA_STATUS_NEW)
+					save->setUfopediaRuleStatus(articleName, ArticleDefinition::PEDIA_STATUS_HIDDEN);
 				shared->articleStatusList.push_back(save->getUfopediaRuleStatus(articleName) == ArticleDefinition::PEDIA_STATUS_HIDDEN);
 			}
 		}

@@ -87,6 +87,7 @@ namespace OpenXcom
 		std::vector<std::string> disabledBy;
 		bool customPalette;
 		bool hiddenCommendation;
+		bool hiddenByDefault;
 
 		/// Get main title of page in ufopedia.
 		const std::string& getMainTitle()
