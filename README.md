@@ -260,7 +260,7 @@ moved into the 'hidden' category (which player can manage manually). This is
 especially suitable to allow damaged/ruined variants of facilities to open
 relevant ufopaedia article on middle mouse button click on them in the
 basescape, but at the same time to prevent clutter in the ufopaedia list and
-avoid of annoyance of seeing damage/ruins while browsing normally.
+avoid annoyance of seeing damaged/ruined variants, while browsing normally.
 
 # OpenXcom Extended More Plans
 1\. Increase craft weapons/system limit to 6 in code.  
