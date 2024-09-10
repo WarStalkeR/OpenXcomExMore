@@ -27,6 +27,7 @@ Uses modified code from SDL\_gfx (LGPL) with permission from author.
 6\. Option to show distance to target, when selecting crafts.  
 7\. Game Data Viewer option switch for Tech Tree Data Viewer.  
 8\. Base sets and New Game starting base selection.  
+9\. Rule flag to hide ufopaedia articles by default.  
 
 # Features Migrated to the Main Branch
 1\. Configurable Ufopaedia facilities preview.  
@@ -244,6 +245,22 @@ and others, just like for `startingBase` (i.e. `facilities`, `crafts`, `items`
 isn't converted to structure and isn't validated. Hence, modders, pay utmost
 attention to the details and syntax of what you're writing. On the positive
 side you can even force specific longitude and latitude for a starting base.
+
+## Rule Flag to Hide Ufopaedia Articles by Default
+**Ufopaedia article values for script files (with example below):**  
+`ufopaedia:`  
+`  - id: STR_HANGAR_DAMAGED`  
+`    requires:`  
+`      - STR_INSPECT_MACHINERY`  
+`    text: STR_HANGAR_DAMAGED_UFOPEDIA`  
+`    hiddenByDefault: true`  
+If `hiddenByDefault` flag is enabled for the ufopaedia article, once relevant
+technology (that is required by the article) is unlocked, it is automatically
+moved into the 'hidden' category (which player can manage manually). This is
+especially suitable to allow damaged/ruined variants of facilities to open
+relevant ufopaedia article on middle mouse button click on them in the
+basescape, but at the same time to prevent clutter in the ufopaedia list and
+avoid of annoyance of seeing damage/ruins while browsing normally.
 
 # OpenXcom Extended More Plans
 1\. Increase craft weapons/system limit to 6 in code.  
