@@ -90,7 +90,7 @@ private:
 	int _buildCost, _refundValue, _buildTime, _monthlyCost;
 	std::map<std::string, std::pair<int, int> > _buildCostItems;
 	int _storage, _personnel, _aliens, _crafts, _labs, _workshops, _psiLabs;
-	bool _spriteEnabled, _craftsHidden;
+	bool _spriteEnabled, _altBuildSprite, _craftsHidden;
 	std::vector<CraftOption> _craftOptions;
 	std::vector<int> _optionGroups;
 	int _sightRange, _sightChance;
@@ -146,6 +146,8 @@ public:
 	/// Retain sprite over shape behavior for bigger facility?
 	bool getSpriteEnabled() const;
 	bool getSpriteEnabledRaw() const { return _spriteEnabled; }
+	/// Use alternative sprite during construction (like shapes do)?
+	bool useAltBuildSprite() const { return _altBuildSprite; }
 	/// Should there be connectors leading to this facility?
 	bool connectorsDisabled() const { return _connectorsDisabled; }
 	/// Gets if the facility's size is 1x1.
