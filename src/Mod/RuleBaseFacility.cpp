@@ -42,7 +42,7 @@ RuleBaseFacility::RuleBaseFacility(const std::string &type, int listOrder) :
 	_lift(false), _hyper(false), _mind(false), _grav(false), _mindPower(1),
 	_sizeX(1), _sizeY(1), _buildCost(0), _refundValue(0), _buildTime(0), _monthlyCost(0),
 	_storage(0), _personnel(0), _aliens(0), _crafts(0), _labs(0), _workshops(0), _psiLabs(0),
-	_spriteEnabled(false), _craftsHidden(false), _craftOptions(), _optionGroups(),
+	_spriteEnabled(false), _altBuildSprite(false), _craftsHidden(false), _craftOptions(), _optionGroups(),
 	_sightRange(0), _sightChance(0), _radarRange(0), _radarChance(0),
 	_defense(0), _hitRatio(0), _fireSound(0), _hitSound(0), _placeSound(-1), _ammoMax(0), _rearmRate(1), _ammoNeeded(1), _listOrder(listOrder),
 	_trainingRooms(0), _maxAllowedPerBase(0), _sickBayAbsoluteBonus(0.0f), _sickBayRelativeBonus(0.0f),
@@ -109,6 +109,7 @@ void RuleBaseFacility::load(const YAML::YamlNodeReader& node, Mod *mod)
 	reader.tryRead("psiLabs", _psiLabs);
 
 	reader.tryRead("spriteEnabled", _spriteEnabled);
+	reader.tryRead("altBuildSprite", _altBuildSprite);
 	reader.tryRead("craftsHidden", _craftsHidden);
 	reader.tryRead("craftOptions", _craftOptions);
 	reader.tryRead("optionGroups", _optionGroups);
