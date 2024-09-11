@@ -560,7 +560,14 @@ void BaseView::draw()
 			{
 				if (fac->getRules()->getSpriteEnabled())
 				{
-					Surface *frame = _texture->getFrame(fac->getRules()->getSpriteFacility() + num);
+					Surface *frame;
+
+					int outline = fac->getRules()->getSizeX() * fac->getRules()->getSizeY();
+					if (fac->getRules()->useAltBuildSprite() && fac->getBuildTime() > 0)
+						frame = _texture->getFrame(fac->getRules()->getSpriteFacility() + num + outline);
+					else
+						frame = _texture->getFrame(fac->getRules()->getSpriteFacility() + num);
+
 					int fx = (x * GRID_SIZE);
 					int fy = (y * GRID_SIZE);
 					frame->blitNShade(this, fx, fy);
