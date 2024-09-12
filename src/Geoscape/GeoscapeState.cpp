@@ -3851,6 +3851,17 @@ void GeoscapeState::determineAlienMissions(bool isNewMonth, const RuleEvent* eve
 				}
 				if (triggerHappy)
 				{
+					// base functions requirements
+					for (auto& triggerBaseFunc : arcScript->getBaseFunctionTriggers())
+					{
+						triggerHappy = (save->isBaseFunctionEnabled(triggerBaseFunc.first,
+							_game->getMod()) == triggerBaseFunc.second);
+						if (!triggerHappy)
+							break;
+					}
+				}
+				if (triggerHappy)
+				{
 					// soldier type requirements
 					for (auto& triggerSoldierType : arcScript->getSoldierTypeTriggers())
 					{
@@ -4063,6 +4074,17 @@ void GeoscapeState::determineAlienMissions(bool isNewMonth, const RuleEvent* eve
 			}
 			if (triggerHappy)
 			{
+				// base functions requirements
+				for (auto& triggerBaseFunc : command->getBaseFunctionTriggers())
+				{
+					triggerHappy = (save->isBaseFunctionEnabled(triggerBaseFunc.first,
+						_game->getMod()) == triggerBaseFunc.second);
+					if (!triggerHappy)
+						break;
+				}
+			}
+			if (triggerHappy)
+			{
 				// soldier type requirements
 				for (auto& triggerSoldierType : command->getSoldierTypeTriggers())
 				{
@@ -4245,6 +4267,17 @@ void GeoscapeState::determineAlienMissions(bool isNewMonth, const RuleEvent* eve
 					for (auto& triggerFacility : eventScript->getFacilityTriggers())
 					{
 						triggerHappy = (save->isFacilityBuilt(triggerFacility.first) == triggerFacility.second);
+						if (!triggerHappy)
+							break;
+					}
+				}
+				if (triggerHappy)
+				{
+					// base functions requirements
+					for (auto& triggerBaseFunc : eventScript->getBaseFunctionTriggers())
+					{
+						triggerHappy = (save->isBaseFunctionEnabled(triggerBaseFunc.first,
+							_game->getMod()) == triggerBaseFunc.second);
 						if (!triggerHappy)
 							break;
 					}
