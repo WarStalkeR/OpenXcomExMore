@@ -110,6 +110,7 @@ void RuleMissionScript::load(const YAML::YamlNodeReader& node)
 	reader.tryRead("researchTriggers", _researchTriggers);
 	reader.tryRead("itemTriggers", _itemTriggers);
 	reader.tryRead("facilityTriggers", _facilityTriggers);
+	reader.tryRead("baseFunctionTriggers", _baseFunctionTriggers);
 	reader.tryRead("xcomBaseInRegionTriggers", _xcomBaseInRegionTriggers);
 	reader.tryRead("xcomBaseInCountryTriggers", _xcomBaseInCountryTriggers);
 	reader.tryRead("useTable", _useTable);
@@ -258,6 +259,14 @@ const std::map<std::string, bool> &RuleMissionScript::getItemTriggers() const
 const std::map<std::string, bool> &RuleMissionScript::getFacilityTriggers() const
 {
 	return _facilityTriggers;
+}
+
+/**
+ * @return a list of base function triggers that govern execution of this script.
+ */
+const std::map<std::string, bool> &RuleMissionScript::getBaseFunctionTriggers() const
+{
+	return _baseFunctionTriggers;
 }
 
 /**

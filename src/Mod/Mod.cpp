@@ -1922,6 +1922,24 @@ std::vector<std::string> Mod::getBaseFunctionNames(RuleBaseFacilityFunctions f) 
 }
 
 /**
+ * Get base functions rule based on function name.
+ */
+RuleBaseFacilityFunctions Mod::getBaseFunctionsRule(const std::string &name) const
+{
+	RuleBaseFacilityFunctions functions;
+	size_t index = _baseFunctionNames.getIndex(name);
+	if (index > 0)
+	{
+		functions.set(index);
+	}
+	else
+	{
+		Log(LOG_WARNING) << "Base function '" << name << "' doesn't exist! Returning empty rule.";
+	}
+	return functions;
+}
+
+/**
  * Loads a list of ints.
  * Another mod can only override the whole list, no partial edits allowed.
  */

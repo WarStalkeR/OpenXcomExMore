@@ -574,6 +574,8 @@ public:
 	void loadBaseFunction(const std::string& parent, RuleBaseFacilityFunctions& f, const YAML::YamlNodeReader& reader);
 	/// Get names of function names in given bitset.
 	std::vector<std::string> getBaseFunctionNames(RuleBaseFacilityFunctions f) const;
+	/// Get base functions rule based on function name.
+	RuleBaseFacilityFunctions getBaseFunctionsRule(const std::string &name) const;
 
 	/// Loads a list of ints.
 	void loadInts(const std::string& parent, std::vector<int>& ints, const YAML::YamlNodeReader& reader) const;
