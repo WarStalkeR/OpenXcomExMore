@@ -344,6 +344,8 @@ public:
 	bool isItemObtained(const std::string &itemType, const Mod* mod) const;
 	/// Gets if a certain facility has been built.
 	bool isFacilityBuilt(const std::string &facilityType) const;
+	/// Gets if a certain base function has been enabled.
+	bool isBaseFunctionEnabled(const std::string &baseFunctionType, const Mod *mod) const;
 	/// Gets if a certain soldier type has been hired.
 	bool isSoldierTypeHired(const std::string& soldierType) const;
 	/// Gets the soldier matching this ID.
