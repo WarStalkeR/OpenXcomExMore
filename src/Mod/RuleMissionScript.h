@@ -45,6 +45,7 @@ private:
 	std::map<std::string, bool> _researchTriggers;
 	std::map<std::string, bool> _itemTriggers;
 	std::map<std::string, bool> _facilityTriggers;
+	std::map<std::string, bool> _baseFunctionTriggers;
 	std::map<std::string, bool> _soldierTypeTriggers;
 	std::map<std::string, bool> _xcomBaseInRegionTriggers;
 	std::map<std::string, bool> _xcomBaseInCountryTriggers;
@@ -122,6 +123,8 @@ public:
 	const std::map<std::string, bool> &getItemTriggers() const;
 	/// Gets the facility triggers that may apply to this command.
 	const std::map<std::string, bool> &getFacilityTriggers() const;
+	/// Gets the base function that may apply to this command.
+	const std::map<std::string, bool> &getBaseFunctionTriggers() const;
 	/// Gets the soldier type triggers that may apply to this command.
 	const std::map<std::string, bool> &getSoldierTypeTriggers() const { return _soldierTypeTriggers; }
 	/// Gets the xcom base triggers that may apply to this command.

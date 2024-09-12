@@ -1982,6 +1982,24 @@ std::vector<std::string> Mod::getBaseFunctionNames(RuleBaseFacilityFunctions f) 
 }
 
 /**
+ * Get base functions rule based on function name.
+ */
+RuleBaseFacilityFunctions Mod::getBaseFunctionsRule(const std::string &name) const
+{
+	RuleBaseFacilityFunctions functions;
+	size_t index = _baseFunctionNames.getIndex(name);
+	if (index > 0)
+	{
+		functions.set(index);
+	}
+	else
+	{
+		Log(LOG_WARNING) << "Base function '" << name << "' doesn't exist! Returning empty rule.";
+	}
+	return functions;
+}
+
+/**
  * Load craft functions to bit set.
  */
 void Mod::loadCraftFunction(const std::string& parent, RuleCraftFunctions& f, const YAML::YamlNodeReader& reader)
