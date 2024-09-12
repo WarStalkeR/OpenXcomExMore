@@ -117,6 +117,7 @@ void RuleMissionScript::load(const YAML::Node& node)
 	_researchTriggers = node["researchTriggers"].as<std::map<std::string, bool> >(_researchTriggers);
 	_itemTriggers = node["itemTriggers"].as<std::map<std::string, bool> >(_itemTriggers);
 	_facilityTriggers = node["facilityTriggers"].as<std::map<std::string, bool> >(_facilityTriggers);
+	_baseFunctionTriggers = node["baseFunctionTriggers"].as<std::map<std::string, bool> >(_baseFunctionTriggers);
 	_xcomBaseInRegionTriggers = node["xcomBaseInRegionTriggers"].as<std::map<std::string, bool> >(_xcomBaseInRegionTriggers);
 	_xcomBaseInCountryTriggers = node["xcomBaseInCountryTriggers"].as<std::map<std::string, bool> >(_xcomBaseInCountryTriggers);
 	_useTable = node["useTable"].as<bool>(_useTable);
@@ -265,6 +266,14 @@ const std::map<std::string, bool> &RuleMissionScript::getItemTriggers() const
 const std::map<std::string, bool> &RuleMissionScript::getFacilityTriggers() const
 {
 	return _facilityTriggers;
+}
+
+/**
+ * @return a list of base function triggers that govern execution of this script.
+ */
+const std::map<std::string, bool> &RuleMissionScript::getBaseFunctionTriggers() const
+{
+	return _baseFunctionTriggers;
 }
 
 /**
