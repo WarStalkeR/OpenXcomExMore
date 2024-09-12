@@ -597,6 +597,21 @@ public:
 			}
 			return _usedNames.find(0)->second;
 		}
+
+		/**
+		 * Get index based on the name
+		 * @param name Name whose index is needed
+		 * @return Index if the name exists, or zero if it doesn't exist
+		 */
+		size_t getIndex(const std::string& name) const
+		{
+			auto it = _usedValues.find(name);
+			if (it != _usedValues.end())
+			{
+				return it->second;
+			}
+			return 0;
+		}
 	};
 };
 

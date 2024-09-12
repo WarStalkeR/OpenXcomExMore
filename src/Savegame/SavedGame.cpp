@@ -2268,6 +2268,7 @@ bool SavedGame::isItemObtained(const std::string &itemType) const
 	}
 	return false;
 }
+
 /**
  * Returns if a certain facility has been built in any base.
  * @param facilityType facility ID.
@@ -2283,6 +2284,24 @@ bool SavedGame::isFacilityBuilt(const std::string &facilityType) const
 			{
 				return true;
 			}
+		}
+	}
+	return false;
+}
+
+/**
+ * Returns if a certain base function has been enabled in any base.
+ * @param facilityType facility ID.
+ * @return Whether it's been built or not. If false, the facility has not been built in any base.
+ */
+bool SavedGame::isBaseFunctionEnabled(const std::string &baseFunctionType, const Mod *mod) const
+{
+	for (auto* xbase : _bases)
+	{
+		if ((~xbase->getProvidedBaseFunc({}) &
+			mod->getBaseFunctionsRule(baseFunctionType)).any())
+		{
+			return true;
 		}
 	}
 	return false;
