@@ -25,9 +25,11 @@ Uses modified code from SDL\_gfx (LGPL) with permission from author.
 4\. Bigger craft sprites support for basescape/hangar.  
 5\. Base attacks and missile strikes debug trigger.  
 6\. Option to show distance to target, when selecting crafts.  
-7\. Game Data Viewer option switch for Tech Tree Data Viewer.  
-8\. Base sets and New Game starting base selection.  
-9\. Rule flag to hide ufopaedia articles by default.  
+7\. Base sets and New Game starting base selection.  
+8\. Rule flag to hide ufopaedia articles by default.  
+9\. Facility rule flag to use alternative sprite for construction.  
+10\. Base function triggers for arc/event/mission scripts.  
+11\. Game Data Viewer option switch for Tech Tree Data Viewer.  
 
 # Features Migrated to the Main Branch
 1\. Configurable Ufopaedia facilities preview.  
@@ -210,19 +212,6 @@ localization via offset.
 string to ensure that it related to the chosen `geoTargetCourseRangeMult` for
 correct distance measurement with new units.  
 
-## Game Data Viewer Mode for Tech Tree Viewer
-Helps to debug and analyze **Arc Scripts**, **Event Scripts** and **Mission
-Scripts**. Mostly works when in `options.cfg` the option `debug: true` is set.
-Once debug mode is enabled, go to Options -> Advanced -> Extended, find option
-**Advanced Debugging Options**, enable it. Additional sub-section **Advanced
-Debugging** will show. In it enable **Tech Tree Viewer - Data Mode**. Load
-game, open Tech Tree Viewer via `Q` hotkey. Typing `ASCRIPT`, `ESCRIPT` or
-`MSCRIPT` in search will list all Arc/Event/Mission scripts.  
-
-Since it is quite spoiler-y, it can be completely disabled in mods via
-`fixedUserOptions` through the `oxceTechTreeDataView: false` and
-`oxceShowAdvancedDebugOptions: false` options.  
-
 ## Base Sets and New Game Starting Base Selection
 **Base Set values for script files (with example below):**  
 `startingBaseSets:`  
@@ -234,7 +223,7 @@ Since it is quite spoiler-y, it can be completely disabled in mods via
 `    baseGenius: ...`  
 `    baseSuperhuman: ...`  
 Allows to enable option `oxceStartingBaseSelection` that in New Game interface 
-that allows user to select custom starting base with different set of starting
+allows user to select custom starting base with different set of starting
 facilities (of course if there are any beside default ones). Syntax follows
 same pattern that you can observe in `startingBase`, `startingBaseGenius` and
 other global variables.
@@ -261,6 +250,57 @@ especially suitable to allow damaged/ruined variants of facilities to open
 relevant ufopaedia article on middle mouse button click on them in the
 basescape, but at the same time to prevent clutter in the ufopaedia list and
 avoid annoyance of seeing damaged/ruined variants, while browsing normally.
+
+## Facility Rule Flag to Use Alternative Sprite for Construction
+**Facility rule values for script files (with example below):**  
+`facilities:`  
+`  - type: STR_SOME_FACILITY`  
+`    altBuildSprite: true`  
+If `altBuildSprite` flag is enabled for the facility rule, during construction
+the facility will be using different sprite, if it has 1x1 size or has the flag
+`spriteEnabled` set to `true`. In terms of definitions, alternative sprite
+should be declared in `BASEBITS.PCK` via `extraSprites` next after the the
+id/number of sprite in `spriteFacility` parameter. E.g. if facility has 2x3 size
+and its `spriteFacility` id is `1120`, alternative sprite for this facility
+should be declared from `1126` (total of 6 sprite tiles of the facility).
+
+## Base function triggers for arc/event/mission scripts
+**Arc/Event/MissionScript rule values for script files (with example below):**
+`eventScripts:`  
+`  - type: STR_UNNECESSARY_EVENT_SCRIPT`  
+`    eventWeights:`  
+`      0:`  
+`        STR_SOME_UNNECESSARY_EVENT: 100`  
+`    firstMonth: 0`  
+`    lastMonth: 0`  
+`    baseFunctionTriggers:`  
+`       OH_NO_ANYWAY: true`  
+`       CPU: true`  
+`       WELL: true`  
+`       WAVE: false`  
+`       WAVE2: false`  
+`    executionOdds: 100`
+The `baseFunctionTriggers` work in exactly same manner, as `facilityTriggers`
+and should be declared as such, `FUNC_NAME: true/false`. Do note that if the
+base function was never declared in any facility, game will log a warning
+message. Unlike other parameters, base functions are self-initializing as long
+as they are declared in any facility (this is how code handles them). At the
+same time, avoid using them purely for the sake of event/arc/mission triggers.
+They are intended to unify facilities into 'service' groups and it is possible
+to declare only **126** base functions in total across all loaded mods.
+
+## Game Data Viewer Mode for Tech Tree Viewer
+Helps to debug and analyze **Arc Scripts**, **Event Scripts** and **Mission
+Scripts**. Mostly works when in `options.cfg` the option `debug: true` is set.
+Once debug mode is enabled, go to Options -> Advanced -> Extended, find option
+**Advanced Debugging Options**, enable it. Additional sub-section **Advanced
+Debugging** will show. In it enable **Tech Tree Viewer - Data Mode**. Load
+game, open Tech Tree Viewer via `Q` hotkey. Typing `ASCRIPT`, `ESCRIPT` or
+`MSCRIPT` in search will list all Arc/Event/Mission scripts.  
+
+Since it is quite spoiler-y, it can be completely disabled in mods via
+`fixedUserOptions` through the `oxceTechTreeDataView: false` and
+`oxceShowAdvancedDebugOptions: false` options.  
 
 # OpenXcom Extended More Plans
 1\. Increase craft weapons/system limit to 6 in code.  
