@@ -2298,7 +2298,7 @@ bool SavedGame::isBaseFunctionEnabled(const std::string &baseFunctionType, const
 {
 	for (auto* xbase : _bases)
 	{
-		if ((~xbase->getProvidedBaseFunc({}) &
+		if (!(~xbase->getProvidedBaseFunc({}) &
 			mod->getBaseFunctionsRule(baseFunctionType)).any())
 		{
 			return true;
