@@ -2296,10 +2296,14 @@ bool SavedGame::isFacilityBuilt(const std::string &facilityType) const
  */
 bool SavedGame::isBaseFunctionEnabled(const std::string &baseFunctionType, const Mod *mod) const
 {
+	// Always return false, if such base function was never created.
+	RuleBaseFacilityFunctions requiredFunc = mod->getBaseFunctionsRule(baseFunctionType);
+	if (requiredFunc.none()) return false;
+
+	// Proceed with proper checks, if base function is valid.
 	for (auto* xbase : _bases)
 	{
-		if (!(~xbase->getProvidedBaseFunc({}) &
-			mod->getBaseFunctionsRule(baseFunctionType)).any())
+		if (!(~xbase->getProvidedBaseFunc({}) & requiredFunc).any())
 		{
 			return true;
 		}
