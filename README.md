@@ -265,7 +265,7 @@ and its `spriteFacility` id is `1120`, alternative sprite for this facility
 should be declared from `1126` (total of 6 sprite tiles of the facility).
 
 ## Base function triggers for arc/event/mission scripts
-**Arc/Event/MissionScript rule values for script files (with example below):**
+**Arc/Event/MissionScript rule values for script files (with example below):**  
 `eventScripts:`  
 `  - type: STR_UNNECESSARY_EVENT_SCRIPT`  
 `    eventWeights:`  
@@ -279,7 +279,7 @@ should be declared from `1126` (total of 6 sprite tiles of the facility).
 `       WELL: true`  
 `       WAVE: false`  
 `       WAVE2: false`  
-`    executionOdds: 100`
+`    executionOdds: 100`  
 The `baseFunctionTriggers` work in exactly same manner, as `facilityTriggers`
 and should be declared as such, `FUNC_NAME: true/false`. Do note that if the
 base function was never declared in any facility, game will log a warning
