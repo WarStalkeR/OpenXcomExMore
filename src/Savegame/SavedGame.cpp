@@ -2291,8 +2291,8 @@ bool SavedGame::isFacilityBuilt(const std::string &facilityType) const
 
 /**
  * Returns if a certain base function has been enabled in any base.
- * @param facilityType facility ID.
- * @return Whether it's been built or not. If false, the facility has not been built in any base.
+ * @param base function ID (as it was initialized in facilities).
+ * @return Whether it's been enabled or not. If false, the function wasn't enabled in any base.
  */
 bool SavedGame::isBaseFunctionEnabled(const std::string &baseFunctionType, const Mod *mod) const
 {
