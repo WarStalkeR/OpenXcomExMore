@@ -2207,7 +2207,32 @@ void TechTreeViewerState::handleArcScript()
 		}
 	}
 
-	// 5. Regional Triggers
+	// 5. Base Function Triggers
+	const auto& baseFuncTriggers = rule->getBaseFunctionTriggers();
+	if (baseFuncTriggers.size() > 0)
+	{
+		_lstLeft->addRow(1, ""); _leftTopics.push_back("-"); _leftFlags.push_back(TTV_NONE); row++;
+		_lstLeft->addRow(1, tr("STR_TRIGGERS_BASEFUNCS").c_str());
+		_lstLeft->setRowColor(row, _white);
+		_leftTopics.push_back("-");
+		_leftFlags.push_back(TTV_NONE);
+		row++;
+		for (auto& baseFuncTrigger : baseFuncTriggers)
+		{
+			std::ostringstream rowFac;
+			rowFac << "  " << tr(baseFuncTrigger.first);
+			rowFac << ": " << std::boolalpha << baseFuncTrigger.second;
+			bool isEnabled = (_save->isBaseFunctionEnabled(baseFuncTrigger.first,
+				_game->getMod()) == baseFuncTrigger.second);
+			_lstLeft->addRow(1, rowFac.str().c_str());
+			_lstLeft->setRowColor(row, isEnabled ? _purple : _pink);
+			_leftTopics.push_back("-");
+			_leftFlags.push_back(TTV_NONE);
+			row++;
+		}
+	}
+
+	// 6. Regional Triggers
 	const auto& regTriggers = rule->getXcomBaseInRegionTriggers();
 	const auto& terTriggers = rule->getXcomBaseInCountryTriggers();
 	if (regTriggers.size() > 0 || terTriggers.size() > 0)
@@ -2505,7 +2530,32 @@ void TechTreeViewerState::handleEventScript()
 		}
 	}
 
-	// 5. Soldier Triggers
+	// 5. Base Function Triggers
+	const auto& baseFuncTriggers = rule->getBaseFunctionTriggers();
+	if (baseFuncTriggers.size() > 0)
+	{
+		_lstLeft->addRow(1, ""); _leftTopics.push_back("-"); _leftFlags.push_back(TTV_NONE); row++;
+		_lstLeft->addRow(1, tr("STR_TRIGGERS_BASEFUNCS").c_str());
+		_lstLeft->setRowColor(row, _white);
+		_leftTopics.push_back("-");
+		_leftFlags.push_back(TTV_NONE);
+		row++;
+		for (auto& baseFuncTrigger : baseFuncTriggers)
+		{
+			std::ostringstream rowFac;
+			rowFac << "  " << tr(baseFuncTrigger.first);
+			rowFac << ": " << std::boolalpha << baseFuncTrigger.second;
+			bool isEnabled = (_save->isBaseFunctionEnabled(baseFuncTrigger.first,
+				_game->getMod()) == baseFuncTrigger.second);
+			_lstLeft->addRow(1, rowFac.str().c_str());
+			_lstLeft->setRowColor(row, isEnabled ? _purple : _pink);
+			_leftTopics.push_back("-");
+			_leftFlags.push_back(TTV_NONE);
+			row++;
+		}
+	}
+
+	// 6. Soldier Triggers
 	const auto& crewTriggers = rule->getSoldierTypeTriggers();
 	if (crewTriggers.size() > 0)
 	{
@@ -2529,7 +2579,7 @@ void TechTreeViewerState::handleEventScript()
 		}
 	}
 
-	// 6. Regional Triggers
+	// 7. Regional Triggers
 	const auto& regTriggers = rule->getXcomBaseInRegionTriggers();
 	const auto& terTriggers = rule->getXcomBaseInCountryTriggers();
 	if (regTriggers.size() > 0 || terTriggers.size() > 0)
@@ -2579,7 +2629,7 @@ void TechTreeViewerState::handleEventScript()
 
 	row = 0; // Right UI Panel Switch
 
-	// 7. One Time Sequential Events
+	// 8. One Time Sequential Events
 	const auto& oneTimeSeqEvents = rule->getOneTimeSequentialEvents();
 	if (oneTimeSeqEvents.size() > 0)
 	{
@@ -2603,7 +2653,7 @@ void TechTreeViewerState::handleEventScript()
 		}
 	}
 
-	// 8. One Time Random Events
+	// 9. One Time Random Events
 	const auto& oneTimeRandEvents = rule->getOneTimeRandomEvents().getChoices();
 	if (oneTimeRandEvents.size() > 0)
 	{
@@ -2634,7 +2684,7 @@ void TechTreeViewerState::handleEventScript()
 		}
 	}
 
-	// 9. Event Weights
+	// 10. Event Weights
 	const auto& eventWeights = rule->getEventWeights();
 	if (eventWeights.size() > 0)
 	{
@@ -2964,7 +3014,32 @@ void TechTreeViewerState::handleMissionScript()
 		}
 	}
 
-	// 6. Regional Triggers
+	// 6. Base Function Triggers
+	const auto& baseFuncTriggers = rule->getBaseFunctionTriggers();
+	if (baseFuncTriggers.size() > 0)
+	{
+		_lstLeft->addRow(1, ""); _leftTopics.push_back("-"); _leftFlags.push_back(TTV_NONE); row++;
+		_lstLeft->addRow(1, tr("STR_TRIGGERS_BASEFUNCS").c_str());
+		_lstLeft->setRowColor(row, _white);
+		_leftTopics.push_back("-");
+		_leftFlags.push_back(TTV_NONE);
+		row++;
+		for (auto& baseFuncTrigger : baseFuncTriggers)
+		{
+			std::ostringstream rowFac;
+			rowFac << "  " << tr(baseFuncTrigger.first);
+			rowFac << ": " << std::boolalpha << baseFuncTrigger.second;
+			bool isEnabled = (_save->isBaseFunctionEnabled(baseFuncTrigger.first,
+				_game->getMod()) == baseFuncTrigger.second);
+			_lstLeft->addRow(1, rowFac.str().c_str());
+			_lstLeft->setRowColor(row, isEnabled ? _purple : _pink);
+			_leftTopics.push_back("-");
+			_leftFlags.push_back(TTV_NONE);
+			row++;
+		}
+	}
+
+	// 7. Regional Triggers
 	const auto& regTriggers = rule->getXcomBaseInRegionTriggers();
 	const auto& terTriggers = rule->getXcomBaseInCountryTriggers();
 	if (regTriggers.size() > 0 || terTriggers.size() > 0)
@@ -3014,7 +3089,7 @@ void TechTreeViewerState::handleMissionScript()
 
 	row = 0; // Right UI Panel Switch
 
-	// 7. Mission Weights
+	// 8. Mission Weights
 	const auto& missionWeights = rule->getMissionWeights();
 	if (missionWeights.size() > 0)
 	{
@@ -3058,7 +3133,7 @@ void TechTreeViewerState::handleMissionScript()
 		}
 	}
 
-	// 8. Region Weights
+	// 9. Region Weights
 	const auto& regionWeights = rule->getRegionWeights();
 	if (regionWeights.size() > 0)
 	{
@@ -3107,7 +3182,7 @@ void TechTreeViewerState::handleMissionScript()
 		}
 	}
 
-	// 9. Race Weights
+	// 10. Race Weights
 	const auto& raceWeights = rule->getRaceWeights();
 	if (raceWeights.size() > 0)
 	{

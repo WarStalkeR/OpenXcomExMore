@@ -229,6 +229,7 @@ ru:
   STR_TRIGGERS_RESEARCH: "Условия технологий:"
   STR_TRIGGERS_ITEM: "Условия экипировки:"
   STR_TRIGGERS_FACILITY: "Условия построек:"
+  STR_TRIGGERS_BASEFUNCS: "Условия функций базы:"
   STR_TRIGGERS_SOLDIER: "Условия команды:"
   STR_TRIGGERS_REGIONAL: "Условия регионов:"
   STR_ARC_RESEARCH_SEQ: "Послед. открытия:"
