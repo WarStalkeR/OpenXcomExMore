@@ -2303,7 +2303,7 @@ bool SavedGame::isBaseFunctionEnabled(const std::string &baseFunctionType, const
 	// Proceed with proper checks, if base function is valid.
 	for (auto* xbase : _bases)
 	{
-		if (!(~xbase->getProvidedBaseFunc({}) & requiredFunc).any())
+		if ((~xbase->getProvidedBaseFunc({}) & requiredFunc).none())
 		{
 			return true;
 		}
