@@ -16,7 +16,6 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <numeric>
 #include <algorithm>
 #include "RuleBaseFacility.h"
 #include "Mod.h"
@@ -42,7 +41,7 @@ RuleBaseFacility::RuleBaseFacility(const std::string &type, int listOrder) :
 	_lift(false), _hyper(false), _mind(false), _grav(false), _mindPower(1),
 	_sizeX(1), _sizeY(1), _buildCost(0), _refundValue(0), _buildTime(0), _monthlyCost(0),
 	_storage(0), _personnel(0), _aliens(0), _crafts(0), _labs(0), _workshops(0), _psiLabs(0),
-	_spriteEnabled(false), _altBuildSprite(false), _craftsHidden(false), _craftOptions(), _optionGroups(),
+	_spriteEnabled(false), _altBuildSprite(false), _craftsHidden(false), _craftOptions(),
 	_sightRange(0), _sightChance(0), _radarRange(0), _radarChance(0),
 	_defense(0), _hitRatio(0), _fireSound(0), _hitSound(0), _placeSound(-1), _ammoMax(0), _rearmRate(1), _ammoNeeded(1), _listOrder(listOrder),
 	_trainingRooms(0), _maxAllowedPerBase(0), _sickBayAbsoluteBonus(0.0f), _sickBayRelativeBonus(0.0f),
@@ -111,7 +110,6 @@ void RuleBaseFacility::load(const YAML::Node &node, Mod *mod)
 	_altBuildSprite = node["altBuildSprite"].as<bool>(_altBuildSprite);
 	_craftsHidden = node["craftsHidden"].as<bool>(_craftsHidden);
 	_craftOptions = node["craftOptions"].as<std::vector<CraftOption>>(_craftOptions);
-	_optionGroups = node["optionGroups"].as<std::vector<int>>(_optionGroups);
 
 	_sightRange = node["sightRange"].as<int>(_sightRange);
 	_sightChance = node["sightChance"].as<int>(_sightChance);
@@ -496,13 +494,64 @@ const std::vector<CraftOption> &RuleBaseFacility::getCraftOptions() const
 }
 
 /**
- * Gets the maximum between crafts number and options group sum.
+ * Gets the minimum/maximum possible crafts number for the facility.
  * @return The maximum number between either of the two.
  */
-int RuleBaseFacility::getCraftGroupSum() const
+const CraftValue RuleBaseFacility::getCraftsNum() const
 {
-	return std::max(std::accumulate(_optionGroups.begin(),
-		_optionGroups.end(), 0), _crafts);
+	// Default {0, 0} value.
+	CraftValue craftsNum;
+
+	// Maps to track the slot groups and subsets for the calculation.
+	std::map<int, std::map<int, int>> groupSubsets;
+	std::map<int, int> groupMin, groupMax;
+	int emptySubsetOffset = 100;
+
+	// Calculate all independent slots and map everything else.
+	for (size_t i = 0; i < _craftOptions.size(); ++i)
+	{
+		// Using pointer for performance.
+		const CraftOption* craftOption = &_craftOptions[i];
+
+		if (craftOption->group == 0)
+		{
+			// Increase directly.
+			craftsNum.totalMin++;
+			craftsNum.totalMax++;
+		}
+		else if (craftOption->subset == 0)
+		{
+			// Map to unique subset to avoid hassle.
+			groupSubsets[craftOption->group][emptySubsetOffset + i]++;
+		}
+		else
+		{
+			// Map to the relevant subset in the group.
+			groupSubsets[craftOption->group][craftOption->subset]++;
+		}
+	}
+
+	// Find biggest and smallest subsets for each group.
+	for (const auto& [group, subsets] : groupSubsets)
+	{
+		// Initialize existing group.
+		if (groupMin[group] == 0) groupMin[group] = INT_MAX;
+		if (groupMax[group] == 0) groupMax[group] = INT_MIN;
+
+		// Find biggest/smallest numbers in group.
+		for (const auto& [subset, number] : subsets)
+		{
+			if (number < groupMin[group]) groupMin[group] = number;
+			if (number > groupMax[group]) groupMax[group] = number;
+		}
+	}
+
+	// Calculate the final min/max value from maps.
+	for (const auto& [group, min] : groupMin) craftsNum.totalMin += min;
+	for (const auto& [group, max] : groupMax) craftsNum.totalMax += max;
+
+	// Return the result.
+	return craftsNum;
 }
 
 /**

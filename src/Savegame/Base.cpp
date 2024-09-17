@@ -1121,7 +1121,7 @@ void Base::updateCraftSlots()
 
 			// These will be changed, if configuration is invalid.
 			int groupsNum = fac->getRules()->getOptionGroups().size();
-			int craftNumOrGroupSum = fac->getRules()->getCraftGroupSum();
+			int craftNumOrGroupSum = fac->getRules()->getCraftsNum();
 
 			// We need craftOptions >= crafts in case we're using optionGroups as well.
 			if (size_t(fac->getRules()->getCrafts()) > fac->getRules()->getCraftOptions().size())

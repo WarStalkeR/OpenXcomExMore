@@ -46,24 +46,35 @@ struct CraftOption
 	int max = 0;
 	/// Is craft hidden or rendered in the base in the slot.
 	bool hide = false;
-	/// Constructor with default parameters. Needed for YAML.
-	CraftOption()
-	{
-		hide = false;
-		min = 0;
-		max = 0;
-		x = 0;
-		y = 0;
-	}
+	/// Group number of the slot. If 0 then there is no group.
+	int group = 0;
+	/// Subset number of the group. Irrelevant if group is 0.
+	int subset = 0;
+	/// Default constructor for the struct.
+	CraftOption() : x(0), y(0), min(0), max(0),
+		hide(false), group(0), subset(0)
+	{ /* Initialized via constructor */ }
 	/// Constructor that allows to define facility craft slots.
-	CraftOption(int xOffset, int yOffset, int minSize, int maxSize, bool isHidden)
-	{
-		hide = isHidden;
-		min = minSize;
-		max = maxSize;
-		x = xOffset;
-		y = yOffset;
-	}
+	CraftOption(int xOffset, int yOffset, int minSize, int maxSize,
+		bool isHidden, int slotGroup, int slotSubset) :
+		x(xOffset), y(yOffset), min(minSize), max(maxSize),
+		hide(isHidden), group(slotGroup), subset(slotSubset)
+	{ /* Initialized via constructor */ }
+};
+
+struct CraftValue
+{
+	/// Smallest possible number of crafts in the facility.
+	int totalMin = 0;
+	/// Largest possible number of crafts in the facility.
+	int totalMax = 0;
+	/// Default constructor for the struct.
+	CraftValue() : totalMin(0), totalMax(0)
+	{ /* Initialized via constructor */ }
+	/// Constructor that defines possible min/max slots number.
+	CraftValue(int totalCraftsMin, int totalCraftsMax) :
+		totalMin(totalCraftsMin), totalMax(totalCraftsMax)
+	{ /* Initialized via constructor */ }
 };
 
 /**
@@ -92,7 +103,6 @@ private:
 	int _storage, _personnel, _aliens, _crafts, _labs, _workshops, _psiLabs;
 	bool _spriteEnabled, _altBuildSprite, _craftsHidden;
 	std::vector<CraftOption> _craftOptions;
-	std::vector<int> _optionGroups;
 	int _sightRange, _sightChance;
 	int _radarRange, _radarChance, _defense, _hitRatio, _fireSound, _hitSound, _placeSound;
 	int _ammoMax, _rearmRate;
@@ -199,10 +209,8 @@ public:
 	bool getCraftsHidden() const;
 	/// Gets a list of craft slots in this facility
 	const std::vector<CraftOption>& getCraftOptions() const;
-	/// Gets a list of craft slot groups in this facility
-	const std::vector<int>& getOptionGroups() const { return _optionGroups; }
-	/// Gets the maximum between crafts number and options group sum.
-	int getCraftGroupSum() const;
+	/// Gets the minimum/maximum possible crafts number in the facility.
+	const CraftValue getCraftsNum() const;
 	/// Gets the facility's sight range.
 	int getSightRange() const { return _sightRange; }
 	/// Gets the facility's alien base detection chance.
@@ -283,6 +291,8 @@ namespace YAML
 			node["min"] = crOpt.min;
 			node["max"] = crOpt.max;
 			node["hide"] = crOpt.hide;
+			node["group"] = crOpt.group;
+			node["subset"] = crOpt.subset;
 			return node;
 		}
 
@@ -296,6 +306,8 @@ namespace YAML
 			crOpt.min = node["min"].as<int>(0);
 			crOpt.max = node["max"].as<int>(0);
 			crOpt.hide = node["hide"].as<bool>(false);
+			crOpt.group = node["group"].as<int>(0);
+			crOpt.subset = node["subset"].as<int>(0);
 
 			if (crOpt.min > crOpt.max) return false;
 			return true;

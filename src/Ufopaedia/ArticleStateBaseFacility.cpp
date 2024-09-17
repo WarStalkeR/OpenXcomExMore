@@ -164,7 +164,7 @@ namespace OpenXcom
 				ts.str(""); ts.clear(); ss.str(""); ss.clear();
 				ts << tr("STR_HANGAR_CRAFT_SLOTS");
 				if (facility->getOptionGroups().size() > 0 &&
-					(size_t)facility->getCraftGroupSum() == facility->getCraftOptions().size())
+					(size_t)facility->getCraftsNum() == facility->getCraftOptions().size())
 				{
 					int optionIt = 0;
 					auto optionGroupsIt = facility->getOptionGroups().begin();

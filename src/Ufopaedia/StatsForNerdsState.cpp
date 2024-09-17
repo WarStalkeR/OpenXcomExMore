@@ -3121,7 +3121,7 @@ void StatsForNerdsState::initFacilityList()
 	{
 		std::vector<std::string> craftSlotSizes;
 		if (facilityRule->getOptionGroups().size() > 0 &&
-			(size_t)facilityRule->getCraftGroupSum() == facilityRule->getCraftOptions().size())
+			(size_t)facilityRule->getCraftsNum() == facilityRule->getCraftOptions().size())
 		{
 			int optionIt = 0;
 			auto optionGroupsIt = facilityRule->getOptionGroups().begin();
