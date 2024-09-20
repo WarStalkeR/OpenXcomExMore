@@ -29,7 +29,7 @@ Uses modified code from SDL\_gfx (LGPL) with permission from author.
 8\. Rule flag to hide ufopaedia articles by default.  
 9\. Facility rule flag to use alternative sprite for construction.  
 10\. Base function triggers for arc/event/mission scripts.  
-11\. Game Data Viewer option switch for Tech Tree Data Viewer.  
+11\. Game Data Viewer option switch for Tech Tree Viewer.  
 
 # Features Migrated to the Main Branch
 1\. Configurable Ufopaedia facilities preview.  
