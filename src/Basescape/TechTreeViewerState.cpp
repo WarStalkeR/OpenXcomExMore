@@ -2174,7 +2174,7 @@ void TechTreeViewerState::handleArcScript()
 			std::ostringstream rowItem;
 			rowItem << "  " << tr(itemTrigger.first);
 			rowItem << ": " << std::boolalpha << itemTrigger.second;
-			bool isObtained = (_save->isItemObtained(itemTrigger.first) == itemTrigger.second);
+			bool isObtained = (_save->isItemObtained(itemTrigger.first, _game->getMod()) == itemTrigger.second);
 			_lstLeft->addRow(1, rowItem.str().c_str());
 			_lstLeft->setRowColor(row, isObtained ? _purple : _pink);
 			_leftTopics.push_back("-");
@@ -2497,7 +2497,7 @@ void TechTreeViewerState::handleEventScript()
 			std::ostringstream rowItem;
 			rowItem << "  " << tr(itemTrigger.first);
 			rowItem << ": " << std::boolalpha << itemTrigger.second;
-			bool isObtained = (_save->isItemObtained(itemTrigger.first) == itemTrigger.second);
+			bool isObtained = (_save->isItemObtained(itemTrigger.first, _game->getMod()) == itemTrigger.second);
 			_lstLeft->addRow(1, rowItem.str().c_str());
 			_lstLeft->setRowColor(row, isObtained ? _purple : _pink);
 			_leftTopics.push_back("-");
@@ -2981,7 +2981,7 @@ void TechTreeViewerState::handleMissionScript()
 			std::ostringstream rowItem;
 			rowItem << "  " << tr(itemTrigger.first);
 			rowItem << ": " << std::boolalpha << itemTrigger.second;
-			bool isObtained = (_save->isItemObtained(itemTrigger.first) == itemTrigger.second);
+			bool isObtained = (_save->isItemObtained(itemTrigger.first, _game->getMod()) == itemTrigger.second);
 			_lstLeft->addRow(1, rowItem.str().c_str());
 			_lstLeft->setRowColor(row, isObtained ? _purple : _pink);
 			_leftTopics.push_back("-");
