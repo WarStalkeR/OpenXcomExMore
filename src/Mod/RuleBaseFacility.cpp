@@ -726,9 +726,8 @@ const RuleBaseFacility* RuleBaseFacility::getDestroyedFacility() const
 // helper overloads for deserialization-only
 bool read(ryml::ConstNodeRef const& n, CraftOption* val)
 {
-	YAML::YamlNodeReader reader(nullptr, n);
-	if (!reader.isMap())
-		return false;
+	YAML::YamlNodeReader reader(n);
+	if (!reader.isMap()) return false;
 	reader.tryRead("x", val->x);
 	reader.tryRead("y", val->y);
 	reader.tryRead("min", val->min);
