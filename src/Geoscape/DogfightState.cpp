@@ -239,7 +239,7 @@ const int DogfightState::_projectileBlobs[4][6][3] =
  * @param ufoIsAttacking Is UFO the aggressor?
  */
 DogfightState::DogfightState(GeoscapeState *state, Craft *craft, Ufo *ufo, bool ufoIsAttacking) :
-	_state(state), _craft(craft), _ufo(ufo),
+	_state(state), _craft(craft), _ufo(ufo), _fightMode(DFM_NONE),
 	_ufoIsAttacking(ufoIsAttacking), _missileCraft(craft->getRules()->isMissile()), _missileImpact(false),
 	_disableDisengage(false), _disableStandoff(false), _disableCautious(false), _disableStandard(false), _disableAggressive(false),
     _craftSpeedBetter(false), _craftStandoffBetter(false), _craftCautiousBetter(false), _craftCombatBetter(false), _craftManeuverBetter(false),
@@ -1097,7 +1097,7 @@ void DogfightState::update()
 			if (_currentDist < _targetDist && !_ufo->isCrashed() && !_craft->isDestroyed())
 			{
 				distanceChange = 2 * _craftAccelerationBonus; // disengage speed
-				if (_currentDist + distanceChange >_targetDist)
+				if (_currentDist + distanceChange > _targetDist)
 				{
 					distanceChange = _targetDist - _currentDist;
 				}
@@ -1177,19 +1177,82 @@ void DogfightState::update()
 				_craft->setDamage(_craft->getCraftStats().damageMax);
 				drawCraftDamage();
 
+				// Allow missile payloads
+				int damage = std::max(0, _craft->getRules()->missilePower());
+				int shieldMult = 100;
+				int effCautious = 0;
+				int effStandard = 0;
+				int effAggressive = 0;
+
+				// Calculate damage bonuses
+				for (auto* cw : *_craft->getWeapons())
+				{
+					if (cw && cw->getRules())
+					{
+						int wDamage = cw->getRules()->getDamage();
+						int wShieldMult = cw->getRules()->getShieldDamageModifier();
+						int wReloadCautious = cw->getRules()->getCautiousReload();
+						int wReloadStandard = cw->getRules()->getStandardReload();
+						int wReloadAggressive = cw->getRules()->getAggressiveReload();
+						if (wDamage > 0)
+						{
+							damage += wDamage;
+							// calculate damage based on available ammo
+							// to simulate warhead rearming, since missile
+							// can't shoot, even if it has guns (wip)
+						}
+						if (wShieldMult != 100) shieldMult += (wShieldMult - 100);
+						if (wReloadCautious > 0) effCautious += wReloadCautious;
+						if (wReloadStandard > 0) effStandard += wReloadStandard;
+						if (wReloadAggressive > 0) effAggressive += wReloadAggressive;
+					}
+				}
+
+				// Handle power bonus
+				int crPwrBonus = _craft->getCraftStats().powerBonus;
+				if (crPwrBonus > 0) damage = (damage * (crPwrBonus + 100)) / 100;
+
+				// Handle strike modes
+				int damageMin = 0;
+				int damageMax = 0;
+				switch (_fightMode)
+				{
+				case DFM_CAUTIOUS:
+					damageMin = (damage * 4 / 5) * (effCautious + 100) / 100;
+					damageMax = (damage * 3 / 2) * (effCautious + 100) / 100;
+					damage = RNG::generate(damageMin, damageMax);
+					break;
+				case DFM_STANDARD:
+					damageMin = (damage * 3 / 4) * (effStandard + 100) / 100;
+					damageMax = (damage * 5 / 4) * (effStandard + 100) / 100;
+					damage = RNG::generate(damageMin, damageMax);
+					break;
+				case DFM_AGGRESSIVE:
+					damageMin = std::min(damage, (damage / 2) * (effAggressive + 100) / 100);
+					damageMax = damage; // no going above in aggressive mode
+					damage = RNG::generate(damageMin, damageMax);
+					break;
+				case DFM_NONE: break;
+				}
+
 				// Handle UFO shields
-				int damage = _craft->getRules()->missilePower(); // Note: no randomness :(
 				int shieldDamage = 0;
 				if (_ufo->getShield() != 0)
 				{
-					shieldDamage = damage; // Note: no shield-effectiveness factor
 					// scale down by bleed-through factor
-					damage = std::max(0, shieldDamage - _ufo->getShield()) * _ufo->getCraftStats().shieldBleedThrough;
+					// and scale up by shield-effectiveness factor
+					shieldDamage = (damage * shieldMult) / 100;
+					damage = std::max(0, shieldDamage - _ufo->getShield()) *
+						_ufo->getCraftStats().shieldBleedThrough / shieldMult;
 					_ufo->setShield(_ufo->getShield() - shieldDamage);
 				}
+
+				// Handle UFO damage
 				damage = std::max(0, damage - _ufo->getCraftStats().armor);
 				_ufo->setDamage(_ufo->getDamage() + damage, _game->getMod());
 				_state->handleDogfightExperience(); // called after setDamage
+
+				// Handle UFO crash
 				if (_ufo->isCrashed())
 				{
 					_ufo->setShotDownByCraftId(_craft->getUniqueId());
@@ -1200,11 +1263,14 @@ void DogfightState::update()
 					finalRun = false;
 					_end = false;
 				}
+
+				// Handle UFO hit
 				if (_ufo->getHitFrame() == 0)
 				{
 					_animatingHit = true;
 					_ufo->setHitFrame(3);
 				}
+
 				// How hard was the ufo hit?
 				if (_ufo->getShield() != 0)
 				{
@@ -2027,6 +2093,7 @@ void DogfightState::btnMinimizeClick(Action *)
 {
 	if (_craftIsDefenseless)
 	{
+		_fightMode = DFM_NONE;
 		_selfDestructPressed = !_selfDestructPressed;
 		if (_selfDestructPressed)
 			setStatus("STR_SELF_DESTRUCT_ACTIVATED");
@@ -2042,6 +2109,7 @@ void DogfightState::btnMinimizeClick(Action *)
 	{
 		if (_currentDist >= STANDOFF_DIST)
 		{
+			_fightMode = DFM_NONE;
 			setMinimized(true);
 			_ufo->setShieldRechargeHandle(0);
 		}
@@ -2061,7 +2129,9 @@ void DogfightState::btnStandoffPress(Action *)
 	if (!_ufo->isCrashed() && !_craft->isDestroyed() && !_ufoBreakingOff)
 	{
 		_end = false;
-		setStatus("STR_STANDOFF");
+		_fightMode = DFM_NONE;
+		if (_missileCraft) setStatus("STR_STANDOFF_MSL");
+		else setStatus("STR_STANDOFF");
 		_targetDist = STANDOFF_DIST;
 	}
 }
@@ -2090,31 +2160,51 @@ void DogfightState::btnCautiousPress(Action *)
 		_end = false;
 		if (!_ufoIsAttacking || _craftCautiousBetter)
 		{
-			setStatus("STR_CAUTIOUS_ATTACK");
-			for (int i = 0; i < _weaponNum; ++i)
+			_fightMode = DFM_CAUTIOUS;
+			if (_missileCraft)
 			{
-				CraftWeapon* w = _craft->getWeapons()->at(i);
-				if (w != 0)
-				{
-					_weaponFireInterval[i] = w->getRules()->getCautiousReload();
-				}
+				_pilotApproachSpeedModifier = 1;
+				setStatus("STR_CAUTIOUS_MSL");
+				aggressiveDistance();
 			}
-			minimumDistance();
+			else
+			{
+				setStatus("STR_CAUTIOUS_ATTACK");
+				for (int i = 0; i < _weaponNum; ++i)
+				{
+					CraftWeapon* w = _craft->getWeapons()->at(i);
+					if (w != 0)
+					{
+						_weaponFireInterval[i] = w->getRules()->getCautiousReload();
+					}
+				}
+				minimumDistance();
+			}
 		}
 		else
 		{
-			setStatus("STR_EVASIVE_MANEUVERS");
-			for (int i = 0; i < _weaponNum; ++i)
+			_fightMode = DFM_AGGRESSIVE;
+			if (_missileCraft)
 			{
-				CraftWeapon* w = _craft->getWeapons()->at(i);
-				if (w != 0)
-				{
-					// double the craft's reload time to balance halving the HK's chance to hit
-					_weaponFireInterval[i] = w->getRules()->getAggressiveReload() * 2;
-				}
+				_pilotApproachSpeedModifier = 4;
+				setStatus("STR_EVASIVE_MSL");
+				aggressiveDistance();
 			}
-			// same distance as aggressive (by design)
-			aggressiveDistance();
+			else
+			{
+				setStatus("STR_EVASIVE_MANEUVERS");
+				for (int i = 0; i < _weaponNum; ++i)
+				{
+					CraftWeapon* w = _craft->getWeapons()->at(i);
+					if (w != 0)
+					{
+						// double the craft's reload time to balance halving the HK's chance to hit
+						_weaponFireInterval[i] = w->getRules()->getAggressiveReload() * 2;
+					}
+				}
+				// same distance as aggressive (by design)
+				aggressiveDistance();
+			}
 		}
 	}
 }
@@ -2141,16 +2231,26 @@ void DogfightState::btnStandardPress(Action *)
 	if (!_ufo->isCrashed() && !_craft->isDestroyed() && !_ufoBreakingOff)
 	{
 		_end = false;
-		setStatus("STR_STANDARD_ATTACK");
-		for (int i = 0; i < _weaponNum; ++i)
+		_fightMode = DFM_STANDARD;
+		if (_missileCraft)
 		{
-			CraftWeapon* w = _craft->getWeapons()->at(i);
-			if (w != 0)
-			{
-				_weaponFireInterval[i] = w->getRules()->getStandardReload();
-			}
+			_pilotApproachSpeedModifier = 2;
+			setStatus("STR_STANDARD_MSL");
+			aggressiveDistance();
 		}
-		maximumDistance();
+		else
+		{
+			setStatus("STR_STANDARD_ATTACK");
+			for (int i = 0; i < _weaponNum; ++i)
+			{
+				CraftWeapon* w = _craft->getWeapons()->at(i);
+				if (w != 0)
+				{
+					_weaponFireInterval[i] = w->getRules()->getStandardReload();
+				}
+			}
+			maximumDistance();
+		}
 	}
 }
 
@@ -2176,13 +2276,22 @@ void DogfightState::btnAggressivePress(Action *)
 	if (!_ufo->isCrashed() && !_craft->isDestroyed() && !_ufoBreakingOff)
 	{
 		_end = false;
-		setStatus("STR_AGGRESSIVE_ATTACK");
-		for (int i = 0; i < _weaponNum; ++i)
+		_fightMode = DFM_AGGRESSIVE;
+		if (_missileCraft)
 		{
-			CraftWeapon* w = _craft->getWeapons()->at(i);
-			if (w != 0)
+			_pilotApproachSpeedModifier = 4;
+			setStatus("STR_AGGRESSIVE_MSL");
+		}
+		else
+		{
+			setStatus("STR_AGGRESSIVE_ATTACK");
+			for (int i = 0; i < _weaponNum; ++i)
 			{
-				_weaponFireInterval[i] = w->getRules()->getAggressiveReload();
+				CraftWeapon* w = _craft->getWeapons()->at(i);
+				if (w != 0)
+				{
+					_weaponFireInterval[i] = w->getRules()->getAggressiveReload();
+				}
 			}
 		}
 		aggressiveDistance();
@@ -2211,6 +2320,7 @@ void DogfightState::btnDisengagePress(Action *)
 	if (!_ufo->isCrashed() && !_craft->isDestroyed() && !_ufoBreakingOff)
 	{
 		_end = true;
+		_fightMode = DFM_NONE;
 		setStatus("STR_DISENGAGING");
 		_targetDist = 800;
 	}
