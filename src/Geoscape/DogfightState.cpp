@@ -1196,10 +1196,11 @@ void DogfightState::update()
 						int wReloadAggressive = cw->getRules()->getAggressiveReload();
 						if (wDamage > 0)
 						{
-							damage += wDamage;
-							// calculate damage based on available ammo
-							// to simulate warhead rearming, since missile
-							// can't shoot, even if it has guns (wip)
+							// Simulate warhead arming behavior
+							int wAmmoMax = cw->getRules()->getAmmoMax();
+							if (wAmmoMax > 0) damage +=
+								((wDamage * cw->getAmmo()) / wAmmoMax);
+							else damage += wDamage;
 						}
 						if (wShieldMult != 100) shieldMult += (wShieldMult - 100);
 						if (wReloadCautious > 0) effCautious += wReloadCautious;
