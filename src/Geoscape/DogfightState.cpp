@@ -1246,12 +1246,23 @@ void DogfightState::update()
 					damage = std::max(0, shieldDamage - _ufo->getShield()) *
 						_ufo->getCraftStats().shieldBleedThrough / shieldMult;
 					_ufo->setShield(_ufo->getShield() - shieldDamage);
+
+					// Shield damage logging
+					Log(LOG_DEBUG) << "Missile: " << _craft->getRules()->getType() << ", UFO: "
+						<< _ufo->getRules()->getType() << ", Shield Damage: " << shieldDamage << ", Shield Status: "
+						<< _ufo->getShield() << "/" << _ufo->getRules()->getStats().shieldCapacity;
 				}
 
 				// Handle UFO damage
 				damage = std::max(0, damage - _ufo->getCraftStats().armor);
 				_ufo->setDamage(_ufo->getDamage() + damage, _game->getMod());
 				_state->handleDogfightExperience(); // called after setDamage
+
+				// Hull damage logging
+				Log(LOG_DEBUG) << "Missile: " << _craft->getRules()->getType() << ", UFO: " 
+					<< _ufo->getRules()->getType() << ", Hull Damage: " << damage << ", Hull Status: "
+					<< (_ufo->getRules()->getStats().damageMax - _ufo->getDamage())
+					<< "/" << _ufo->getRules()->getStats().damageMax;
 
 				// Handle UFO crash
 				if (_ufo->isCrashed())
@@ -1332,6 +1343,11 @@ void DogfightState::update()
 							{
 								// scale down by bleed-through factor and scale up by shield-effectiveness factor
 								damage = std::max(0, shieldDamage - _ufo->getShield()) * _ufo->getCraftStats().shieldBleedThrough / p->getShieldDamageModifier();
+
+								// Shield damage logging
+								Log(LOG_DEBUG) << "Craft: " << _craft->getRules()->getType() << ", UFO: "
+									<< _ufo->getRules()->getType() << ", Shield Damage: " << shieldDamage << ", Shield Status: "
+									<< _ufo->getShield() << "/" << _ufo->getRules()->getStats().shieldCapacity;
 							}
 							_ufo->setShield(_ufo->getShield() - shieldDamage);
 						}
@@ -1339,6 +1355,14 @@ void DogfightState::update()
 						damage = std::max(0, damage - _ufo->getCraftStats().armor);
 						_ufo->setDamage(_ufo->getDamage() + damage, _game->getMod());
 						_state->handleDogfightExperience(); // called after setDamage
+
+						// Hull damage logging
+						Log(LOG_DEBUG) << "Craft: " << _craft->getRules()->getType() << ", UFO: "
+							<< _ufo->getRules()->getType() << ", Hull Damage: " << damage << ", Hull Status: "
+							<< (_ufo->getRules()->getStats().damageMax - _ufo->getDamage())
+							<< "/" << _ufo->getRules()->getStats().damageMax;
+
+						// Handle UFO crash
 						if (_ufo->isCrashed())
 						{
 							_ufo->setShotDownByCraftId(_craft->getUniqueId());
@@ -1349,6 +1373,8 @@ void DogfightState::update()
 							finalRun = false;
 							_end = false;
 						}
+
+						// Handle UFO hit
 						if (_ufo->getHitFrame() == 0)
 						{
 							_animatingHit = true;
