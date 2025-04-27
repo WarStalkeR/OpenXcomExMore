@@ -28,7 +28,6 @@ namespace OpenXcom
 const int STANDOFF_DIST = 560;
 const int AGGRESSIVE_DIST = 64;
 enum ColorNames { CRAFT_MIN, CRAFT_MAX, RADAR_MIN, RADAR_MAX, DAMAGE_MIN, DAMAGE_MAX, BLOB_MIN, RANGE_METER, DISABLED_WEAPON, DISABLED_AMMO, DISABLED_RANGE, SHIELD_MIN, SHIELD_MAX };
-enum DogfightMode { DFM_NONE, DFM_CAUTIOUS, DFM_STANDARD, DFM_AGGRESSIVE };
 
 class ImageButton;
 class Text;
@@ -57,7 +56,6 @@ private:
 	Text *_txtAmmo[RuleCraft::WeaponMax], *_txtDistance, *_txtStatus, *_txtInterceptionNumber;
 	Craft *_craft;
 	Ufo *_ufo;
-	DogfightMode _fightMode;
 	bool _ufoIsAttacking, _missileCraft, _missileImpact;
 	bool _disableDisengage, _disableStandoff, _disableCautious, _disableStandard, _disableAggressive;
 	bool _craftSpeedBetter, _craftStandoffBetter, _craftCautiousBetter, _craftCombatBetter, _craftManeuverBetter;

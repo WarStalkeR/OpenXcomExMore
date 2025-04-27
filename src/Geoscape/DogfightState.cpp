@@ -239,7 +239,7 @@ const int DogfightState::_projectileBlobs[4][6][3] =
  * @param ufoIsAttacking Is UFO the aggressor?
  */
 DogfightState::DogfightState(GeoscapeState *state, Craft *craft, Ufo *ufo, bool ufoIsAttacking) :
-	_state(state), _craft(craft), _ufo(ufo), _fightMode(DFM_NONE),
+	_state(state), _craft(craft), _ufo(ufo),
 	_ufoIsAttacking(ufoIsAttacking), _missileCraft(craft->getRules()->isMissile()), _missileImpact(false),
 	_disableDisengage(false), _disableStandoff(false), _disableCautious(false), _disableStandard(false), _disableAggressive(false),
     _craftSpeedBetter(false), _craftStandoffBetter(false), _craftCautiousBetter(false), _craftCombatBetter(false), _craftManeuverBetter(false),
@@ -332,17 +332,17 @@ DogfightState::DogfightState(GeoscapeState *state, Craft *craft, Ufo *ufo, bool 
 	// HK options
 	if (_ufoIsAttacking)
 	{
+		_disableDisengage = !_craftSpeedBetter;
 		_disableStandoff = !_craftStandoffBetter;
 		_disableStandard = !_craftCombatBetter;
 		_disableAggressive = false;
-        if (!_craftSpeedBetter)
-		{
-			_disableDisengage = true;
-		}
+
+		// can't fight without weapons
 		if (_weaponNum == 0)
 		{
 			_disableCautious = true;
 		}
+
 		// make sure the HK attacks its primary target first!
 		{
 			Craft* target = dynamic_cast<Craft*>(_ufo->getDestination());
@@ -361,14 +361,13 @@ DogfightState::DogfightState(GeoscapeState *state, Craft *craft, Ufo *ufo, bool 
 			}
 		}
 	}
+
 	// Missile options
 	if (_missileCraft)
 	{
 		_disableStandoff = !_craftStandoffBetter;
 		_disableStandard = !_craftCombatBetter;
 		_disableAggressive = false;
-		_disableDisengage = !_craftSpeedBetter;
-		_disableCautious = !_craftCautiousBetter;
 
 		// approach UFO at maximum approach speed
 		_pilotApproachSpeedModifier = 4;
@@ -1214,26 +1213,33 @@ void DogfightState::update()
 				if (crPwrBonus > 0) damage = (damage * (crPwrBonus + 100)) / 100;
 
 				// Handle strike modes
-				int damageMin = 0;
-				int damageMax = 0;
-				switch (_fightMode)
+				if (_mode == _btnCautious && _craftCautiousBetter)
 				{
-				case DFM_CAUTIOUS:
-					damageMin = (damage * 4 / 5) * (effCautious + 100) / 100;
-					damageMax = (damage * 3 / 2) * (effCautious + 100) / 100;
+					// Precision strike, 88% ~ 166% base
+					int damageMax = (damage * 5 / 3) * (effCautious + 100) / 100;
+					int damageMin = (damage * 8 / 9) * (effCautious + 100) / 100;
 					damage = RNG::generate(damageMin, damageMax);
-					break;
-				case DFM_STANDARD:
-					damageMin = (damage * 3 / 4) * (effStandard + 100) / 100;
-					damageMax = (damage * 5 / 4) * (effStandard + 100) / 100;
+				}
+				else if (_mode == _btnStandard)
+				{
+					// Standard strike, 75% ~ 125% base
+					int damageMax = (damage * 5 / 4) * (effStandard + 100) / 100;
+					int damageMin = (damage * 3 / 4) * (effStandard + 100) / 100;
 					damage = RNG::generate(damageMin, damageMax);
-					break;
-				case DFM_AGGRESSIVE:
-					damageMin = std::min(damage, (damage / 2) * (effAggressive + 100) / 100);
-					damageMax = damage; // no going above in aggressive mode
+				}
+				else if (_mode == _btnAggressive)
+				{
+					// Aggressive strike, 50% ~ 100% base
+					int damageMax = damage; // no going beyond 100% in aggressive mode
+					int damageMin = std::min(damageMax, (damage / 2) * (effAggressive + 100) / 100);
 					damage = RNG::generate(damageMin, damageMax);
-					break;
-				case DFM_NONE: break;
+				}
+				else
+				{
+					// Evasive strike, 33% ~ 100% base
+					int damageMax = damage; // no going beyond 100% in evasive mode
+					int damageMin = std::min(damageMax, damage / 3); // no bonuses, random only
+					damage = RNG::generate(damageMin, damageMax);
 				}
 
 				// Handle UFO shields
@@ -1448,7 +1454,7 @@ void DogfightState::update()
 					chancetoHit += _ufo->getCraftStats().hitBonus;
 					chancetoHit -= _pilotDodgeBonus;
 					// evasive maneuvers
-					if (_ufoIsAttacking && _mode == _btnCautious)
+					if (_mode == _btnCautious && (_ufoIsAttacking || _missileCraft) && !_craftCautiousBetter)
 					{
 						// HK's chance to hit is halved, but craft's reload time is doubled too
 						chancetoHit = chancetoHit / 2;
@@ -2120,7 +2126,6 @@ void DogfightState::btnMinimizeClick(Action *)
 {
 	if (_craftIsDefenseless)
 	{
-		_fightMode = DFM_NONE;
 		_selfDestructPressed = !_selfDestructPressed;
 		if (_selfDestructPressed)
 			setStatus("STR_SELF_DESTRUCT_ACTIVATED");
@@ -2136,7 +2141,6 @@ void DogfightState::btnMinimizeClick(Action *)
 	{
 		if (_currentDist >= STANDOFF_DIST)
 		{
-			_fightMode = DFM_NONE;
 			setMinimized(true);
 			_ufo->setShieldRechargeHandle(0);
 		}
@@ -2156,7 +2160,6 @@ void DogfightState::btnStandoffPress(Action *)
 	if (!_ufo->isCrashed() && !_craft->isDestroyed() && !_ufoBreakingOff)
 	{
 		_end = false;
-		_fightMode = DFM_NONE;
 		if (_missileCraft) setStatus("STR_STANDOFF_MSL");
 		else setStatus("STR_STANDOFF");
 		_targetDist = STANDOFF_DIST;
@@ -2185,9 +2188,8 @@ void DogfightState::btnCautiousPress(Action *)
 	if (!_ufo->isCrashed() && !_craft->isDestroyed() && !_ufoBreakingOff)
 	{
 		_end = false;
-		if (!_ufoIsAttacking || _craftCautiousBetter)
+		if (_craftCautiousBetter || (!_ufoIsAttacking && !_missileCraft))
 		{
-			_fightMode = DFM_CAUTIOUS;
 			if (_missileCraft)
 			{
 				_pilotApproachSpeedModifier = 1;
@@ -2210,7 +2212,6 @@ void DogfightState::btnCautiousPress(Action *)
 		}
 		else
 		{
-			_fightMode = DFM_AGGRESSIVE;
 			if (_missileCraft)
 			{
 				_pilotApproachSpeedModifier = 4;
@@ -2258,7 +2259,6 @@ void DogfightState::btnStandardPress(Action *)
 	if (!_ufo->isCrashed() && !_craft->isDestroyed() && !_ufoBreakingOff)
 	{
 		_end = false;
-		_fightMode = DFM_STANDARD;
 		if (_missileCraft)
 		{
 			_pilotApproachSpeedModifier = 2;
@@ -2303,7 +2303,6 @@ void DogfightState::btnAggressivePress(Action *)
 	if (!_ufo->isCrashed() && !_craft->isDestroyed() && !_ufoBreakingOff)
 	{
 		_end = false;
-		_fightMode = DFM_AGGRESSIVE;
 		if (_missileCraft)
 		{
 			_pilotApproachSpeedModifier = 4;
@@ -2347,7 +2346,6 @@ void DogfightState::btnDisengagePress(Action *)
 	if (!_ufo->isCrashed() && !_craft->isDestroyed() && !_ufoBreakingOff)
 	{
 		_end = true;
-		_fightMode = DFM_NONE;
 		setStatus("STR_DISENGAGING");
 		_targetDist = 800;
 	}
