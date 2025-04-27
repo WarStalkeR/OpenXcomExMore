@@ -19,7 +19,7 @@ and the [wiki](https://www.ufopaedia.org/index.php/OpenXcom).
 Uses modified code from SDL\_gfx (LGPL) with permission from author.
 
 # OpenXcom Extended More Features
-1\. Advanced craft vs hunter killer dogfight behavior.  
+1\. Advanced craft/HK and missile dogfight behavior.  
 2\. Modifiable craft size stat and craft classifications.  
 3\. Multi-craft hangar mechanics implementation.  
 4\. Bigger craft sprites support for basescape/hangar.  
@@ -46,12 +46,15 @@ please refer to the [official OXCE documentation](https://www.ufopaedia.org/inde
 `constants:`  
 `  accelerationPenalty: [10, 10, 10, 10]`  
 `  accelerationCoefficient: [[10, 20], [15, 35], [20, 50], [25, 70]]`  
+
 The `accelerationPenalty` is list of acceleration penalties for
-various dogfight modes: `Standoff`, `Cautious`, `Combat` and `Maneuver`.  
+various dogfight modes: `Standoff`, `Cautious`, `Combat` and `Maneuver`.
 The `accelerationCoefficient` is list of positive and negative acceleration
 coefficients for `Standoff`, `Cautious`, `Combat` and `Maneuver` modes.
+
 **Note**: if `Craft_Acceleration >= Acceleration_Penalty` positive coefficient
-is applied.  
+is applied.
+
 **Formula** `Craft_Speed > HK_Speed * (1 + Acceleration_Coefficient/1000 *
 (Acceleration_Penalty - Craft_Acceleration))` defines, if dogfight mode is
 available versus hunter killer. It should be noted although
@@ -64,6 +67,40 @@ hunter killer. And **Maneuver** defines if in **Standard** mode will you be
 holding enemy craft at distance of your weapons or not. Only **Disengage**
 and **Postpone** behavior didn't change. They still require original
 `Craft_Speed > HK_Speed` to be `true`.
+
+## Advanced Missile Craft Dogfight Behavior
+Main change is that if craft has `missilePower` set to `-1` it will become
+zero damage missile, which is perfect if you want payload dependent missile.
+
+And if craft is a missile (regardless, if its manned or not), it no longer can
+use craft weapons (even if you will somehow equip it, it just won't shoot).
+Instead, various stats of the weapon module contribute to final damage of the
+missile effect, when UFO is hit.  
+
+Whilst missile uses same dogfight UI, the effects and usage is different:  
+**Tracking Mode** - missile just continues to follow target.  
+**Precision Mode** - takes time to close-in to UFO, but does most damage.  
+**Standard Mode** - average close-in time, but damage is average as well.  
+**Aggressive Mode** - fastest close-in time, but limited damage potential.  
+**Evasive Mode** - aggressive, but with better evasion and worse damage.  
+**Disarm Mode** - disarm missile and attempt to return it safely to base.  
+
+**Evasive Mode** available, only when **Precision Mode** isn't: i.e. if
+missile is too slow and target is a hunter killer.
+
+Since missiles can't use weapons/modules as crafts do, equipped modules
+contribute instead to various parameters of the missile and it's final damage
+effect. All speed, armor and fuel related stats affect missiles in exactly
+same manner, as they affect crafts.
+
+**Weapon Stat Effects (for Missiles)**:  
+`damage` - adds flat damage bonus in addition to raw `missilePower`.  
+`ammoMax` - if above `0`, `damage` will be multipled by `ammo/ammoMax`.  
+`shieldDamageModifier` - modifies shield damage multiplier by `VAL-100`%.  
+`reloadCautious` - increases damage roll range for **Precision Mode**.  
+`reloadStandard` - increases damage roll range for **Standard Mode**.  
+`reloadAggressive` - increases damage roll range for **Aggressive Mode**.  
+`powerBonus` - modifies base damage multiplier by flat percent value.  
 
 ## Multi-Craft Hangars, Craft Sizes and Craft Classifications
 **Facility values for script files (with example below):**  
@@ -79,6 +116,7 @@ base view.
 `      - {x: 8, y: 2, min: 1, max: 9, hide: true}` Always hidden in base view.  
 `      - {x: 2, y: -4, min: 0, max: 0, hide: false}` Default hangar values.  
 `    optionGroups: [2, 2, 1]` Allows disconnected craft size ranges.  
+
 **Usage**: Now it is possible to define positions of crafts in hangar (when in
 base view mode) and if they are permanently hidden. Each **craftOptions** entry
 consists from 5 variables: *Horizontal Offset*, *Vertical Offset*, *Craft
@@ -98,6 +136,7 @@ given to the bigger crafts first.
 `crafts:`  
 `  - type: NEW_FANCY_CRAFT`  
 `    craftSize: 12`  
+
 This craft with size `12` can't be placed into size 11 hangar slots. But if it
 uses value of `0` (default value for all craft), it can be placed into any
 hangar slot. The `craftSize` variable has no bounds beside being an `int` (i.e.
@@ -110,6 +149,7 @@ classify what size ranges belong to what classes.
 `  - type: NEW_FANCY_WEAPON`  
 `    stats:`  
 `      craftSize: 6`  
+
 In this example `craftSize` of `6` means that once this weapon is equipped,
 craft's size will be increased by 6. If crafts aren't allowed to change class
 (via option) or has no suitable hangar slot after such change, player will
@@ -128,6 +168,7 @@ get notification that it can't be equipped.
 `    1: STR_CLASS_TEAM` Size range `1 ~ 9` for human teams.  
 `    0: STR_CLASS_NA` Size `0` is compatibility value. Always leave it as is.  
 `    -1: STR_CLASS_NO` Size range `-1` and below. Custom bottom limit.  
+
 This feature allows to assigns custom strings to selected craft size ranges.
 Last entry in the list, i.e. `STR_CLASS_NO` will not be rendered or shown in
 Ufopaedia (Analysis will show it anyway in numerical format). In conjunction
@@ -168,6 +209,7 @@ standard and short.
 `en-US:`  
 `  STR_CLASS_CAR_SMALL: "Small Vehicle"`  
 `  STR_CLASS_CAR_SMALL_UC: "SV"`  
+
 Standard version will be seen in Craft's Ufopaedia entry. Short will be seen
 in Facility's Ufopaedia entry (hangars only).  
 
@@ -176,6 +218,7 @@ in Facility's Ufopaedia entry (hangars only).
 `crafts:`  
 `  - type: BIG_SPRITE_CRAFT`  
 `    spriteSize: [54, 72]`  
+
 Now it is possible to define new sprite size for crafts with bigger sprites
 in order to still keep them centered at original coordinates. The `spriteSize`
 values should be exactly as as vertical and horizontal size of your image in
@@ -222,6 +265,7 @@ correct distance measurement with new units.
 `    baseVeteran: ...`  
 `    baseGenius: ...`  
 `    baseSuperhuman: ...`  
+
 Allows to enable option `oxceStartingBaseSelection` that in New Game interface 
 allows user to select custom starting base with different set of starting
 facilities (of course if there are any beside default ones). Syntax follows
@@ -243,6 +287,7 @@ side you can even force specific longitude and latitude for a starting base.
 `      - STR_INSPECT_MACHINERY`  
 `    text: STR_HANGAR_DAMAGED_UFOPEDIA`  
 `    hiddenByDefault: true`  
+
 If `hiddenByDefault` flag is enabled for the ufopaedia article, once relevant
 technology (that is required by the article) is unlocked, it is automatically
 moved into the 'hidden' category (which player can manage manually). This is
@@ -256,6 +301,7 @@ avoid annoyance of seeing damaged/ruined variants, while browsing normally.
 `facilities:`  
 `  - type: STR_SOME_FACILITY`  
 `    altBuildSprite: true`  
+
 If `altBuildSprite` flag is enabled for the facility rule, during construction
 the facility will be using different sprite, if it has 1x1 size or has the flag
 `spriteEnabled` set to `true`. In terms of definitions, alternative sprite
@@ -280,6 +326,7 @@ should be declared from `1126` (total of 6 sprite tiles of the facility).
 `       WAVE: false`  
 `       WAVE2: false`  
 `    executionOdds: 100`  
+
 The `baseFunctionTriggers` work in exactly same manner, as `facilityTriggers`
 and should be declared as such, `FUNC_NAME: true/false`. Do note that if the
 base function was never declared in any facility, game will log a warning
