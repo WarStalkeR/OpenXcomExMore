@@ -28,6 +28,7 @@ namespace OpenXcom
 const int STANDOFF_DIST = 560;
 const int AGGRESSIVE_DIST = 64;
 enum ColorNames { CRAFT_MIN, CRAFT_MAX, RADAR_MIN, RADAR_MAX, DAMAGE_MIN, DAMAGE_MAX, BLOB_MIN, RANGE_METER, DISABLED_WEAPON, DISABLED_AMMO, DISABLED_RANGE, SHIELD_MIN, SHIELD_MAX };
+enum DogfightModes { DFM_CAUTIOUS, DFM_STANDARD, DFM_AGGRESSIVE };
 
 class ImageButton;
 class Text;
@@ -73,6 +74,7 @@ private:
 	int _pilotAccuracyBonus, _pilotDodgeBonus, _pilotApproachSpeedModifier, _craftAccelerationBonus;
 	bool _firedAtLeastOnce, _experienceAwarded;
 	bool _delayedRecolorDone;
+	int _travelModes[3];
 	// craft min/max, radar min/max, damage min/max, shield min/max
 	int _colors[13];
 	// Ends the dogfight.

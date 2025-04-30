@@ -595,6 +595,11 @@ DogfightState::DogfightState(GeoscapeState *state, Craft *craft, Ufo *ufo, bool 
 	_txtInterceptionNumber->setText(ss1.str());
 	_txtInterceptionNumber->setVisible(false);
 
+	// travel modes array init
+	_travelModes[DFM_CAUTIOUS] = 0;
+	_travelModes[DFM_STANDARD] = 0;
+	_travelModes[DFM_AGGRESSIVE] = 0;
+
 	// define the colors to be used
 	_colors[CRAFT_MIN] = dogfightInterface->getElement("craftRange")->color;
 	_colors[CRAFT_MAX] = dogfightInterface->getElement("craftRange")->color2;
@@ -1136,6 +1141,23 @@ void DogfightState::update()
 			_txtDistance->setText(ss.str());
 		}
 
+		// protection from missile craft exploits
+		if (_missileCraft)
+		{
+			if (_mode == _btnAggressive)
+			{
+				_travelModes[DFM_AGGRESSIVE] += std::abs(distanceChange);
+			}
+			else if (_mode == _btnStandard)
+			{
+				_travelModes[DFM_STANDARD] += std::abs(distanceChange);
+			}
+			else if (_mode == _btnCautious)
+			{
+				_travelModes[DFM_CAUTIOUS] += std::abs(distanceChange);
+			}
+		}
+
 		// Check and recharge craft shields
 		// Check if the UFO's shields are being handled by an interception window
 		if (_ufo->getShieldRechargeHandle() == 0)
@@ -1212,27 +1234,37 @@ void DogfightState::update()
 				int crPwrBonus = _craft->getCraftStats().powerBonus;
 				if (crPwrBonus > 0) damage = (damage * (crPwrBonus + 100)) / 100;
 
+				// Handle exploit protection
+				std::string strikeType;
+				int limitCautious = _travelModes[DFM_CAUTIOUS];
+				int limitStandard = limitCautious + _travelModes[DFM_STANDARD];
+				int limitAggressive = limitStandard + _travelModes[DFM_AGGRESSIVE];
+				int modeValue = RNG::generate(0, limitAggressive);
+
 				// Handle strike modes
-				if (_mode == _btnCautious && _craftCautiousBetter)
+				if (_mode == _btnCautious && _craftCautiousBetter && modeValue <= limitCautious)
 				{
 					// Precision strike, 88% ~ 166% base
 					int damageMax = (damage * 5 / 3) * (effCautious + 100) / 100;
 					int damageMin = (damage * 8 / 9) * (effCautious + 100) / 100;
 					damage = RNG::generate(damageMin, damageMax);
+					strikeType = "PRECISION";
 				}
-				else if (_mode == _btnStandard)
+				else if (_mode == _btnStandard && modeValue <= limitStandard)
 				{
 					// Standard strike, 75% ~ 125% base
 					int damageMax = (damage * 5 / 4) * (effStandard + 100) / 100;
 					int damageMin = (damage * 3 / 4) * (effStandard + 100) / 100;
 					damage = RNG::generate(damageMin, damageMax);
+					strikeType = "STANDARD";
 				}
-				else if (_mode == _btnAggressive)
+				else if (_mode == _btnAggressive && modeValue <= limitAggressive)
 				{
 					// Aggressive strike, 50% ~ 100% base
 					int damageMax = damage; // no going beyond 100% in aggressive mode
 					int damageMin = std::min(damageMax, (damage / 2) * (effAggressive + 100) / 100);
 					damage = RNG::generate(damageMin, damageMax);
+					strikeType = "AGGRESSIVE";
 				}
 				else
 				{
@@ -1240,6 +1272,7 @@ void DogfightState::update()
 					int damageMax = damage; // no going beyond 100% in evasive mode
 					int damageMin = std::min(damageMax, damage / 3); // no bonuses, random only
 					damage = RNG::generate(damageMin, damageMax);
+					strikeType = "EVASIVE";
 				}
 
 				// Handle UFO shields
@@ -1255,7 +1288,8 @@ void DogfightState::update()
 
 					// Shield damage logging
 					Log(LOG_DEBUG) << "Missile: " << _craft->getRules()->getType() << ", UFO: "
-						<< _ufo->getRules()->getType() << ", Shield Damage: " << shieldDamage << ", Shield Status: "
+						<< _ufo->getRules()->getType() << ", Strike Type: " << strikeType
+						<< ", Shield Damage: " << shieldDamage << ", Shield Status: "
 						<< _ufo->getShield() << "/" << _ufo->getRules()->getStats().shieldCapacity;
 				}
 
@@ -1266,7 +1300,8 @@ void DogfightState::update()
 
 				// Hull damage logging
 				Log(LOG_DEBUG) << "Missile: " << _craft->getRules()->getType() << ", UFO: " 
-					<< _ufo->getRules()->getType() << ", Hull Damage: " << damage << ", Hull Status: "
+					<< _ufo->getRules()->getType() << ", Strike Type: " << strikeType
+					<< ", Hull Damage: " << damage << ", Hull Status: "
 					<< (_ufo->getRules()->getStats().damageMax - _ufo->getDamage())
 					<< "/" << _ufo->getRules()->getStats().damageMax;
 
