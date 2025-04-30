@@ -487,7 +487,7 @@ DogfightState::DogfightState(GeoscapeState *state, Craft *craft, Ufo *ufo, bool 
 				dogfightInterface->getElement("disengageButton")->color + 4);
 		}
 	}
-	if (!_craftSpeedBetter)
+	if (_ufoIsAttacking && !_craftSpeedBetter)
 	{
 		int offset = dogfightInterface->getElement("minimizeButtonDummy")->TFTDMode ? 1 : 0;
 		_window->drawRect(_btnMinimize->getX() + 1 + offset, _btnMinimize->getY() + 1, _btnMinimize->getWidth() - 2 - offset, _btnMinimize->getHeight() - 2,
