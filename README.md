@@ -100,7 +100,12 @@ same manner, as they affect crafts.
 `reloadCautious` - increases damage roll range for **Precision Mode**.  
 `reloadStandard` - increases damage roll range for **Standard Mode**.  
 `reloadAggressive` - increases damage roll range for **Aggressive Mode**.  
-`powerBonus` - modifies base damage multiplier by flat percent value.  
+`powerBonus` - modifies base damage multiplier by flat percent value.
+
+**Note**: if you will use multiple strike modes during dogfight, the damage
+effect might be even more random than you think. During dogfight game tracks
+how much distance missile have traveled in each mode and uses these numbers
+to select final damage effect against UFO on impact.
 
 ## Multi-Craft Hangars, Craft Sizes and Craft Classifications
 **Facility values for script files (with example below):**  
