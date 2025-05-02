@@ -44,6 +44,7 @@ keyBattleCenterEnemy9, keyBattleCenterEnemy10, keyBattleVoxelView, keyBattleZero
 
 // Extra hotkeys (OXCE)
 OPT SDLKey keyGeoDailyPilotExperience, keyGeoUfoTracker, keyGeoTechTreeViewer, keyGeoGlobalResearch, keyGeoGlobalProduction, keyGeoGlobalAlienContainment,
+	keyGeoActivePause,
 	keyGraphsZoomIn, keyGraphsZoomOut,
 	keyToggleQuickSearch, keyInstaSave,
 	keyCraftLoadoutSave, keyCraftLoadoutLoad,
@@ -88,6 +89,9 @@ OPT bool oxceUfoLandingAlert;
 OPT bool oxceRememberDisabledCraftWeapons;
 OPT bool oxceGeoscapeEventsInstantDelivery;
 OPT bool oxceShowBaseNameInPopups;
+OPT bool oxceGeoActivePauseEnabled;
+OPT bool oxceGeoActivePauseReplace;
+OPT bool oxceGeoActivePauseOnLoad;
 
 OPT bool oxceAlternateCraftEquipmentManagement;
 OPT bool oxceBaseInfoScaleEnabled;

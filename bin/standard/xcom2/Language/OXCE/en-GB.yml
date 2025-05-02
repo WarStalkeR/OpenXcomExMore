@@ -30,6 +30,7 @@ en-GB:
   STR_UFO_SURVIVED_SPLASHDOWN: "ALIEN SUB DOWNED!"
 #GeoscapeState.cpp
   STR_UFO_HAS_LANDED: "USO has touched down at{NEWLINE}{0}"
+  STR_ACTIVE_PAUSE_CENTER_ON_UFO: "CENTRE ON ALIEN SUB - Pause"
 #SelectMusicTrackState.cpp
   GMGEO1: "Geoscape Track #1"
   GMGEO2: "Geoscape Track #2"
