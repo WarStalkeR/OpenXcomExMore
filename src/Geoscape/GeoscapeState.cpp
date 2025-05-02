@@ -141,7 +141,7 @@ namespace OpenXcom
  * Initializes all the elements in the Geoscape screen.
  * @param game Pointer to the core game.
  */
-GeoscapeState::GeoscapeState() : _pause(false), _zoomInEffectDone(false), _zoomOutEffectDone(false), _minimizedDogfights(0), _slowdownCounter(0)
+GeoscapeState::GeoscapeState() : _pause(false), _pauseActive(false), _zoomInEffectDone(false), _zoomOutEffectDone(false), _minimizedDogfights(0), _slowdownCounter(0)
 {
 	int screenWidth = Options::baseXGeoscape;
 	int screenHeight = Options::baseYGeoscape;
@@ -194,8 +194,10 @@ GeoscapeState::GeoscapeState() : _pause(false), _zoomInEffectDone(false), _zoomO
 
 	int slackingIndicatorOffset = _game->getMod()->getInterface("geoscape")->getElement("slackingIndicator")->custom;
 	_txtSlacking = new Text(59, 17, screenWidth - 61, screenHeight / 2 - 100 + slackingIndicatorOffset);
+	_btnActivePause = new InteractiveSurface(63, 39, screenWidth-63, screenHeight/2-28);
 
 	_timeSpeed = _btn5Secs;
+	_lastSpeed = nullptr;
 	_gameTimer = new Timer(Options::geoClockSpeed);
 
 	_zoomInEffectTimer = new Timer(Options::dogfightSpeed);
@@ -252,6 +254,7 @@ GeoscapeState::GeoscapeState() : _pause(false), _zoomInEffectDone(false), _zoomO
 	add(_txtMonth, "text", "geoscape");
 	add(_txtYear, "text", "geoscape");
 	add(_txtSlacking, "slackingIndicator", "geoscape");
+	add(_btnActivePause);
 
 	add(_txtDebug, "text", "geoscape");
 	add(_cbxRegion, "button", "geoscape");
@@ -315,6 +318,7 @@ GeoscapeState::GeoscapeState() : _pause(false), _zoomInEffectDone(false), _zoomO
 	_btn5Secs->setBig();
 	_btn5Secs->setText(tr("STR_5_SECONDS"));
 	_btn5Secs->setGroup(&_timeSpeed);
+	_btn5Secs->onMouseClick((ActionHandler)&GeoscapeState::btnUnpauseClick, SDL_BUTTON_LEFT);
 	_btn5Secs->onKeyboardPress((ActionHandler)&GeoscapeState::btnTimerClick, Options::keyGeoSpeed1);
 	_btn5Secs->setGeoscapeButton(true);
 
@@ -322,6 +326,7 @@ GeoscapeState::GeoscapeState() : _pause(false), _zoomInEffectDone(false), _zoomO
 	_btn1Min->setBig();
 	_btn1Min->setText(tr("STR_1_MINUTE"));
 	_btn1Min->setGroup(&_timeSpeed);
+	_btn1Min->onMouseClick((ActionHandler)&GeoscapeState::btnUnpauseClick, SDL_BUTTON_LEFT);
 	_btn1Min->onKeyboardPress((ActionHandler)&GeoscapeState::btnTimerClick, Options::keyGeoSpeed2);
 	_btn1Min->setGeoscapeButton(true);
 
@@ -329,6 +334,7 @@ GeoscapeState::GeoscapeState() : _pause(false), _zoomInEffectDone(false), _zoomO
 	_btn5Mins->setBig();
 	_btn5Mins->setText(tr("STR_5_MINUTES"));
 	_btn5Mins->setGroup(&_timeSpeed);
+	_btn5Mins->onMouseClick((ActionHandler)&GeoscapeState::btnUnpauseClick, SDL_BUTTON_LEFT);
 	_btn5Mins->onKeyboardPress((ActionHandler)&GeoscapeState::btnTimerClick, Options::keyGeoSpeed3);
 	_btn5Mins->setGeoscapeButton(true);
 
@@ -336,6 +342,7 @@ GeoscapeState::GeoscapeState() : _pause(false), _zoomInEffectDone(false), _zoomO
 	_btn30Mins->setBig();
 	_btn30Mins->setText(tr("STR_30_MINUTES"));
 	_btn30Mins->setGroup(&_timeSpeed);
+	_btn30Mins->onMouseClick((ActionHandler)&GeoscapeState::btnUnpauseClick, SDL_BUTTON_LEFT);
 	_btn30Mins->onKeyboardPress((ActionHandler)&GeoscapeState::btnTimerClick, Options::keyGeoSpeed4);
 	_btn30Mins->setGeoscapeButton(true);
 
@@ -343,6 +350,7 @@ GeoscapeState::GeoscapeState() : _pause(false), _zoomInEffectDone(false), _zoomO
 	_btn1Hour->setBig();
 	_btn1Hour->setText(tr("STR_1_HOUR"));
 	_btn1Hour->setGroup(&_timeSpeed);
+	_btn1Hour->onMouseClick((ActionHandler)&GeoscapeState::btnUnpauseClick, SDL_BUTTON_LEFT);
 	_btn1Hour->onKeyboardPress((ActionHandler)&GeoscapeState::btnTimerClick, Options::keyGeoSpeed5);
 	_btn1Hour->setGeoscapeButton(true);
 
@@ -350,9 +358,10 @@ GeoscapeState::GeoscapeState() : _pause(false), _zoomInEffectDone(false), _zoomO
 	_btn1Day->setBig();
 	_btn1Day->setText(tr("STR_1_DAY"));
 	_btn1Day->setGroup(&_timeSpeed);
+	_btn1Day->onMouseClick((ActionHandler)&GeoscapeState::btnUnpauseClick, SDL_BUTTON_LEFT);
 	_btn1Day->onKeyboardPress((ActionHandler)&GeoscapeState::btnTimerClick, Options::keyGeoSpeed6);
 	_btn1Day->setGeoscapeButton(true);
-
+	
 	_sideBottom->setGeoscapeButton(true);
 	_sideTop->setGeoscapeButton(true);
 
@@ -383,6 +392,9 @@ GeoscapeState::GeoscapeState() : _pause(false), _zoomInEffectDone(false), _zoomO
 	_btnZoomOut->onMouseClick((ActionHandler)&GeoscapeState::btnZoomOutLeftClick, SDL_BUTTON_LEFT);
 	_btnZoomOut->onMouseClick((ActionHandler)&GeoscapeState::btnZoomOutRightClick, SDL_BUTTON_RIGHT);
 	_btnZoomOut->onKeyboardPress((ActionHandler)&GeoscapeState::btnZoomOutLeftClick, Options::keyGeoZoomOut);
+
+	_btnActivePause->onMouseClick((ActionHandler)&GeoscapeState::btnActivePauseClick, SDL_BUTTON_LEFT);
+	_btnActivePause->onKeyboardPress((ActionHandler)&GeoscapeState::btnActivePauseClick, Options::keyGeoActivePause);
 
 	_txtFunds->setAlign(ALIGN_CENTER);
 	_txtFunds->setVisible(Options::showFundsOnGeoscape);
@@ -429,6 +441,8 @@ GeoscapeState::GeoscapeState() : _pause(false), _zoomInEffectDone(false), _zoomO
 	_zoomOutEffectTimer->onTimer((StateHandler)&GeoscapeState::zoomOutEffect);
 	_dogfightStartTimer->onTimer((StateHandler)&GeoscapeState::startDogfight);
 	_dogfightTimer->onTimer((StateHandler)&GeoscapeState::handleDogfights);
+
+	if (Options::oxceGeoActivePauseOnLoad) btnActivePauseClick(0);
 
 	// debug helpers
 	{
@@ -749,6 +763,13 @@ void GeoscapeState::init()
 		determineAlienMissions();
 		_game->getSavedGame()->setFunds(_game->getSavedGame()->getFunds() - (_game->getSavedGame()->getBaseMaintenance() - _game->getSavedGame()->getBases()->front()->getPersonnelMaintenance()));
 	}
+
+	// Release button after returning to geoscape
+	if (_pauseActive)
+	{
+		_timeSpeed = nullptr;
+		_btn5Secs->draw();
+	}
 }
 
 /**
@@ -774,7 +795,7 @@ void GeoscapeState::think()
 			// If all dogfights are minimized rotate the globe, etc.
 			if (_dogfights.size() == _minimizedDogfights)
 			{
-				_pause = false;
+				if (!_pauseActive) _pause = false;
 				_gameTimer->think(this, 0);
 			}
 			_dogfightTimer->think(this, 0);
@@ -824,7 +845,8 @@ void GeoscapeState::timeDisplay()
 	ss4 << _game->getSavedGame()->getTime()->getDayString(_game->getLanguage());
 	_txtDay->setText(ss4.str());
 
-	_txtWeekday->setText(tr(_game->getSavedGame()->getTime()->getWeekdayString()));
+	if (_pauseActive) _txtWeekday->setText(tr("STR_ACTIVE_PAUSE_UC"));
+	else _txtWeekday->setText(tr(_game->getSavedGame()->getTime()->getWeekdayString()));
 
 	_txtMonth->setText(tr(_game->getSavedGame()->getTime()->getMonthString()));
 
@@ -912,7 +934,7 @@ void GeoscapeState::timeAdvance()
 		}
 	}
 
-	_pause = !_dogfightsToBeStarted.empty() || _zoomInEffectTimer->isRunning() || _zoomOutEffectTimer->isRunning();
+	_pause = !_dogfightsToBeStarted.empty() || _zoomInEffectTimer->isRunning() || _zoomOutEffectTimer->isRunning() || _pauseActive;
 
 	timeDisplay();
 	_globe->draw();
@@ -4846,6 +4868,105 @@ void GeoscapeState::btnTimerClick(Action *action)
 	ev.button.button = SDL_BUTTON_LEFT;
 	Action a = Action(&ev, 0.0, 0.0, 0, 0);
 	action->getSender()->mousePress(&a, this);
+	btnUnpauseClick(action);
+}
+
+/**
+ * Handler for unpausing via timer button.
+ * @param action pointer to the mouse action.
+ */
+void GeoscapeState::btnUnpauseClick(Action *action)
+{
+	// Ignore, if disabled
+	if (!Options::oxceGeoActivePauseEnabled) return;
+
+	// Unpause, only if truly paused
+	if (_pauseActive && _pause)
+	{
+		_lastSpeed = (TextButton*)action->getSender();
+		_timeSpeed = nullptr;
+		btnActivePauseClick(0);
+	}
+}
+
+/**
+ * Handler for enforcing active pause.
+ * @param action pointer to the mouse action.
+ */
+void GeoscapeState::btnPauseClick(Action *)
+{
+	// Ignore, if disabled
+	if (!Options::oxceGeoActivePauseEnabled) return;
+
+	// Pause, only if truly unpaused
+	if (!_pauseActive && !_pause)
+	{
+		btnActivePauseClick(0);
+	}
+}
+
+/**
+ * Handler for triggering active pause.
+ * @param action Pointer to an action.
+ */
+void GeoscapeState::btnActivePauseClick(Action *)
+{
+	// Ignore, if disabled
+	if (!Options::oxceGeoActivePauseEnabled) return;
+
+	// Change pause mode
+	_pauseActive = !_pauseActive;
+
+	// Mouse click simulation
+	SDL_Event ev;
+	ev.type = SDL_MOUSEBUTTONDOWN;
+	ev.button.button = SDL_BUTTON_LEFT;
+	Action a = Action(&ev, 0.0, 0.0, 0, 0);
+
+	// Force selected pause mode
+	if (_pauseActive && !_pause) {
+		if (_timeSpeed)
+		{
+			_pause = true;
+			_lastSpeed = _timeSpeed;
+			_timeSpeed = nullptr;
+			_lastSpeed->draw();
+		}
+		else // Edge case handling
+		{
+			_pause = true;
+			_lastSpeed = _btn5Secs;
+			_lastSpeed->mousePress(&a, this);
+			_lastSpeed->mouseRelease(&a, this);
+			_timeSpeed = nullptr;
+			_lastSpeed->draw();
+		}
+	}
+	else if (!_pauseActive && _pause)
+	{
+		if (_lastSpeed)
+		{
+			_pause = false;
+			_timeSpeed = _lastSpeed;
+			_lastSpeed = nullptr;
+			_timeSpeed->draw();
+		}
+		else // Edge case handling
+		{
+			_pause = false;
+			_timeSpeed = _btn5Secs;
+			_timeSpeed->draw();
+		}
+	}
+}
+
+/**
+ * Check if active pause is in effect.
+ * @return Is active pause fully enacted?
+ */
+bool GeoscapeState::isFullyPaused()
+{
+	return _pauseActive && _pause;
 }
 
 /**

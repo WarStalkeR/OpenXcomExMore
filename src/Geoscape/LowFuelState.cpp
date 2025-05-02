@@ -64,7 +64,9 @@ LowFuelState::LowFuelState(Craft *craft, GeoscapeState *state) : _craft(craft), 
 	_btnOk->onMouseClick((ActionHandler)&LowFuelState::btnOkClick);
 	_btnOk->onKeyboardPress((ActionHandler)&LowFuelState::btnOkClick, Options::keyCancel);
 
-	_btnOk5Secs->setText(tr("STR_OK_5_SECONDS"));
+	if (Options::oxceGeoActivePauseEnabled && Options::oxceGeoActivePauseReplace)
+		_btnOk5Secs->setText(tr("STR_ACTIVE_PAUSE_OK"));
+	else _btnOk5Secs->setText(tr("STR_OK_5_SECONDS"));
 	_btnOk5Secs->onMouseClick((ActionHandler)&LowFuelState::btnOk5SecsClick);
 	_btnOk5Secs->onKeyboardPress((ActionHandler)&LowFuelState::btnOk5SecsClick, Options::keyOk);
 
@@ -101,7 +103,15 @@ void LowFuelState::btnOkClick(Action *)
  */
 void LowFuelState::btnOk5SecsClick(Action *)
 {
-	_state->timerReset();
+	if (Options::oxceGeoActivePauseEnabled && Options::oxceGeoActivePauseReplace)
+	{
+		if (!_state->isFullyPaused())
+		{
+			_state->timerReset();
+			_state->btnPauseClick(0);
+		}
+	}
+	else _state->timerReset();
 	_game->popState();
 }
 
