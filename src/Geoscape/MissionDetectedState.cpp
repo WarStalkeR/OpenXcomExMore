@@ -74,7 +74,9 @@ MissionDetectedState::MissionDetectedState(MissionSite *mission, GeoscapeState *
 	_btnIntercept->setText(tr("STR_INTERCEPT"));
 	_btnIntercept->onMouseClick((ActionHandler)&MissionDetectedState::btnInterceptClick);
 
-	_btnCenter->setText(tr("STR_CENTER_ON_SITE_TIME_5_SECONDS"));
+	if (Options::oxceGeoActivePauseEnabled && Options::oxceGeoActivePauseReplace)
+		_btnCenter->setText(tr("STR_ACTIVE_PAUSE_CENTER_ON_SITE"));
+	else _btnCenter->setText(tr("STR_CENTER_ON_SITE_TIME_5_SECONDS"));
 	_btnCenter->onMouseClick((ActionHandler)&MissionDetectedState::btnCenterClick);
 
 	_btnCancel->setText(tr("STR_CANCEL_UC"));
@@ -116,7 +118,15 @@ void MissionDetectedState::btnInterceptClick(Action *)
  */
 void MissionDetectedState::btnCenterClick(Action *)
 {
-	_state->timerReset();
+	if (Options::oxceGeoActivePauseEnabled && Options::oxceGeoActivePauseReplace)
+	{
+		if (!_state->isFullyPaused())
+		{
+			_state->timerReset();
+			_state->btnPauseClick(0);
+		}
+	}
+	else _state->timerReset();
 	_state->getGlobe()->center(_mission->getLongitude(), _mission->getLatitude());
 	_game->popState();
 }
