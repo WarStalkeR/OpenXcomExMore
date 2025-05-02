@@ -47,13 +47,13 @@ private:
 	Surface *_bg, *_sideLine, *_sidebar;
 	Globe *_globe;
 	TextButton *_btnIntercept, *_btnBases, *_btnGraphs, *_btnUfopaedia, *_btnOptions, *_btnFunding;
-	TextButton *_timeSpeed;
+	TextButton *_timeSpeed, *_btnActivePause, *_lastSpeed;
 	TextButton *_btn5Secs, *_btn1Min, *_btn5Mins, *_btn30Mins, *_btn1Hour, *_btn1Day;
 	TextButton *_sideTop, *_sideBottom;
 	InteractiveSurface *_btnRotateLeft, *_btnRotateRight, *_btnRotateUp, *_btnRotateDown, *_btnZoomIn, *_btnZoomOut;
 	Text *_txtFunds, *_txtHour, *_txtHourSep, *_txtMin, *_txtMinSep, *_txtSec, *_txtWeekday, *_txtDay, *_txtMonth, *_txtYear;
 	Timer *_gameTimer, *_zoomInEffectTimer, *_zoomOutEffectTimer, *_dogfightStartTimer, *_dogfightTimer;
-	bool _pause, _zoomInEffectDone, _zoomOutEffectDone;
+	bool _pause, _pauseActive, _zoomInEffectDone, _zoomOutEffectDone;
 	Text *_txtDebug;
 	ComboBox *_cbxRegion, *_cbxZone, *_cbxArea, *_cbxCountry;
 	Text *_txtSlacking;
@@ -181,6 +181,8 @@ public:
 	int getFirstFreeDogfightSlot();
 	/// Handler for clicking the timer button.
 	void btnTimerClick(Action *action);
+	/// Handler for triggering Active Pause.
+	void btnActivePauseClick(Action *action);
 	/// Process a mission site
 	bool processMissionSite(MissionSite *site);
 	/// Handles base defense

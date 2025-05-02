@@ -409,6 +409,14 @@ en-GB:
   STR_DATA_VIEWER_TRANSLATE: "Data viewer strings translation"
   STR_DATA_VIEWER_TRANSLATE_DESC: "Defines if Data Viewer tries to find localized translation for entry or just uses identifier as is. Can help with detecting missed localizations for scripts."
   STR_ADV_DEBUG: "Advanced Debugging"
+  STR_ACTIVE_PAUSE_ENABLE: "Enable Active Pause"
+  STR_ACTIVE_PAUSE_ENABLE_DESC: "Enables active pause in Geoscape. Using designated hotkey (SPACE by default) you can completely pause flow of time, whilst in Geoscape."
+  STR_ACTIVE_PAUSE_REPLACE: "Active Pause UFO Context Replace"
+  STR_ACTIVE_PAUSE_REPLACE_DESC: "Replaces the '5 secs' option for various interactions with UFO (detection, interception, etc) with 'pause' variant. Won't work, if Active Pause is not enabled."
+  STR_ACTIVE_PAUSE_ONLOAD: "Active Pause On Game Load"
+  STR_ACTIVE_PAUSE_ONLOAD_DESC: "After loading save game, Geoscape loads not in '5 secs' mode, but with an active pause enabled instead. Won't work, if Active Pause is not enabled."
+  STR_OK_ACTIVE_PAUSE: "OK - Pause"
+  STR_ACTIVE_PAUSE: "Active Pause"
 #==== General ===============
   STR_UPDATE_CHECK: "Automatic update check"
   STR_UPDATE_CHECK_DESC: "If enabled, OpenXcom will automatically check for updates and give you an option to update itself by a single button click."
@@ -579,6 +587,7 @@ en-GB:
   STR_ECONOMY_WARNING: "The funds {0} and income {1} are low and the maintenance {2} too high! Sell something to avoid taking a credit... funds missing: {3}"
   STR_SLACKING_INDICATOR: "{0}:{1}"
   STR_EXTENDED_UC: "EXTENDED"
+  STR_ACTIVE_PAUSE_UC: "ACTIVE PAUSE"
 #InterceptState.cpp
   STR_BASE_DISTANCE: "BASE,{NEWLINE}DISTANCE (KM)"
   STR_RETURNING: "RETURNING"

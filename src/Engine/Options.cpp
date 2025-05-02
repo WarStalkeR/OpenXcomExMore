@@ -574,11 +574,19 @@ void createAdvancedOptionsOTHER()
 	_info.push_back(OptionInfo(OPTION_OTHER, "oxceDataViewStringTrunc", &oxceDataViewStringTrunc, 0, "STR_DATA_VIEWER_STRING_TRUNC", "STR_ADV_DEBUG"));
 	_info.push_back(OptionInfo(OPTION_OTHER, "oxceDataViewCleanReplace", &oxceDataViewCleanReplace, true, "STR_DATA_VIEWER_CLEAN_REPLACE", "STR_ADV_DEBUG"));
 	_info.push_back(OptionInfo(OPTION_OTHER, "oxceDataViewStrTranslate", &oxceDataViewStrTranslate, false, "STR_DATA_VIEWER_TRANSLATE", "STR_ADV_DEBUG"));
+
+	// Geoscape Active Pause feature integration.
+	_info.push_back(OptionInfo(OPTION_OTHER, "oxceGeoActivePauseEnabled", &oxceGeoActivePauseEnabled, false, "STR_ACTIVE_PAUSE_ENABLE", "STR_GEOSCAPE"));
+	_info.push_back(OptionInfo(OPTION_OTHER, "oxceGeoActivePauseReplace", &oxceGeoActivePauseReplace, false, "STR_ACTIVE_PAUSE_REPLACE", "STR_GEOSCAPE"));
+	_info.push_back(OptionInfo(OPTION_OTHER, "oxceGeoActivePauseOnLoad", &oxceGeoActivePauseOnLoad, false, "STR_ACTIVE_PAUSE_REPLACE", "STR_GEOSCAPE"));
 }
 
 void createControlsOTHER()
 {
 	// your fork's controls here
+
+	// Hotkey for active pause in the Geoscape.
+	_info.push_back(OptionInfo(OPTION_OTHER, "keyGeoActivePause", &keyGeoActivePause, SDLK_SPACE, "STR_ACTIVE_PAUSE", "STR_GEOSCAPE"));
 }
 
 
