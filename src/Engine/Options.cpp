@@ -572,11 +572,19 @@ void createAdvancedOptionsOTHER()
 	
 	// Enable/disable trigger for starting base selection interface.
 	_info.push_back(OptionInfo(OPTION_OTHER, "oxceStartingBaseSelection", &oxceStartingBaseSelection, false, "STR_SHOW_BASE_SELECTION", "STR_GENERAL"));
+
+	// Geoscape Active Pause feature integration.
+	_info.push_back(OptionInfo(OPTION_OTHER, "oxceGeoActivePauseEnabled", &oxceGeoActivePauseEnabled, false, "STR_ACTIVE_PAUSE_ENABLE", "STR_GEOSCAPE"));
+	_info.push_back(OptionInfo(OPTION_OTHER, "oxceGeoActivePauseReplace", &oxceGeoActivePauseReplace, false, "STR_ACTIVE_PAUSE_REPLACE", "STR_GEOSCAPE"));
+	_info.push_back(OptionInfo(OPTION_OTHER, "oxceGeoActivePauseOnLoad", &oxceGeoActivePauseOnLoad, false, "STR_ACTIVE_PAUSE_ONLOAD", "STR_GEOSCAPE"));
 }
 
 void createControlsOTHER()
 {
 	// your fork's controls here
+
+	// Hotkey for active pause in the Geoscape.
+	_info.push_back(OptionInfo(OPTION_OTHER, "keyGeoActivePause", &keyGeoActivePause, SDLK_SPACE, "STR_ACTIVE_PAUSE", "STR_GEOSCAPE"));
 }
 
 

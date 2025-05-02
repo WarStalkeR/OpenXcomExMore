@@ -122,7 +122,9 @@ UfoDetectedState::UfoDetectedState(Ufo *ufo, GeoscapeState *state, bool detected
 	_btnIntercept->setText(tr("STR_INTERCEPT"));
 	_btnIntercept->onMouseClick((ActionHandler)&UfoDetectedState::btnInterceptClick);
 
-	_btnCentre->setText(tr("STR_CENTER_ON_UFO_TIME_5_SECONDS"));
+	if (Options::oxceGeoActivePauseEnabled && Options::oxceGeoActivePauseReplace)
+		_btnCentre->setText(tr("STR_ACTIVE_PAUSE_CENTER_ON_UFO"));
+	else _btnCentre->setText(tr("STR_CENTER_ON_UFO_TIME_5_SECONDS"));
 	_btnCentre->onMouseClick((ActionHandler)&UfoDetectedState::btnCentreClick);
 
 	if (_game->isCtrlPressed())
@@ -240,7 +242,15 @@ void UfoDetectedState::btnInterceptClick(Action *)
  */
 void UfoDetectedState::btnCentreClick(Action *)
 {
-	_state->timerReset();
+	if (Options::oxceGeoActivePauseEnabled && Options::oxceGeoActivePauseReplace)
+	{
+		if (!_state->isFullyPaused())
+		{
+			_state->timerReset();
+			_state->btnPauseClick(0);
+		}
+	}
+	else _state->timerReset();
 	_state->getGlobe()->center(_ufo->getLongitude(), _ufo->getLatitude());
 	_game->popState();
 }
