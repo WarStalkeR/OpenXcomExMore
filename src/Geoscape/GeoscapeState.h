@@ -181,6 +181,8 @@ public:
 	int getFirstFreeDogfightSlot();
 	/// Handler for clicking the timer button.
 	void btnTimerClick(Action *action);
+	/// Handler for unpausing via timer button.
+	void btnUnpauseClick(Action *action);
 	/// Handler for triggering Active Pause.
 	void btnActivePauseClick(Action *action);
 	/// Process a mission site

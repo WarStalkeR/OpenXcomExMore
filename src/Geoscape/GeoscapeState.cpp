@@ -318,6 +318,7 @@ GeoscapeState::GeoscapeState() : _pause(false), _pauseActive(false), _zoomInEffe
 	_btn5Secs->setBig();
 	_btn5Secs->setText(tr("STR_5_SECONDS"));
 	_btn5Secs->setGroup(&_timeSpeed);
+	_btn5Secs->onMouseClick((ActionHandler)&GeoscapeState::btnUnpauseClick, SDL_BUTTON_LEFT);
 	_btn5Secs->onKeyboardPress((ActionHandler)&GeoscapeState::btnTimerClick, Options::keyGeoSpeed1);
 	_btn5Secs->setGeoscapeButton(true);
 
@@ -325,6 +326,7 @@ GeoscapeState::GeoscapeState() : _pause(false), _pauseActive(false), _zoomInEffe
 	_btn1Min->setBig();
 	_btn1Min->setText(tr("STR_1_MINUTE"));
 	_btn1Min->setGroup(&_timeSpeed);
+	_btn1Min->onMouseClick((ActionHandler)&GeoscapeState::btnUnpauseClick, SDL_BUTTON_LEFT);
 	_btn1Min->onKeyboardPress((ActionHandler)&GeoscapeState::btnTimerClick, Options::keyGeoSpeed2);
 	_btn1Min->setGeoscapeButton(true);
 
@@ -332,6 +334,7 @@ GeoscapeState::GeoscapeState() : _pause(false), _pauseActive(false), _zoomInEffe
 	_btn5Mins->setBig();
 	_btn5Mins->setText(tr("STR_5_MINUTES"));
 	_btn5Mins->setGroup(&_timeSpeed);
+	_btn5Mins->onMouseClick((ActionHandler)&GeoscapeState::btnUnpauseClick, SDL_BUTTON_LEFT);
 	_btn5Mins->onKeyboardPress((ActionHandler)&GeoscapeState::btnTimerClick, Options::keyGeoSpeed3);
 	_btn5Mins->setGeoscapeButton(true);
 
@@ -339,6 +342,7 @@ GeoscapeState::GeoscapeState() : _pause(false), _pauseActive(false), _zoomInEffe
 	_btn30Mins->setBig();
 	_btn30Mins->setText(tr("STR_30_MINUTES"));
 	_btn30Mins->setGroup(&_timeSpeed);
+	_btn30Mins->onMouseClick((ActionHandler)&GeoscapeState::btnUnpauseClick, SDL_BUTTON_LEFT);
 	_btn30Mins->onKeyboardPress((ActionHandler)&GeoscapeState::btnTimerClick, Options::keyGeoSpeed4);
 	_btn30Mins->setGeoscapeButton(true);
 
@@ -346,6 +350,7 @@ GeoscapeState::GeoscapeState() : _pause(false), _pauseActive(false), _zoomInEffe
 	_btn1Hour->setBig();
 	_btn1Hour->setText(tr("STR_1_HOUR"));
 	_btn1Hour->setGroup(&_timeSpeed);
+	_btn1Hour->onMouseClick((ActionHandler)&GeoscapeState::btnUnpauseClick, SDL_BUTTON_LEFT);
 	_btn1Hour->onKeyboardPress((ActionHandler)&GeoscapeState::btnTimerClick, Options::keyGeoSpeed5);
 	_btn1Hour->setGeoscapeButton(true);
 
@@ -353,6 +358,7 @@ GeoscapeState::GeoscapeState() : _pause(false), _pauseActive(false), _zoomInEffe
 	_btn1Day->setBig();
 	_btn1Day->setText(tr("STR_1_DAY"));
 	_btn1Day->setGroup(&_timeSpeed);
+	_btn1Day->onMouseClick((ActionHandler)&GeoscapeState::btnUnpauseClick, SDL_BUTTON_LEFT);
 	_btn1Day->onKeyboardPress((ActionHandler)&GeoscapeState::btnTimerClick, Options::keyGeoSpeed6);
 	_btn1Day->setGeoscapeButton(true);
 	
@@ -756,6 +762,13 @@ void GeoscapeState::init()
 		_game->getSavedGame()->increaseDaysPassed();
 		determineAlienMissions();
 		_game->getSavedGame()->setFunds(_game->getSavedGame()->getFunds() - (_game->getSavedGame()->getBaseMaintenance() - _game->getSavedGame()->getBases()->front()->getPersonnelMaintenance()));
+	}
+
+	// Unclick button after returning to geoscape
+	if (_pauseActive)
+	{
+		_timeSpeed = nullptr;
+		_btn5Secs->draw();
 	}
 }
 
@@ -4833,6 +4846,24 @@ void GeoscapeState::btnTimerClick(Action *action)
 	ev.button.button = SDL_BUTTON_LEFT;
 	Action a = Action(&ev, 0.0, 0.0, 0, 0);
 	action->getSender()->mousePress(&a, this);
+}
+
+/**
+ * Handler for unpausing via timer button.
+ * @param action pointer to the mouse action.
+ */
+void GeoscapeState::btnUnpauseClick(Action *action)
+{
+	// Ignore, if disabled
+	if (!Options::oxceGeoActivePauseEnabled) return;
+
+	if (_pauseActive && _pause)
+	{
+		_lastSpeed = (TextButton*)action->getSender();
+		_timeSpeed = nullptr;
+		_lastSpeed->draw();
+		btnActivePauseClick(0);
+	}
 }
 
 /**
