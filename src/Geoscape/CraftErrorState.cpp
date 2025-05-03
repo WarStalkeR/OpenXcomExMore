@@ -71,7 +71,9 @@ CraftErrorState::CraftErrorState(GeoscapeState *state, const std::string &msg, b
 		}
 	}
 
-	_btnOk5Secs->setText(tr("STR_OK_5_SECONDS"));
+	if (Options::oxceGeoActivePauseEnabled && Options::oxceGeoActivePauseReplace)
+		_btnOk5Secs->setText(tr("STR_ACTIVE_PAUSE_OK"));
+	else _btnOk5Secs->setText(tr("STR_OK_5_SECONDS"));
 	_btnOk5Secs->onMouseClick((ActionHandler)&CraftErrorState::btnOk5SecsClick);
 	if (enableHotkeys && _state)
 	{
@@ -109,7 +111,15 @@ void CraftErrorState::btnOkClick(Action *)
  */
 void CraftErrorState::btnOk5SecsClick(Action *)
 {
-	_state->timerReset();
+	if (Options::oxceGeoActivePauseEnabled && Options::oxceGeoActivePauseReplace)
+	{
+		if (!_state->isFullyPaused())
+		{
+			_state->timerReset();
+			_state->btnPauseClick(0);
+		}
+	}
+	else _state->timerReset();
 	if (_centerOnTarget)
 	{
 		_state->getGlobe()->center(_centerOnTarget->getLongitude(), _centerOnTarget->getLatitude());

@@ -183,8 +183,12 @@ public:
 	void btnTimerClick(Action *action);
 	/// Handler for unpausing via timer button.
 	void btnUnpauseClick(Action *action);
-	/// Handler for triggering Active Pause.
+	/// Handler for enforcing active pause.
+	void btnPauseClick(Action *action);
+	/// Handler for triggering active pause.
 	void btnActivePauseClick(Action *action);
+	/// Check if active pause is in effect.
+	bool isFullyPaused();
 	/// Process a mission site
 	bool processMissionSite(MissionSite *site);
 	/// Handles base defense

@@ -764,7 +764,7 @@ void GeoscapeState::init()
 		_game->getSavedGame()->setFunds(_game->getSavedGame()->getFunds() - (_game->getSavedGame()->getBaseMaintenance() - _game->getSavedGame()->getBases()->front()->getPersonnelMaintenance()));
 	}
 
-	// Unclick button after returning to geoscape
+	// Release button after returning to geoscape
 	if (_pauseActive)
 	{
 		_timeSpeed = nullptr;
@@ -4858,17 +4858,33 @@ void GeoscapeState::btnUnpauseClick(Action *action)
 	// Ignore, if disabled
 	if (!Options::oxceGeoActivePauseEnabled) return;
 
+	// Unpause, only if truly paused
 	if (_pauseActive && _pause)
 	{
 		_lastSpeed = (TextButton*)action->getSender();
 		_timeSpeed = nullptr;
-		_lastSpeed->draw();
 		btnActivePauseClick(0);
 	}
 }
 
 /**
- * Handler for triggering Active Pause.
+ * Handler for enforcing active pause.
+ * @param action pointer to the mouse action.
+ */
+void GeoscapeState::btnPauseClick(Action *)
+{
+	// Ignore, if disabled
+	if (!Options::oxceGeoActivePauseEnabled) return;
+
+	// Pause, only if truly unpaused
+	if (!_pauseActive && !_pause)
+	{
+		btnActivePauseClick(0);
+	}
+}
+
+/**
+ * Handler for triggering active pause.
  * @param action Pointer to an action.
  */
 void GeoscapeState::btnActivePauseClick(Action *)
@@ -4892,7 +4908,6 @@ void GeoscapeState::btnActivePauseClick(Action *)
 			_pause = true;
 			_lastSpeed = _timeSpeed;
 			_timeSpeed = nullptr;
-			_lastSpeed->mouseRelease(&a, this);
 			_lastSpeed->draw();
 		}
 		else // Edge case handling
@@ -4901,6 +4916,7 @@ void GeoscapeState::btnActivePauseClick(Action *)
 			_lastSpeed = _btn5Secs;
 			_lastSpeed->mousePress(&a, this);
 			_lastSpeed->mouseRelease(&a, this);
+			_timeSpeed = nullptr;
 			_lastSpeed->draw();
 		}
 	}
@@ -4911,15 +4927,24 @@ void GeoscapeState::btnActivePauseClick(Action *)
 			_pause = false;
 			_timeSpeed = _lastSpeed;
 			_lastSpeed = nullptr;
-			_timeSpeed->mousePress(&a, this);
+			_timeSpeed->draw();
 		}
 		else // Edge case handling
 		{
 			_pause = false;
 			_timeSpeed = _btn5Secs;
-			_timeSpeed->mousePress(&a, this);
+			_timeSpeed->draw();
 		}
 	}
+}
+
+/**
+ * Check if active pause is in effect.
+ * @return Is active pause fully enacted?
+ */
+bool GeoscapeState::isFullyPaused()
+{
+	return _pauseActive && _pause;
 }
 
 /**
