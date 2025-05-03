@@ -29,7 +29,8 @@ Uses modified code from SDL\_gfx (LGPL) with permission from author.
 8\. Rule flag to hide ufopaedia articles by default.  
 9\. Facility rule flag to use alternative sprite for construction.  
 10\. Base function triggers for arc/event/mission scripts.  
-11\. Game Data Viewer option switch for Tech Tree Viewer.  
+11\. Active pause for Geoscape and UFO context interactions.  
+12\. Game Data Viewer option switch for Tech Tree Viewer.  
 
 # Features Migrated to the Main Branch
 1\. Configurable Ufopaedia facilities preview.  
@@ -340,6 +341,12 @@ as they are declared in any facility (this is how code handles them). At the
 same time, avoid using them purely for the sake of event/arc/mission triggers.
 They are intended to unify facilities into 'service' groups and it is possible
 to declare only **126** base functions in total across all loaded mods.
+
+## Geoscape Active Pause (with UFO Context Interactions)
+If active pause feature is enabled, you can pause game in Geoscape just by
+clicking on the Date/Time UI, or by using `Spacebar` hotkey. Hotkey and
+settings themselves are configurable via Options (Controls/Advanced tabs).
+All settings have proper descriptions and pretty much self-explanatory.
 
 ## Game Data Viewer Mode for Tech Tree Viewer
 Helps to debug and analyze **Arc Scripts**, **Event Scripts** and **Mission
