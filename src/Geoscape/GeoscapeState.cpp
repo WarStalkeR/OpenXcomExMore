@@ -4846,6 +4846,7 @@ void GeoscapeState::btnTimerClick(Action *action)
 	ev.button.button = SDL_BUTTON_LEFT;
 	Action a = Action(&ev, 0.0, 0.0, 0, 0);
 	action->getSender()->mousePress(&a, this);
+	btnUnpauseClick(action);
 }
 
 /**
