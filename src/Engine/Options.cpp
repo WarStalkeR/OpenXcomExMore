@@ -578,7 +578,7 @@ void createAdvancedOptionsOTHER()
 	// Geoscape Active Pause feature integration.
 	_info.push_back(OptionInfo(OPTION_OTHER, "oxceGeoActivePauseEnabled", &oxceGeoActivePauseEnabled, false, "STR_ACTIVE_PAUSE_ENABLE", "STR_GEOSCAPE"));
 	_info.push_back(OptionInfo(OPTION_OTHER, "oxceGeoActivePauseReplace", &oxceGeoActivePauseReplace, false, "STR_ACTIVE_PAUSE_REPLACE", "STR_GEOSCAPE"));
-	_info.push_back(OptionInfo(OPTION_OTHER, "oxceGeoActivePauseOnLoad", &oxceGeoActivePauseOnLoad, false, "STR_ACTIVE_PAUSE_REPLACE", "STR_GEOSCAPE"));
+	_info.push_back(OptionInfo(OPTION_OTHER, "oxceGeoActivePauseOnLoad", &oxceGeoActivePauseOnLoad, false, "STR_ACTIVE_PAUSE_ONLOAD", "STR_GEOSCAPE"));
 }
 
 void createControlsOTHER()
