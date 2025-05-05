@@ -2280,9 +2280,39 @@ void TechTreeViewerState::handleArcScript()
 		}
 	}
 
+	// 7. Diplomatic Triggers
+	const auto& pactTriggers = rule->getPactCountryTriggers();
+	if (pactTriggers.size() > 0)
+	{
+		_lstLeft->addRow(1, ""); _leftTopics.push_back("-"); _leftFlags.push_back(TTV_NONE); row++;
+		std::set<std::string> pactCountries;
+		for (auto* country : *_save->getCountries())
+		{
+			if (country->getPact()) pactCountries.insert(country->getRules()->getType());
+		}
+		_lstLeft->addRow(1, tr("STR_TRIGGERS_DIPLOMACY").c_str());
+		_lstLeft->setRowColor(row, _white);
+		_leftTopics.push_back("-");
+		_leftFlags.push_back(TTV_NONE);
+		row++;
+		for (auto& pactTrigger : pactTriggers)
+		{
+			std::ostringstream rowReg;
+			rowReg << "  " << tr(pactTrigger.first) << " (" << tr("STR_TRDIPLO_PACT") << ")";
+			rowReg << ": " << std::boolalpha << pactTrigger.second;
+			bool isPactFound = (pactCountries.find(pactTrigger.first) != pactCountries.end());
+			bool isPactValid = isPactFound == pactTrigger.second;
+			_lstLeft->addRow(1, rowReg.str().c_str());
+			_lstLeft->setRowColor(row, isPactValid ? _purple : _pink);
+			_leftTopics.push_back("-");
+			_leftFlags.push_back(TTV_NONE);
+			row++;
+		}
+	}
+
 	row = 0; // Right UI Panel Switch
 
-	// 7. Sequential Arcs
+	// 8. Sequential Arcs
 	if (arcSeqResearch.size() > 0)
 	{
 		_lstRight->addRow(1, tr("STR_ARC_RESEARCH_SEQ").c_str());
@@ -2305,7 +2335,7 @@ void TechTreeViewerState::handleArcScript()
 		}
 	}
 
-	// 8. Random Arcs
+	// 9. Random Arcs
 	if (arcRandResearch.getChoices().size() > 0)
 	{
 		if (arcSeqResearch.size() > 0)
@@ -2627,9 +2657,39 @@ void TechTreeViewerState::handleEventScript()
 		}
 	}
 
+	// 8. Diplomatic Triggers
+	const auto& pactTriggers = rule->getPactCountryTriggers();
+	if (pactTriggers.size() > 0)
+	{
+		_lstLeft->addRow(1, ""); _leftTopics.push_back("-"); _leftFlags.push_back(TTV_NONE); row++;
+		std::set<std::string> pactCountries;
+		for (auto* country : *_save->getCountries())
+		{
+			if (country->getPact()) pactCountries.insert(country->getRules()->getType());
+		}
+		_lstLeft->addRow(1, tr("STR_TRIGGERS_DIPLOMACY").c_str());
+		_lstLeft->setRowColor(row, _white);
+		_leftTopics.push_back("-");
+		_leftFlags.push_back(TTV_NONE);
+		row++;
+		for (auto& pactTrigger : pactTriggers)
+		{
+			std::ostringstream rowReg;
+			rowReg << "  " << tr(pactTrigger.first) << " (" << tr("STR_TRDIPLO_PACT") << ")";
+			rowReg << ": " << std::boolalpha << pactTrigger.second;
+			bool isPactFound = (pactCountries.find(pactTrigger.first) != pactCountries.end());
+			bool isPactValid = isPactFound == pactTrigger.second;
+			_lstLeft->addRow(1, rowReg.str().c_str());
+			_lstLeft->setRowColor(row, isPactValid ? _purple : _pink);
+			_leftTopics.push_back("-");
+			_leftFlags.push_back(TTV_NONE);
+			row++;
+		}
+	}
+
 	row = 0; // Right UI Panel Switch
 
-	// 8. One Time Sequential Events
+	// 9. One Time Sequential Events
 	const auto& oneTimeSeqEvents = rule->getOneTimeSequentialEvents();
 	if (oneTimeSeqEvents.size() > 0)
 	{
@@ -2653,7 +2713,7 @@ void TechTreeViewerState::handleEventScript()
 		}
 	}
 
-	// 9. One Time Random Events
+	// 10. One Time Random Events
 	const auto& oneTimeRandEvents = rule->getOneTimeRandomEvents().getChoices();
 	if (oneTimeRandEvents.size() > 0)
 	{
@@ -2684,7 +2744,7 @@ void TechTreeViewerState::handleEventScript()
 		}
 	}
 
-	// 10. Event Weights
+	// 11. Event Weights
 	const auto& eventWeights = rule->getEventWeights();
 	if (eventWeights.size() > 0)
 	{
@@ -3087,9 +3147,39 @@ void TechTreeViewerState::handleMissionScript()
 		}
 	}
 
+	// 8. Diplomatic Triggers
+	const auto& pactTriggers = rule->getPactCountryTriggers();
+	if (pactTriggers.size() > 0)
+	{
+		_lstLeft->addRow(1, ""); _leftTopics.push_back("-"); _leftFlags.push_back(TTV_NONE); row++;
+		std::set<std::string> pactCountries;
+		for (auto* country : *_save->getCountries())
+		{
+			if (country->getPact()) pactCountries.insert(country->getRules()->getType());
+		}
+		_lstLeft->addRow(1, tr("STR_TRIGGERS_DIPLOMACY").c_str());
+		_lstLeft->setRowColor(row, _white);
+		_leftTopics.push_back("-");
+		_leftFlags.push_back(TTV_NONE);
+		row++;
+		for (auto& pactTrigger : pactTriggers)
+		{
+			std::ostringstream rowReg;
+			rowReg << "  " << tr(pactTrigger.first) << " (" << tr("STR_TRDIPLO_PACT") << ")";
+			rowReg << ": " << std::boolalpha << pactTrigger.second;
+			bool isPactFound = (pactCountries.find(pactTrigger.first) != pactCountries.end());
+			bool isPactValid = isPactFound == pactTrigger.second;
+			_lstLeft->addRow(1, rowReg.str().c_str());
+			_lstLeft->setRowColor(row, isPactValid ? _purple : _pink);
+			_leftTopics.push_back("-");
+			_leftFlags.push_back(TTV_NONE);
+			row++;
+		}
+	}
+
 	row = 0; // Right UI Panel Switch
 
-	// 8. Mission Weights
+	// 9. Mission Weights
 	const auto& missionWeights = rule->getMissionWeights();
 	if (missionWeights.size() > 0)
 	{
@@ -3133,7 +3223,7 @@ void TechTreeViewerState::handleMissionScript()
 		}
 	}
 
-	// 9. Region Weights
+	// 10. Region Weights
 	const auto& regionWeights = rule->getRegionWeights();
 	if (regionWeights.size() > 0)
 	{
@@ -3182,7 +3272,7 @@ void TechTreeViewerState::handleMissionScript()
 		}
 	}
 
-	// 10. Race Weights
+	// 11. Race Weights
 	const auto& raceWeights = rule->getRaceWeights();
 	if (raceWeights.size() > 0)
 	{
