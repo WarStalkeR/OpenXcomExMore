@@ -1,20 +1,26 @@
 # OpenXcom + Extended + More
 
-OpenXcom (OXC) is an open-source clone of the popular "UFO: Enemy Unknown" 
-("X-COM: UFO Defense" in the USA release) and "X-COM: Terror From the Deep" 
-videogames by Microprose, licensed under the GPL and written in C++ / SDL.
+OpenXcom (OXC) is an [open-source clone](https://github.com/OpenXcom/OpenXcom)
+of the popular "UFO: Enemy Unknown" ("X-COM: UFO Defense" in the USA release)
+and "X-COM: Terror From the Deep" videogames by Microprose, licensed under the
+GPL and written in C++ / SDL.
 
-OpenXcom Extended (OXCE) is OXC up-to-date fork managed, improved and 
-supported by Yankes and Meridian. OXCE has many additional features, modding 
-capabilities and even scripts, to say the least.
+OpenXcom Extended (OXCE) is an [OXC up-to-date fork](https://github.com/MeridianOXC/OpenXcom)
+managed, improved and supported by Yankes and Meridian. OXCE has many additional
+features, modding capabilities and even scripts, to say the least.
 
-OpenXcom Extended More (OXCEM) is OXCE fork managed by me. Here I implement 
-all the features I desire. Sometimes they are simple, sometimes they are not.
-Complete list of changes I've made so far (as well as all potential future 
-plans) are listed below along with technical details on how to use them.
+OpenXcom Extended More (OXCEM) is an [OXCE modified fork](https://git.soon-tm.info/warstalker/OpenXcomExMore)
+managed by me. Here I implement all the features I desire. Sometimes they are
+simple, sometimes they are not. Complete list of changes I've made so far (as
+well as all potential future plans) are listed below along with technical
+details on how to use them.
 
 See more info at the [website](https://openxcom.org)
-and the [wiki](https://www.ufopaedia.org/index.php/OpenXcom).
+and the [wiki](https://www.ufopaedia.org/index.php/OpenXcom). OXCEM-specific
+information is available below.
+
+OXC ruleset reference is available [here](https://www.ufopaedia.org/index.php/Ruleset_Reference_(OpenXcom)).  
+OXCE ruleset reference is available [here](https://www.ufopaedia.org/index.php/Ruleset_Reference_Nightly_(OpenXcom)).
 
 Uses modified code from SDL\_gfx (LGPL) with permission from author.
 
