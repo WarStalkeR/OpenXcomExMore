@@ -10,10 +10,10 @@ managed, improved and supported by Yankes and Meridian. OXCE has many additional
 features, modding capabilities and even scripts, to say the least.
 
 OpenXcom Extended More (OXCEM) is an [OXCE modified fork](https://git.soon-tm.info/warstalker/OpenXcomExMore)
-managed by me. Here I implement all the features I desire. Sometimes they are
-simple, sometimes they are not. Complete list of changes I've made so far (as
-well as all potential future plans) are listed below along with technical
-details on how to use them.
+managed by me (WarStalkeR). Here I implement all the features I desire.
+Sometimes they are simple, sometimes they are not. Complete list of changes
+I've made so far (as well as all potential future plans) are listed below
+along with technical details on how to use them.
 
 See more info at the [website](https://openxcom.org)
 and the [wiki](https://www.ufopaedia.org/index.php/OpenXcom). OXCEM-specific
