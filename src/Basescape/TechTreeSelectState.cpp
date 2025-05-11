@@ -391,12 +391,40 @@ void TechTreeSelectState::initLists()
 			}
 			++row;
 		}
+
+		_firstAdhocScriptIndex = row;
+
+		for (auto& adhocScript : *_game->getMod()->getAdhocScriptList())
+		{
+			std::string adhocName = adhocScript;
+			Unicode::upperCase(adhocName);
+			if (searchString == "HSCRIPT")
+			{
+				// Force Add
+			}
+			else if (adhocName.find(searchString) == std::string::npos)
+			{
+				continue;
+			}
+
+			_availableTopics.push_back(adhocScript);
+			std::ostringstream ss;
+			_parent->strPush(ss, adhocScript);
+			ss << tr("STR_HS_FLAG");
+			_lstTopics->addRow(1, ss.str().c_str());
+			if (!_parent->isGuaranteedMission(adhocScript))
+			{
+				_lstTopics->setRowColor(row, _lstTopics->getSecondaryColor());
+			}
+			++row;
+		}
 	}
 	else
 	{
 		_firstArcScriptIndex = row;
 		_firstEventScriptIndex = row;
 		_firstMissionScriptIndex = row;
+		_firstAdhocScriptIndex = row;
 	}
 }
 
@@ -414,7 +442,11 @@ void TechTreeSelectState::onSelectTopic(Action *)
 
 	TTVMode topicType = TTV_RESEARCH;
 
-	if (index >= _firstMissionScriptIndex)
+	if (index >= _firstAdhocScriptIndex)
+	{
+		topicType = TTV_ADHOC;
+	}
+	else if (index >= _firstMissionScriptIndex)
 	{
 		topicType = TTV_MISSIONS;
 	}

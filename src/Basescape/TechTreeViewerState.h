@@ -39,7 +39,7 @@ class RuleEventScript;
 class RuleMissionScript;
 class SavedGame;
 
-enum TTVMode { TTV_NONE, TTV_RESEARCH, TTV_MANUFACTURING, TTV_FACILITIES, TTV_ITEMS, TTV_CRAFTS, TTV_ARCS, TTV_EVENTS, TTV_MISSIONS };
+enum TTVMode { TTV_NONE, TTV_RESEARCH, TTV_MANUFACTURING, TTV_FACILITIES, TTV_ITEMS, TTV_CRAFTS, TTV_ARCS, TTV_EVENTS, TTV_MISSIONS, TTV_ADHOC };
 enum GameDifficulty : int;
 
 /**
@@ -61,7 +61,7 @@ private:
 	std::unordered_set<std::string> _disabledResearch;
 	std::unordered_set<std::string> _alreadyAvailableResearch, _alreadyAvailableManufacture, _alreadyAvailableFacilities, _alreadyAvailableCrafts;
 	std::unordered_set<std::string> _protectedItems, _alreadyAvailableItems;
-	std::unordered_set<std::string> _listArcScripts, _listEventScripts, _listMissionScripts;
+	std::unordered_set<std::string> _listArcScripts, _listEventScripts, _listMissionScripts, _listAdhocScripts;
 	int _currMonth, _currScore;
 	GameDifficulty _currDiff;
 	int64_t _currFunds;

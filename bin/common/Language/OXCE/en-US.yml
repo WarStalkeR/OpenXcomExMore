@@ -187,6 +187,7 @@ en-US:
   STR_AS_FLAG: " [+]"
   STR_ES_FLAG: " [?]"
   STR_MS_FLAG: " [!]"
+  STR_HS_FLAG: " [^]"
 #TechTreeViewerState.cpp
   STR_THIS_FEATURE_IS_DISABLED_1: "This feature is disabled."
   STR_THIS_FEATURE_IS_DISABLED_2: "This feature is disabled."
@@ -275,6 +276,7 @@ en-US:
   STR_TRIGGER_MAXRUNS: "Maximum runs:"
   STR_TRMAXRUN_NONE: "Unlimited"
   STR_TRDIPLO_PACT: "Pact"
+  STR_TRIGGERS_ADHOC: "Ad-hoc script tags:"
   STR_TRIGGERS_RESEARCH: "Research triggers:"
   STR_TRIGGERS_ITEM: "Item triggers:"
   STR_TRIGGERS_FACILITY: "Facility triggers:"

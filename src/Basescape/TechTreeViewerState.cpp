@@ -292,6 +292,16 @@ TechTreeViewerState::TechTreeViewerState(const RuleResearch *r, const RuleManufa
 				_listMissionScripts.insert(missionScript);
 			}
 		}
+
+		const RuleMissionScript *adhocScriptRule = 0;
+		for (auto& adhocScript : *_game->getMod()->getAdhocScriptList())
+		{
+			adhocScriptRule = _game->getMod()->getMissionScript(adhocScript);
+			if (Options::debug || isPossibleMission(adhocScriptRule))
+			{
+				_listAdhocScripts.insert(adhocScript);
+			}
+		}
 	}
 
 	_txtProgress->setAlign(ALIGN_RIGHT);
@@ -391,6 +401,10 @@ void TechTreeViewerState::initLists()
 		{
 			ss << tr("STR_MS_FLAG");
 		}
+		else if (_selectedFlag == TTV_ADHOC)
+		{
+			ss << tr("STR_HS_FLAG");
+		}
 		_txtSelectedTopic->setText(tr("STR_TOPIC").arg(ss.str()));
 		_txtCostIndicator->setText("");
 	}
@@ -439,7 +453,7 @@ void TechTreeViewerState::initLists()
 	{
 		handleEventScript();
 	}
-	else if (_selectedFlag == TTV_MISSIONS)
+	else if (_selectedFlag == TTV_MISSIONS || _selectedFlag == TTV_ADHOC)
 	{
 		handleMissionScript();
 	}
@@ -2800,7 +2814,10 @@ void TechTreeViewerState::handleEventScript()
 void TechTreeViewerState::handleMissionScript()
 {
 	int row = 0;
-	const RuleMissionScript *rule = _game->getMod()->getMissionScript(_selectedTopic);
+	bool isAdhoc = _selectedFlag == TTV_ADHOC;
+	const RuleMissionScript *rule = isAdhoc ?
+		_game->getMod()->getAdhocScript(_selectedTopic) :
+		_game->getMod()->getMissionScript(_selectedTopic);
 	if (rule == 0)
 		return;
 
@@ -3002,7 +3019,29 @@ void TechTreeViewerState::handleMissionScript()
 	_leftFlags.push_back(TTV_NONE);
 	row++; bTrigger.str(""); bTrigger.clear();
 
-	// 3. Research Trigger
+	// 3. Ad-hoc Script Tags
+	const auto& adhocScriptTags = rule->getAdhocMissionScriptTags();
+	if (!adhocScriptTags.empty())
+	{
+		_lstLeft->addRow(1, ""); _leftTopics.push_back("-"); _leftFlags.push_back(TTV_NONE); row++;
+		_lstLeft->addRow(1, tr("STR_TRIGGERS_ADHOC").c_str());
+		_lstLeft->setRowColor(row, _white);
+		_leftTopics.push_back("-");
+		_leftFlags.push_back(TTV_NONE);
+		row++;
+		for (auto& adhocScriptTag : adhocScriptTags)
+		{
+			std::ostringstream rowTag;
+			rowTag << "  " << tr(adhocScriptTag);
+			_lstLeft->addRow(1, rowTag.str().c_str());
+			_lstLeft->setRowColor(row, _blue);
+			_leftTopics.push_back("-");
+			_leftFlags.push_back(TTV_NONE);
+			row++;
+		}
+	}
+
+	// 4. Research Trigger
 	const auto& resTriggers = rule->getResearchTriggers();
 	if (resTriggers.size() > 0)
 	{
@@ -3026,7 +3065,7 @@ void TechTreeViewerState::handleMissionScript()
 		}
 	}
 
-	// 4. Item Triggers
+	// 5. Item Triggers
 	const auto& itemTriggers = rule->getItemTriggers();
 	if (itemTriggers.size() > 0)
 	{
@@ -3050,7 +3089,7 @@ void TechTreeViewerState::handleMissionScript()
 		}
 	}
 
-	// 5. Facility Triggers
+	// 6. Facility Triggers
 	const auto& facTriggers = rule->getFacilityTriggers();
 	if (facTriggers.size() > 0)
 	{
@@ -3074,7 +3113,7 @@ void TechTreeViewerState::handleMissionScript()
 		}
 	}
 
-	// 6. Base Function Triggers
+	// 7. Base Function Triggers
 	const auto& baseFuncTriggers = rule->getBaseFunctionTriggers();
 	if (baseFuncTriggers.size() > 0)
 	{
@@ -3099,7 +3138,7 @@ void TechTreeViewerState::handleMissionScript()
 		}
 	}
 
-	// 7. Regional Triggers
+	// 8. Regional Triggers
 	const auto& regTriggers = rule->getXcomBaseInRegionTriggers();
 	const auto& terTriggers = rule->getXcomBaseInCountryTriggers();
 	if (regTriggers.size() > 0 || terTriggers.size() > 0)
@@ -3147,7 +3186,7 @@ void TechTreeViewerState::handleMissionScript()
 		}
 	}
 
-	// 8. Diplomatic Triggers
+	// 9. Diplomatic Triggers
 	const auto& pactTriggers = rule->getPactCountryTriggers();
 	if (pactTriggers.size() > 0)
 	{
@@ -3179,7 +3218,7 @@ void TechTreeViewerState::handleMissionScript()
 
 	row = 0; // Right UI Panel Switch
 
-	// 9. Mission Weights
+	// 10. Mission Weights
 	const auto& missionWeights = rule->getMissionWeights();
 	if (missionWeights.size() > 0)
 	{
@@ -3223,7 +3262,7 @@ void TechTreeViewerState::handleMissionScript()
 		}
 	}
 
-	// 10. Region Weights
+	// 11. Region Weights
 	const auto& regionWeights = rule->getRegionWeights();
 	if (regionWeights.size() > 0)
 	{
@@ -3272,7 +3311,7 @@ void TechTreeViewerState::handleMissionScript()
 		}
 	}
 
-	// 11. Race Weights
+	// 12. Race Weights
 	const auto& raceWeights = rule->getRaceWeights();
 	if (raceWeights.size() > 0)
 	{
