@@ -102,7 +102,7 @@ void Screen::makeVideoFlags()
 		_flags |= SDL_NOFRAME;
 	}
 
-	_bpp = (use32bitScaler() || useOpenGL()) ? 32 : 8;
+	_bpp = (use32bitForced() || use32bitScaler() || useOpenGL()) ? 32 : 8;
 	_baseWidth = Options::baseXResolution;
 	_baseHeight = Options::baseYResolution;
 }
@@ -201,7 +201,7 @@ void Screen::flip()
 		_pushPalette = false;
 	}
 
-	if (getWidth() != _baseWidth || getHeight() != _baseHeight || useOpenGL())
+	if (use32bitForced() || getWidth() != _baseWidth || getHeight() != _baseHeight || useOpenGL())
 	{
 		Zoom::flipWithZoom(_surface.get(), _screen, _topBlackBand, _bottomBlackBand, _leftBlackBand, _rightBlackBand, &glOutput);
 	}
@@ -638,6 +638,15 @@ bool Screen::useOpenGL()
 #else
 	return Options::useOpenGL;
 #endif
+}
+
+/**
+ * Check if 32-bit color mode is enabled.
+ * @return if it is enabled.
+ */
+bool Screen::use32bitForced()
+{
+	return Options::oxceForce32bitMode;
 }
 
 /**

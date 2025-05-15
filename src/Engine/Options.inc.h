@@ -77,6 +77,7 @@ OPT bool oxceBattleTouchButtonsEnabled;
 OPT bool oxceQuickSearchButton;
 OPT bool oxceHighlightNewTopics;
 OPT bool oxcePediaShowClipSize;
+OPT bool oxceForce32bitMode;
 
 OPT int oxceInterceptTableSize;
 OPT bool oxceEnableSlackingIndicator;
