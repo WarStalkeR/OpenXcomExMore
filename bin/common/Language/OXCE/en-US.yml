@@ -400,6 +400,8 @@ en-US:
   STR_LAZY_LOADING_DESC: "If enabled, graphic resources are loaded on-demand. Otherwise everything is loaded at start-up."
   STR_VSYNC_FOR_OPENGL: "VSync for OpenGL"
   STR_VSYNC_FOR_OPENGL_DESC: "Turn off for maximum enemy hidden movement speed and (optionally) soldier movement speed. DO NOT set FPS limit to 0. Only applies to OpenGL rendering."
+  STR_FORCE_32BIT_MODE: "Force 32-bit mode screen"
+  STR_FORCE_32BIT_MODE_DESC: "Force screen to work in 32-bit mode to allow multi-palette rendering. When enabled, sub-surfaces with custom palettes will render in their true colors."
   STR_SHOW_BASE_SELECTION: "Starting base selection"
   STR_SHOW_BASE_SELECTION_DESC: "Allows to select some other starting base layout beside default one, given they were added by the mods."
   STR_ACTIVE_PAUSE_ENABLE: "Enable active pause"

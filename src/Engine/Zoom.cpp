@@ -681,6 +681,14 @@ void Zoom::flipWithZoom(SDL_Surface *src, SDL_Surface *dst, int topBlackBand, in
 		}
 #endif
 	}
+	else if (Screen::use32bitForced())
+	{
+		SDL_Surface *tmp = SDL_CreateRGBSurface(dst->flags, dstWidth, dstHeight, 32, 0, 0, 0, 0);
+		_zoomSurfaceY32(src, tmp, 0, 0);
+		SDL_Rect dstrect = {(Sint16)leftBlackBand, (Sint16)topBlackBand, (Uint16)tmp->w, (Uint16)tmp->h};
+		SDL_BlitSurface(tmp, NULL, dst, &dstrect);
+		SDL_FreeSurface(tmp);
+	}
 	else if (topBlackBand <= 0 && bottomBlackBand <= 0 && leftBlackBand <= 0 && rightBlackBand <= 0)
 	{
 		_zoomSurfaceY(src, dst, 0, 0);
@@ -936,6 +944,80 @@ int Zoom::_zoomSurfaceY(SDL_Surface * src, SDL_Surface * dst, int flipx, int fli
 	return 0;
 }
 
+/**
+ * Internal 32-bit Zoomer without smoothing.
+ * Heavily based on the Zoom::_zoomSurfaceY32() function.
+ *
+ * Zooms 32-bit sprite/Y 'src' surface to 'dst' surface.
+ * Assumes src and dst surfaces are of 32-bit depth.
+ * Assumes dst surface was allocated with the correct dimensions.
+ *
+ * @param src The surface to zoom (input).
+ * @param dst The zoomed surface (output).
+ * @param flipx Flag indicating if the image should be horizontally flipped.
+ * @param flipy Flag indicating if the image should be vertically flipped.
+ * @return 0 for success or -1 for error.
+ */
+int Zoom::_zoomSurfaceY32(SDL_Surface *src, SDL_Surface *dst, int flipx, int flipy)
+{
+	static Uint32 *sax = nullptr, *say = nullptr;
+	static bool proclaimed = false;
+
+	// early-out for special filters (HQX, xBRZ, etc.)
+	if (Screen::use32bitScaler()) return Zoom::_zoomSurfaceY(src, dst, flipx, flipy);
+
+	// remind user about OpenGL alternative
+	if (!proclaimed)
+	{
+		Log(LOG_INFO) << "Using software scaling routine. For best results, try an OpenGL filter.";
+		proclaimed = true;
+	}
+
+	// allocate scratch lookup tables
+	sax = (Uint32*)realloc(sax, (dst->w + 1) * sizeof(Uint32));
+	say = (Uint32*)realloc(say, (dst->h + 1) * sizeof(Uint32));
+	if (!sax || !say) return -1;
+
+	// build X / Y increment tables
+	Uint32 *csax = sax, *csay = say;
+	int acc = 0;
+	for (int x = 0; x < dst->w; ++x)
+	{
+		acc += src->w; *csax = 0;
+		while (acc >= dst->w) { acc -= dst->w; (*csax)++; }
+		(*csax) *= (flipx ? -1 : 1);  csax++;
+	}
+	acc = 0;
+	for (int y = 0; y < dst->h; ++y)
+	{
+		acc += src->h; *csay = 0;
+		while (acc >= dst->h) { acc -= dst->h; (*csay)++; }
+		(*csay) *= src->pitch/4 * (flipy ? -1 : 1);  csay++;
+	}
+
+	// main copy loop (4-byte pixels)
+	Uint32 *spBase = (Uint32*)src->pixels;
+	if (flipx) spBase += src->w - 1;
+	if (flipy) spBase += (src->pitch/4) * (src->h-1);
+
+	Uint32 *dp = (Uint32*)dst->pixels;
+	const int dgap = dst->pitch/4 - dst->w;
+
+	csay = say;
+	for (int y = 0; y < dst->h; ++y)
+	{
+		csax = sax;
+		Uint32 *sp = spBase;
+		for (int x = 0; x < dst->w; ++x)
+		{
+			*dp++ = *sp;
+			sp += *csax++;
+		}
+		spBase += *csay++;
+		dp += dgap;
+	}
+	return 0;
+}
 
 }
 

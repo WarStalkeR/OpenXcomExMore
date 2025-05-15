@@ -78,6 +78,7 @@ OPT bool oxceBattleTouchButtonsEnabled;
 OPT bool oxceQuickSearchButton;
 OPT bool oxceHighlightNewTopics;
 OPT bool oxcePediaShowClipSize;
+OPT bool oxceForce32bitMode;
 OPT bool oxceStartingBaseSelection;
 OPT bool oxceShowAdvancedDebugOptions;
 

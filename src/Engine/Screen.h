@@ -98,6 +98,8 @@ public:
 	static bool use32bitScaler();
 	/// Checks whether OpenGL output is requested
 	static bool useOpenGL();
+	/// Checks whether screen is forced to work in 32-bit color mode
+	static bool use32bitForced();
 	/// update the game scale as required.
 	static void updateScale(int type, int &width, int &height, bool change);
 };
