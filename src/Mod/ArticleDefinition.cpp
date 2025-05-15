@@ -129,6 +129,28 @@ namespace OpenXcom
 	}
 
 	/**
+	 * Constructor.
+	 */
+	ArticleDefinitionPreviewCraft::ArticleDefinitionPreviewCraft() : x(0), y(0), x_offset(0), y_offset(0), facility() {}
+
+	/**
+	 * Sets the craft basescape preview parameters in a function.
+	 * @param set_x X.
+	 * @param set_y Y.
+	 * @param set_x_offset Horizontal offset of the craft.
+	 * @param set_y_offset Vertical offset of the craft.
+	 * @param set_facility Background facility for the craft.
+	 */
+	void ArticleDefinitionPreviewCraft::set(int set_x, int set_y, int set_x_offset, int set_y_offset, std::string set_facility)
+	{
+		x = set_x;
+		y = set_y;
+		x_offset = set_x_offset;
+		y_offset = set_y_offset;
+		facility = set_facility;
+	}
+
+	/**
 	 * Constructor (only setting type of base class).
 	 */
 	ArticleDefinitionCraft::ArticleDefinitionCraft() : ArticleDefinition(UFOPAEDIA_TYPE_CRAFT)
@@ -147,6 +169,7 @@ namespace OpenXcom
 			customPalette = true;
 		reader.tryRead("rect_stats", rect_stats);
 		reader.tryRead("rect_text", rect_text);
+		reader.tryRead("preview_craft", preview_craft);
 	}
 
 	/**
@@ -324,6 +347,17 @@ namespace OpenXcom
 		reader.tryRead("y", val->y);
 		reader.tryRead("width", val->width);
 		reader.tryRead("height", val->height);
+		return true;
+	}
+
+	bool read(ryml::ConstNodeRef const& n, ArticleDefinitionPreviewCraft* val)
+	{
+		YAML::YamlNodeReader reader(n);
+		reader.tryRead("x", val->x);
+		reader.tryRead("y", val->y);
+		reader.tryRead("x_offset", val->x_offset);
+		reader.tryRead("y_offset", val->y_offset);
+		reader.tryRead("facility", val->facility);
 		return true;
 	}
 }
