@@ -242,7 +242,6 @@ Surface::Surface() : _x{ }, _y{ }, _width{ }, _height{ }, _pitch{ }, _visible(tr
  * @param height Height in pixels.
  * @param x X position in pixels.
  * @param y Y position in pixels.
- * @param bpp Bits-per-pixel depth.
  */
 Surface::Surface(int width, int height, int x, int y) : _x(x), _y(y), _visible(true), _hidden(false), _redraw(false)
 {
@@ -250,6 +249,34 @@ Surface::Surface(int width, int height, int x, int y) : _x(x), _y(y), _visible(t
 	_width = _surface->w;
 	_height = _surface->h;
 	_pitch = _surface->pitch;
+	SDL_SetColorKey(_surface.get(), SDL_SRCCOLORKEY, 0);
+}
+
+/**
+ * Sets up a blank 8bpp/32bpp surface with the specified size and position,
+ * with pure black as the transparent color.
+ * @note Surfaces don't have to fill the whole size since their
+ * background is transparent, specially subclasses with their own
+ * drawing logic, so it just covers the maximum drawing area.
+ * @param bpp Bits-per-pixel depth.
+ * @param width Width in pixels.
+ * @param height Height in pixels.
+ * @param x X position in pixels.
+ * @param y Y position in pixels.
+ */
+Surface::Surface(Uint8 bpp, int width, int height, int x, int y) : _x(x), _y(y), _visible(true), _hidden(false), _redraw(false)
+{
+	// Bit depth selection
+	if (bpp == 8) std::tie(_alignedBuffer, _surface) = Surface::NewPair8Bit(width, height);
+	else if (bpp == 32) std::tie(_alignedBuffer, _surface) = Surface::NewPair32Bit(width, height);
+	else throw Exception("Unsupported bpp in Surface ctor");
+
+	// Handled by default
+	_width = _surface->w;
+	_height = _surface->h;
+	_pitch = _surface->pitch;
+
+	// Ensures transparency
 	SDL_SetColorKey(_surface.get(), SDL_SRCCOLORKEY, 0);
 }
 
@@ -989,6 +1016,36 @@ void Surface::blitNShade(SurfaceRaw<Uint8> surface, int x, int y, int shade, Gra
 	dest.setDomain(range);
 
 	ShaderDraw<helper::StandardShade>(dest, src, ShaderScalar(shade));
+}
+
+/**
+ * Blits an 8-bit sprite to a 32-bit destination, copying colors exactly
+ * (no shade maths, index 0 kept transparent).
+ * @param surface destination blit to
+ * @param x
+ * @param y
+ */
+void Surface::blitNShade32(SurfaceRaw<Uint32> surface, int x, int y) const
+{
+	/* ---------- 1. Build a 32-bit ARGB lookup table ---------- */
+	Uint32 lut[256];
+	const SDL_Color *palette = getPalette();
+
+	for (int i = 0; i < 256; ++i)
+	{
+		Uint8 a = (i == 0) ? 0 : 255;         // only index 0 transparent
+		lut[i] = (Uint32(a) << 24)            // AA
+			| (palette[i].r << 16)                // RR
+			| (palette[i].g <<  8)                // GG
+			|  palette[i].b;                      // BB
+	}
+
+	/* ---------- 2. Wrap the two surfaces for ShaderDraw ---------- */
+	auto src = ShaderMove<const Uint8>(SurfaceRaw<const Uint8>(this), x, y);
+	auto dst = ShaderMove<Uint32>(surface);
+
+	/* ---------- 3. Copy pixels, no shading ---------- */
+	ShaderDraw<helper::PalToRGBA>(dst, src, ShaderScalar(lut));
 }
 
 /**

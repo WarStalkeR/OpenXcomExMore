@@ -100,6 +100,8 @@ public:
 	Surface();
 	/// Creates a new surface with the specified size and position.
 	Surface(int width, int height, int x = 0, int y = 0);
+	/// Creates a new surface with the specified size, position and depth.
+	Surface(Uint8 bpp, int width, int height, int x, int y);
 	/// Creates a new surface from an existing one.
 	Surface(const Surface& other);
 	/// Move surface to another place.
@@ -307,6 +309,16 @@ public:
 	{
 		return _alignedBuffer.get();
 	}
+	/// Get pointer to 32-bit buffer
+	Uint32* getBuffer32()
+	{
+		return reinterpret_cast<Uint32 *>(_alignedBuffer.get());
+	}
+	/// Get pointer to 32-bit buffer
+	const Uint32* getBuffer32() const
+	{
+		return reinterpret_cast<const Uint32 *>(_alignedBuffer.get());
+	}
 	/// Sets the surface's special hidden flag.
 	void setHidden(bool hidden);
 	/// Locks the surface.
@@ -319,6 +331,8 @@ public:
 	void blitNShade(SurfaceRaw<Uint8> surface, int x, int y, int shade = 0, bool half = false, int newBaseColor = 0) const;
 	/// Specific blit function to blit battlescape terrain data in different shades in a fast way.
 	void blitNShade(SurfaceRaw<Uint8> surface, int x, int y, int shade, GraphSubset range) const;
+	/// Specific blit function to blit sprites in 32 bits-per-pixel depth.
+	void blitNShade32(SurfaceRaw<Uint32> surface, int x, int y) const;
 	/// Invalidate the surface: force it to be redrawn
 	void invalidate(bool valid = true);
 
@@ -368,28 +382,42 @@ public:
 
 	}
 
-	/// Constructor, SFINAE enable it only for `Uint8`
-	template<typename = std::enable_if<std::is_same<Uint8, Pixel>::value, void>>
+	/// Constructor, SFINAE enable it only for `Uint8` or `Uint32`
+	template<typename = std::enable_if<
+		std::is_same<Uint8, Pixel>::value ||
+		std::is_same<Uint32, Pixel>::value, void>>
 	SurfaceRaw(Surface* surf) : SurfaceRaw{ }
 	{
 		if (surf)
 		{
-			*this = SurfaceRaw{ surf->getBuffer(), surf->getWidth(), surf->getHeight(), surf->getPitch() };
+			Pixel *buff = std::is_same<Uint32, Pixel>::value
+				? reinterpret_cast<Pixel*>(surf->getBuffer32())
+				: reinterpret_cast<Pixel*>(surf->getBuffer());
+
+			*this = SurfaceRaw{ buff, surf->getWidth(), surf->getHeight(), surf->getPitch() };
 		}
 	}
 
-	/// Constructor, SFINAE enable it only for `Uint8`
-	template<typename = std::enable_if<std::is_same<const Uint8, Pixel>::value, void>>
+	/// Constructor, SFINAE enable it only for `const Uint8` or `const Uint32`
+	template<typename = std::enable_if<
+		std::is_same<const Uint8, Pixel>::value ||
+		std::is_same<const Uint32, Pixel>::value, void>>
 	SurfaceRaw(const Surface* surf) : SurfaceRaw{ }
 	{
 		if (surf)
 		{
-			*this = SurfaceRaw{ surf->getBuffer(), surf->getWidth(), surf->getHeight(), surf->getPitch() };
+			const Pixel *buff = std::is_same<const Uint32, Pixel>::value
+				? reinterpret_cast<const Pixel*>(surf->getBuffer32())
+				: reinterpret_cast<const Pixel*>(surf->getBuffer());
+
+			*this = SurfaceRaw{ buff, surf->getWidth(), surf->getHeight(), surf->getPitch() };
 		}
 	}
 
-	/// Constructor, SFINAE enable it only for `Uint8`
-	template<typename = std::enable_if<std::is_same<Uint8, Pixel>::value, void>>
+	/// Constructor, SFINAE enable it only for `Uint8` or `Uint32`
+	template<typename = std::enable_if<
+		std::is_same<Uint8, Pixel>::value ||
+		std::is_same<Uint32, Pixel>::value, void>>
 	SurfaceRaw(SDL_Surface* surf) : SurfaceRaw{ }
 	{
 		if (surf)
@@ -398,8 +426,10 @@ public:
 		}
 	}
 
-	/// Constructor, SFINAE enable it only for `const Uint8`
-	template<typename = std::enable_if<std::is_same<const Uint8, Pixel>::value, void>>
+	/// Constructor, SFINAE enable it only for `const Uint8` or `const Uint32`
+	template<typename = std::enable_if<
+		std::is_same<const Uint8, Pixel>::value ||
+		std::is_same<const Uint32, Pixel>::value, void>>
 	SurfaceRaw(const SDL_Surface* surf) : SurfaceRaw{ }
 	{
 		if (surf)

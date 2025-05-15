@@ -412,6 +412,16 @@ struct controler<ShaderBase<Pixel> > : public controler_base<typename ShaderBase
 
 };
 
+struct PalToRGBA
+{
+	static inline void func(Uint32 &dst,
+		const Uint8 &src,
+		const Uint32 *lut)
+	{
+		if (src) dst = lut[src];
+	}
+};
+
 }//namespace helper
 
 }//namespace OpenXcom
