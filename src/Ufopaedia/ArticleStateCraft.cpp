@@ -22,9 +22,11 @@
 #include "../Mod/ArticleDefinition.h"
 #include "../Mod/Mod.h"
 #include "../Mod/RuleCraft.h"
+#include "../Mod/RuleBaseFacility.h"
 #include "../Engine/Game.h"
 #include "../Engine/Palette.h"
 #include "../Engine/Surface.h"
+#include "../Engine/SurfaceSet.h"
 #include "../Engine/LocalizedText.h"
 #include "../Engine/Unicode.h"
 #include "../Interface/Text.h"
@@ -82,6 +84,84 @@ namespace OpenXcom
 
 		_txtStats->setColor(Palette::blockOffset(14)+15);
 		_txtStats->setSecondaryColor(Palette::blockOffset(15)+4);
+
+		if (defs->preview_craft.x != 0 && defs->preview_craft.y != 0)
+		{
+			// fetch facility rule
+			RuleBaseFacility *facility = _game->getMod()->getBaseFacility(defs->preview_craft.facility);
+
+			// define image with facility data or ufopaedia defaults
+			int grid_size = 32;
+			int hng_center_x = 2;
+			int hng_center_y = -4;
+			_image = new Surface(
+				grid_size * (facility != nullptr ? facility->getSizeX() :
+					std::max(1, Mod::PEDIA_FACILITY_RENDER_PARAMETERS[0])),
+				grid_size * (facility != nullptr ? facility->getSizeY() :
+					std::max(1, Mod::PEDIA_FACILITY_RENDER_PARAMETERS[1])),
+				defs->preview_craft.x,
+				defs->preview_craft.y);
+			add(_image);
+
+			// ensure that craft and facility use proper palette
+			_image->setPalette(_game->getMod()->getPalette("PAL_BASESCAPE")->getColors());
+
+			// crafts and facilities share same surface set
+			SurfaceSet *graphic = _game->getMod()->getSurfaceSet("BASEBITS.PCK");
+
+			// use ufopaedia defaults, if facility doesn't exist
+			int x_offset = (std::max(1, Mod::PEDIA_FACILITY_RENDER_PARAMETERS[0])
+				- 1) * grid_size / 2 + hng_center_x;
+			int y_offset = (std::max(1, Mod::PEDIA_FACILITY_RENDER_PARAMETERS[1])
+				- 1) * grid_size / 2 + hng_center_y;
+
+			// render facility, if it exists
+			if (facility != nullptr)
+			{
+				Surface *frame;
+				int x_pos, y_pos;
+				int num;
+
+				// reset offsets, because image = facility
+				x_offset = 0;
+				y_offset = 0;
+
+				num = 0;
+				y_pos = y_offset;
+				for (int y = 0; y < facility->getSizeY(); ++y)
+				{
+					x_pos = x_offset;
+					for (int x = 0; x < facility->getSizeX(); ++x)
+					{
+						frame = graphic->getFrame(facility->getSpriteShape() + num);
+						frame->blitNShade(_image, x_pos, y_pos);
+
+						if (facility->getSpriteEnabled())
+						{
+							frame = graphic->getFrame(facility->getSpriteFacility() + num);
+							frame->blitNShade(_image, x_pos, y_pos);
+						}
+
+						x_pos += grid_size;
+						num++;
+					}
+					y_pos += grid_size;
+				}
+
+				// prepare basescape offsets for the craft
+				x_offset = (facility->getSizeX() - 1) * grid_size / 2 + hng_center_x;
+				y_offset = (facility->getSizeY() - 1) * grid_size / 2 + hng_center_y;
+			}
+
+			// render craft with offsets
+			Surface *frame = graphic->getFrame(craft->getSprite(0) + 33);
+
+			// always render craft, even without facility
+			frame->blitNShade(_image,
+				x_offset + craft->getSizeOffsetX() + defs->preview_craft.x_offset,
+				y_offset + craft->getSizeOffsetY() + defs->preview_craft.y_offset
+			);
+		}
 
 		std::ostringstream ss;
 		const int craftSize = craft->getCraftSize();

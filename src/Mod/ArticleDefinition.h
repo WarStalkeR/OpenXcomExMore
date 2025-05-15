@@ -162,6 +162,20 @@ namespace OpenXcom
 		int height;
 	};
 
+	class ArticleDefinitionPreviewCraft
+	{
+	public:
+		ArticleDefinitionPreviewCraft();
+
+		void set(int set_x, int set_y, int set_x_offset, int set_y_offset, std::string set_facility);
+
+		int x;
+		int y;
+		int x_offset;
+		int y_offset;
+		std::string facility;
+	};
+
 	/**
 	 * ArticleDefinitionCraft defines articles for craft, e.g. SKYRANGER.
 	 * They have a large background image, a stats block and a description positioned differently.
@@ -178,6 +192,7 @@ namespace OpenXcom
 		std::string image_id;
 		ArticleDefinitionRect rect_stats;
 		ArticleDefinitionRect rect_text;
+		ArticleDefinitionPreviewCraft preview_craft;
 	};
 
 	/**
@@ -328,4 +343,5 @@ namespace OpenXcom
 
 	// helper overloads for deserialization-only
 	bool read(ryml::ConstNodeRef const& n, ArticleDefinitionRect* val);
+	bool read(ryml::ConstNodeRef const& n, ArticleDefinitionPreviewCraft* val);
 }
