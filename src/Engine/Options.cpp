@@ -562,6 +562,9 @@ void createOptionsOTHER()
 void createAdvancedOptionsOTHER()
 {
 	// your fork's advanced options here
+	
+	// Force screen to work in 32-bit mode to allow multi-palette rendering.
+	_info.push_back(OptionInfo(OPTION_OTHER, "oxceForce32bitMode", &oxceForce32bitMode, false, "STR_FORCE_32BIT_MODE", "STR_GENERAL"));
 }
 
 void createControlsOTHER()
