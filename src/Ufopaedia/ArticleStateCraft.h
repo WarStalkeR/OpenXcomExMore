@@ -22,6 +22,7 @@
 namespace OpenXcom
 {
 	class Game;
+	class Surface;
 	class Text;
 	class ArticleDefinitionCraft;
 
@@ -38,6 +39,7 @@ namespace OpenXcom
 		virtual ~ArticleStateCraft();
 
 	protected:
+		Surface *_image;
 		Text *_txtTitle;
 		Text *_txtInfo;
 		Text *_txtStats;
