@@ -91,11 +91,13 @@ namespace OpenXcom
 			RuleBaseFacility *facility = _game->getMod()->getBaseFacility(defs->preview_craft.facility);
 
 			// define image with facility data or ufopaedia defaults
-			int tile_size = 32;
+			int grid_size = 32;
+			int hng_center_x = 2;
+			int hng_center_y = -4;
 			_image = new Surface(
-				tile_size * (facility != nullptr ? facility->getSizeX() :
+				grid_size * (facility != nullptr ? facility->getSizeX() :
 					std::max(1, Mod::PEDIA_FACILITY_RENDER_PARAMETERS[0])),
-				tile_size * (facility != nullptr ? facility->getSizeY() :
+				grid_size * (facility != nullptr ? facility->getSizeY() :
 					std::max(1, Mod::PEDIA_FACILITY_RENDER_PARAMETERS[1])),
 				defs->preview_craft.x,
 				defs->preview_craft.y);
@@ -108,8 +110,10 @@ namespace OpenXcom
 			SurfaceSet *graphic = _game->getMod()->getSurfaceSet("BASEBITS.PCK");
 
 			// use ufopaedia defaults, if facility doesn't exist
-			int x_offset = (tile_size * std::max(0, Mod::PEDIA_FACILITY_RENDER_PARAMETERS[0])) / 2;
-			int y_offset = (tile_size * std::max(0, Mod::PEDIA_FACILITY_RENDER_PARAMETERS[1])) / 2;
+			int x_offset = (std::max(1, Mod::PEDIA_FACILITY_RENDER_PARAMETERS[0])
+				- 1) * grid_size / 2 + hng_center_x;
+			int y_offset = (std::max(1, Mod::PEDIA_FACILITY_RENDER_PARAMETERS[1])
+				- 1) * grid_size / 2 + hng_center_y;
 
 			// render facility, if it exists
 			if (facility != nullptr)
@@ -138,30 +142,24 @@ namespace OpenXcom
 							frame->blitNShade(_image, x_pos, y_pos);
 						}
 
-						x_pos += tile_size;
+						x_pos += grid_size;
 						num++;
 					}
-					y_pos += tile_size;
+					y_pos += grid_size;
 				}
 
-				// prepare offsets for craft sprite
-				x_offset = (tile_size * facility->getSizeX()) / 2;
-				y_offset = (tile_size * facility->getSizeY()) / 2;
+				// prepare basescape offsets for the craft
+				x_offset = (facility->getSizeX() - 1) * grid_size / 2 + hng_center_x;
+				y_offset = (facility->getSizeY() - 1) * grid_size / 2 + hng_center_y;
 			}
 
 			// render craft with offsets
 			Surface *frame = graphic->getFrame(craft->getSprite(0) + 33);
 
-			// 16 is half of default craft sprite width
-			// 20 is half of default craft sprite height
-			int frame_x_shift = -16 + craft->getSizeOffsetX();
-			int frame_y_shift = -20 + craft->getSizeOffsetY();
-
-			// +2 is default hangar horizontal offset
-			// -4 is default hangar vertical offset
+			// always render craft, even without facility
 			frame->blitNShade(_image,
-				x_offset + 2 + frame_x_shift + defs->preview_craft.x_offset,
-				y_offset - 4 + frame_y_shift + defs->preview_craft.y_offset
+				x_offset + craft->getSizeOffsetX() + defs->preview_craft.x_offset,
+				y_offset + craft->getSizeOffsetY() + defs->preview_craft.y_offset
 			);
 		}
 
