@@ -946,7 +946,7 @@ int Zoom::_zoomSurfaceY(SDL_Surface * src, SDL_Surface * dst, int flipx, int fli
 
 /**
  * Internal 32-bit Zoomer without smoothing.
- * Heavily based on the Zoom::_zoomSurfaceY32() function.
+ * Heavily based on the Zoom::_zoomSurfaceY() function.
  *
  * Zooms 32-bit sprite/Y 'src' surface to 'dst' surface.
  * Assumes src and dst surfaces are of 32-bit depth.
