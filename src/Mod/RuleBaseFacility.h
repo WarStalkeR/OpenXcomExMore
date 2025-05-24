@@ -40,21 +40,18 @@ struct CraftOption
 	int x = 2;
 	/// Vertical offset for rendering craft in the facility.
 	int y = -4;
-	/// Minimum size of craft that can be housed in the slot.
-	int min = 0;
-	/// Maximum size of craft that can be housed in the slot.
-	int max = 0;
+	/// Bitset of craft functions that define slot compatibility.
+	RuleCraftFunctions func = 0;
 	/// Is craft hidden or rendered in the base in the slot.
 	bool hide = false;
 	/// Constructor with default parameters. Needed for YAML.
 	CraftOption() = default;
 	/// Constructor that allows to define facility craft slots.
-	CraftOption(int xOffset, int yOffset, int minSize, int maxSize, bool isHidden)
+	CraftOption(int xOffset, int yOffset, RuleCraftFunctions craftFunctions, bool isHidden)
 	{
 		x = xOffset;
 		y = yOffset;
-		min = minSize;
-		max = maxSize;
+		func = craftFunctions;
 		hide = isHidden;
 	}
 };
@@ -85,7 +82,7 @@ private:
 	int _storage, _personnel, _aliens, _crafts, _labs, _workshops, _psiLabs;
 	bool _spriteEnabled, _altBuildSprite, _craftsHidden;
 	std::vector<CraftOption> _craftOptions;
-	std::vector<int> _optionGroups;
+	std::vector<std::string> _optionStrings;
 	int _sightRange, _sightChance;
 	int _radarRange, _radarChance, _defense, _hitRatio, _fireSound, _hitSound, _placeSound;
 	int _ammoMax, _rearmRate;
@@ -190,12 +187,10 @@ public:
 	int getPsiLaboratories() const;
 	/// Gets if facility's crafts are hidden or not.
 	bool getCraftsHidden() const;
-	/// Gets a list of craft slots in this facility
+	/// Gets the facility's list of craft slot options.
 	const std::vector<CraftOption>& getCraftOptions() const;
-	/// Gets a list of craft slot groups in this facility
-	const std::vector<int>& getOptionGroups() const { return _optionGroups; }
-	/// Gets the maximum between crafts number and options group sum.
-	int getCraftGroupSum() const;
+	/// Gets the facility's list of slot slot names.
+	const std::vector<std::string>& getOptionStrings() const;
 	/// Gets the facility's sight range.
 	int getSightRange() const { return _sightRange; }
 	/// Gets the facility's alien base detection chance.

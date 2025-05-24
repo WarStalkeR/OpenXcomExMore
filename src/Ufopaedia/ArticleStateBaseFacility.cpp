@@ -163,57 +163,21 @@ namespace OpenXcom
 			{
 				ts.str(""); ts.clear(); ss.str(""); ss.clear();
 				ts << tr("STR_HANGAR_CRAFT_SLOTS");
-				if (facility->getOptionGroups().size() > 0 &&
-					(size_t)facility->getCraftGroupSum() == facility->getCraftOptions().size())
+				for (int i = 0; i < facility->getCrafts(); ++i)
 				{
-					int optionIt = 0;
-					auto optionGroupsIt = facility->getOptionGroups().begin();
-					while (optionGroupsIt != facility->getOptionGroups().end())
+					std::string slotStr = "";
+					// Get proper slot string, if it exists
+					if (facility->getOptionStrings().size() > (size_t)i)
+						slotStr = facility->getOptionStrings().at(i);
+					// Or get fallback string from function names
+					else if (facility->getCraftOptions().size() > (size_t)i)
+						slotStr = _game->getMod()->getCraftFunctionNames(
+							facility->getCraftOptions().at(i).func).back() + "_UC";
+					// Broken slot entry is hidden in ufopaedia, but shown in analysis
+					if (!slotStr.empty())
 					{
-						std::ostringstream sss;
-						for (int i = 0; i < *optionGroupsIt; ++i)
-						{
-							const int& slotSize = facility->getCraftOptions().at(optionIt).max;
-							const std::string sizeClass = _game->getMod()->getCraftClassFromSize(slotSize);
-							if (sizeClass != _game->getMod()->getCraftSizeClassMap()->begin()->second)
-							{
-								// broken slot entry is hidden in ufopaedia, but shown in analysis
-								if (!sss.str().empty()) sss << "~";
-								const std::string slotClass = sizeClass.empty() ?
-									std::to_string(slotSize) : tr(sizeClass + "_UC").c_str();
-								sss << slotClass;
-							}
-							optionIt++;
-						}
-						if (!sss.str().empty())
-						{
-							if (!ss.str().empty()) ss << ", ";
-							ss << sss.str().c_str();
-						}
-						if ((size_t)optionIt >= facility->getCraftOptions().size())
-							optionIt = facility->getCraftOptions().size() - 1;
-						++optionGroupsIt;
-					}
-				}
-				else
-				{
-					const int maxCraftOptions = (size_t)facility->getCrafts() >
-						facility->getCraftOptions().size() ?
-						facility->getCrafts() :
-						facility->getCraftOptions().size();
-					for (int i = 0; i < maxCraftOptions; ++i)
-					{
-						const int& slotSize = facility->getCraftOptions().size() > (size_t)i ?
-							facility->getCraftOptions().at(i).max : 0;
-						const std::string sizeClass = _game->getMod()->getCraftClassFromSize(slotSize);
-						if (sizeClass != _game->getMod()->getCraftSizeClassMap()->begin()->second)
-						{
-							// broken slot entry is hidden in ufopaedia, but shown in analysis
-							const std::string slotClass = sizeClass.empty() ?
-								std::to_string(slotSize) : tr(sizeClass + "_UC").c_str();
-							if (!ss.str().empty()) ss << ", ";
-							ss << slotClass;
-						}
+						if (!ss.str().empty()) ss << ", ";
+						ss << tr(slotStr).c_str();
 					}
 				}
 				addToStatList(&ts, &ss, colStat, colValue, row);

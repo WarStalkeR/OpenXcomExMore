@@ -1010,36 +1010,29 @@ int Base::getAvailableHangars() const
 
 /**
  * Returns heuristic cost of the craft for specified craft slot.
- * @param Craft size reference.
+ * @param Craft functionalities reference.
  * @param CraftSlot object reference.
- * @param Vector of group identifiers reference.
  * @return Heuristic cost of the craft in slot.
  */
-int Base::getCraftSlotCost(const int& craftSize, const CraftSlot& rSlot,
-	const std::vector<int>& rGroup) const
+int Base::getCraftSlotCost(const RuleCraftFunctions& craftFunc, const CraftSlot& rSlot) const
 {
 	// Incompatible or occupied slot, placement not possible.
-	if (rSlot.craft != nullptr || rSlot.min == 0 || rSlot.max == 0 ||
-		craftSize < rSlot.min || craftSize > rSlot.max ||
-		std::find(rGroup.begin(), rGroup.end(), rSlot.group) != rGroup.end())
+	if (rSlot.craft != nullptr || rSlot.func.none() || craftFunc.none()
+		|| (rSlot.func & craftFunc) != craftFunc)
 	{
 		return INT_MAX;
 	}
 
-	// Wasted slot space. Avoid zeros just in case.
-	int slotUseCost = std::max(1, rSlot.max - craftSize);
+	// Show only unused functionalities bits.
+	// ~ inverts all bits in the bitset.
+	// & selects only enabled (1) bits.
+	RuleCraftFunctions unusedFunc = rSlot.func & ~craftFunc;
 
-	// Multi-class slots are more expensive.
-	if (rSlot.group > 0)
-	{
-		int refSlotGroup = rSlot.group;
-		int groupCount = std::count_if(_craftSlots.begin(),
-			_craftSlots.end(), [refSlotGroup](const CraftSlot& cSlot)
-		{
-			return cSlot.group == refSlotGroup;
-		});
-		slotUseCost *= (groupCount * groupCount);
-	}
+	// Wasted slot space. Avoid zeros just in case.
+	int slotUseCost = 1 + (int)unusedFunc.count();
+
+	// Increase the weight, since 65*65 is the worst case.
+	slotUseCost = slotUseCost * slotUseCost;
 
 	// Return the calculated slot usage cost.
 	return slotUseCost;
@@ -1047,37 +1040,29 @@ int Base::getCraftSlotCost(const int& craftSize, const CraftSlot& rSlot,
 
 /**
  * Returns heuristic cost of the craft for specified virtual slot.
- * @param Craft size reference.
+ * @param Craft functionalities reference.
  * @param VirtualSlot object reference.
- * @param Vector of group identifiers reference.
- * @param Vector of VirtualSlot objects reference.
  * @return Heuristic cost of the craft in slot.
  */
-int Base::getCraftVirtualCost(const int& craftSize, const VirtualSlot& rSlot,
-	const std::vector<int>& rGroup, const std::vector<VirtualSlot>& vSlots) const
+int Base::getCraftVirtualCost(const RuleCraftFunctions& craftFunc, const VirtualSlot& rSlot) const
 {
 	// Incompatible or occupied slot, placement not possible.
-	if (rSlot.size != nullptr || rSlot.min == 0 || rSlot.max == 0 ||
-		craftSize < rSlot.min || craftSize > rSlot.max ||
-		std::find(rGroup.begin(), rGroup.end(), rSlot.group) != rGroup.end())
+	if (rSlot.funcPtr != nullptr || rSlot.func.none() || craftFunc.none()
+		|| (rSlot.func & craftFunc) != craftFunc)
 	{
 		return INT_MAX;
 	}
 
-	// Wasted slot space. Avoid zeros just in case.
-	int slotUseCost = std::max(1, rSlot.max - craftSize);
+	// Show only unused functionalities bits.
+	// ~ inverts all bits in the bitset.
+	// & selects only enabled (1) bits.
+	RuleCraftFunctions unusedFunc = rSlot.func & ~craftFunc;
 
-	// Multi-class slots are more expensive.
-	if (rSlot.group > 0)
-	{
-		int refSlotGroup = rSlot.group;
-		int groupCount = std::count_if(vSlots.begin(),
-			vSlots.end(), [refSlotGroup](const VirtualSlot& cSlot)
-		{
-			return cSlot.group == refSlotGroup;
-		});
-		slotUseCost *= (groupCount * groupCount);
-	}
+	// Wasted slot space. Avoid zeros just in case.
+	int slotUseCost = 1 + (int)unusedFunc.count();
+
+	// Increase the weight, since 65*65 is the worst case.
+	slotUseCost = slotUseCost * slotUseCost;
 
 	// Return the calculated slot usage cost.
 	return slotUseCost;
@@ -1088,9 +1073,6 @@ int Base::getCraftVirtualCost(const int& craftSize, const VirtualSlot& rSlot,
  */
 void Base::updateCraftSlots()
 {
-	// Zeros are reserved for single-class slots.
-	int cSlotGroup = 1;
-
 	// Purging existing craft slots.
 	_craftSlots.clear();
 
@@ -1100,72 +1082,37 @@ void Base::updateCraftSlots()
 	// Checking all built hangar facilities.
 	for (auto* fac : _facilities)
 	{
-		if (fac->getBuildTime() == 0 && fac->getRules()->getCrafts() > 0)
-		{
-			// Flag, if grouping was used.
-			int groupItCounter = 0;
+		// Fetch max crafts number once.
+		const int craftsMax = fac->getRules()->getCrafts();
 
+		// Only if facility is complete and can house crafts.
+		if (fac->getBuildTime() == 0 && craftsMax > 0)
+		{
 			// I would've set it to const, but I was told not to.
 			bool hidesCrafts = fac->getRules()->getCraftsHidden();
 
-			// These will be changed, if configuration is invalid.
-			int groupsNum = fac->getRules()->getOptionGroups().size();
-			int craftNumOrGroupSum = fac->getRules()->getCraftGroupSum();
-
-			// We need craftOptions >= crafts in case we're using optionGroups as well.
-			if (size_t(fac->getRules()->getCrafts()) > fac->getRules()->getCraftOptions().size())
+			// We need craftOptions >= crafts in case we're going multi-craft.
+			if (craftsMax > 1 && size_t(craftsMax) > fac->getRules()->getCraftOptions().size())
 			{
 				Log(LOG_WARNING) << "Facility " << fac->getRules()->getType()
-					<< " has craft capacity of " << fac->getRules()->getCrafts()
+					<< " has craft capacity of " << craftsMax
 					<< ", but slots are defined only for "
 					<< fac->getRules()->getCraftOptions().size() << "!";
 			}
 
-			// If optionGroups are used, ensure that they are properly aligned with craftOptions.
-			if (groupsNum > 0 && fac->getRules()->getCraftOptions().size() != (size_t)craftNumOrGroupSum)
-			{
-				Log(LOG_WARNING) << "The sum of 'optionGroups' isn't equal to number"
-					<< " of entries in 'craftOptions' variable! Discarding...";
-				craftNumOrGroupSum = fac->getRules()->getCrafts();
-				groupsNum = 0; // Discard grouping, if not assigned correctly. Keep modding responsibly.
-			}
-
-			// Iterator to safely switch between 'optionGroups' values in loops.
-			auto groupIt = fac->getRules()->getOptionGroups().begin();
-			for (int i = 0; i < craftNumOrGroupSum; ++i)
+			// Iterate over every facility and populate craft slots.
+			for (int i = 0; i < craftsMax; ++i)
 			{
 				if (size_t(i) < fac->getRules()->getCraftOptions().size())
 				{
-					// Slot grouping into multi-class slots. This was painful.
-					if (groupsNum > 0 && groupIt != fac->getRules()->getOptionGroups().end())
-					{
-						const int sGroup = *groupIt > 1 ? cSlotGroup : 0; // Disable grouping for single entries.
-						const auto& refOpts = fac->getRules()->getCraftOptions()[i];
-						_craftSlots.push_back(CraftSlot(fac, nullptr, refOpts.hide || hidesCrafts, sGroup, refOpts.min, refOpts.max,
-							fac->getX() * GRID_SIZE + (fac->getRules()->getSizeX() - 1) * GRID_SIZE / 2 + refOpts.x,
-							fac->getY() * GRID_SIZE + (fac->getRules()->getSizeY() - 1) * GRID_SIZE / 2 + refOpts.y));
-						++groupItCounter;
-					}
-					else // Single-class slot handling. This was easy.
-					{
-						const auto& refOpts = fac->getRules()->getCraftOptions()[i];
-						_craftSlots.push_back(CraftSlot(fac, nullptr, refOpts.hide || hidesCrafts, 0, refOpts.min, refOpts.max,
-							fac->getX() * GRID_SIZE + (fac->getRules()->getSizeX() - 1) * GRID_SIZE / 2 + refOpts.x,
-							fac->getY() * GRID_SIZE + (fac->getRules()->getSizeY() - 1) * GRID_SIZE / 2 + refOpts.y));
-					}
-
-					// If slot grouping was used, move to the next variable.
-					if (groupsNum > 0 && groupIt != fac->getRules()->getOptionGroups().end()
-						&& groupItCounter >= *groupIt)
-					{
-						if (*groupIt > 1) ++cSlotGroup; // Increase group counter, only if it was used.
-						groupItCounter = 0;
-						++groupIt;
-					}
+					const CraftOption* refOpts = &(fac->getRules()->getCraftOptions().at(i));
+					_craftSlots.push_back(CraftSlot(fac, nullptr, refOpts->hide || hidesCrafts, refOpts->func,
+						fac->getX() * GRID_SIZE + (fac->getRules()->getSizeX() - 1) * GRID_SIZE / 2 + refOpts->x,
+						fac->getY() * GRID_SIZE + (fac->getRules()->getSizeY() - 1) * GRID_SIZE / 2 + refOpts->y));
 				}
 				else // Default center offsets for hangars with undefined craft slots.
 				{
-					_craftSlots.push_back(CraftSlot(fac, nullptr, false, 0, 0, 0,
+					_craftSlots.push_back(CraftSlot(fac, nullptr, false, 0,
 						fac->getX() * GRID_SIZE + (fac->getRules()->getSizeX() - 1) * GRID_SIZE / 2 + HNG_CENTER_X,
 						fac->getY() * GRID_SIZE + (fac->getRules()->getSizeY() - 1) * GRID_SIZE / 2 + HNG_CENTER_Y));
 				}
@@ -1178,9 +1125,16 @@ void Base::updateCraftSlots()
 	{
 		for (size_t i = 0; i < _craftSlots.size(); ++i)
 		{
+			std::ostringstream funcStr;
+			const std::vector<std::string> funcList = _mod->getCraftFunctionNames(_craftSlots[i].func);
+			for (const auto& func : funcList)
+			{
+				if (!funcStr.str().empty()) funcStr << ", ";
+				funcStr << func;
+			}
 			Log(LOG_DEBUG) << "Base: " << _name << ", " << _craftSlots[i].parent->getRules()->getType()
-				<< " Slot #" << (i+1) << ", Offset: [" << _craftSlots[i].x << "," << _craftSlots[i].y << "], Group: "
-				<< _craftSlots[i].group << ", Size: " << _craftSlots[i].min << "~" << _craftSlots[i].max;
+				<< " Slot #" << (i+1) << ", Offset: [" << _craftSlots[i].x << "," << _craftSlots[i].y
+				<< "], Functionalities: [" << funcStr.str().c_str() << "]";
 		}
 	}
 }
@@ -1205,30 +1159,37 @@ void Base::syncCraftSlots()
 	if (_crafts.size() <= 0) return;
 
 	// Lets hope that they're empty, when initialized.
-	std::vector<int> craftSizes;
-	std::vector<int> occupiedGroups;
+	std::vector<RuleCraftFunctions> craftFuncs;
 
-	// Collect and sort all used craft sizes.
+	// Collect all used craft functionality sets.
 	for (const Craft* refCraft : _crafts)
 	{
-		const int& refCraftSize = refCraft->getCraftSize();
-		if (std::find(craftSizes.begin(), craftSizes.end(),
-			refCraftSize) == craftSizes.end())
-			craftSizes.push_back(refCraftSize);
+		const RuleCraftFunctions& refCraftFunc =
+			refCraft->getRules()->getRequiresCraftSlotFunc();
+		if (std::find(craftFuncs.begin(), craftFuncs.end(),
+			refCraftFunc) == craftFuncs.end())
+			craftFuncs.push_back(refCraftFunc);
 	}
 
-	// Start from bigger crafts first.
-	std::sort(craftSizes.begin(), craftSizes.end(),
-		std::greater<int>());
+	// Start from bigger functionality sets first.
+	std::sort(craftFuncs.begin(), craftFuncs.end(),
+		[](const RuleCraftFunctions& a, const RuleCraftFunctions& b)
+		{
+			return a.count() > b.count();
+		}
+	);
 
 	// Allocate all crafts to existing slots in base.
-	for (const int& craftSize : craftSizes)
+	for (const RuleCraftFunctions& craftFunc : craftFuncs)
 	{
 		for (size_t i = 0; i < _crafts.size(); ++i)
 		{
-			// Mixing sizes works bad, so we avoid it.
-			if (_crafts[i]->getCraftSize() != craftSize)
-				continue;
+			// Calling it just once to speed things up.
+			const RuleCraftFunctions refCraftFunc =
+				_crafts[i]->getRules()->getRequiresCraftSlotFunc();
+
+			// Mixing different sets works bad, so we avoid it.
+			if (refCraftFunc != craftFunc) continue;
 
 			// Used to find most suitable slot.
 			bool gotPlace = false;
@@ -1238,9 +1199,12 @@ void Base::syncCraftSlots()
 			// Checking all craft slots in base.
 			for (size_t j = 0; j < _craftSlots.size(); ++j)
 			{
-				int slotUseCost = getCraftSlotCost(
-					_crafts[i]->getCraftSize(),
-					_craftSlots[j], occupiedGroups);
+				// Calculate cost of craft using new slot.
+				int slotUseCost = getCraftSlotCost(refCraftFunc, _craftSlots[j]);
+
+				// To avoid repeats for default values.
+				if (refCraftFunc.none() && _craftSlots[j].func.none())
+					slotUseCost = 1;
 
 				// Checking, if new slot is more suitable.
 				if (slotUseCost < INT_MAX && slotUseCost < bestCost)
@@ -1250,12 +1214,10 @@ void Base::syncCraftSlots()
 				}
 			}
 
-			// Housing craft and registering group.
+			// Housing craft in the slot for good.
 			if (bestCost < INT_MAX && bestSlot)
 			{
 				bestSlot->craft = _crafts[i];
-				if (bestSlot->group > 0)
-					occupiedGroups.push_back(bestSlot->group);
 				bestSlot->parent->setCraftForDrawing(_crafts[i]);
 				gotPlace = true;
 			}
@@ -1266,18 +1228,10 @@ void Base::syncCraftSlots()
 			// No suitable slot size? Look for a fall-back slot.
 			for (size_t j = 0; j < _craftSlots.size(); ++j)
 			{
-				// We need to ensure that slot isn't in used group.
-				const bool isFreeSlotGroup = (_craftSlots[j].group == 0 ||
-					!(std::find(occupiedGroups.begin(), occupiedGroups.end(),
-						_craftSlots[j].group) != occupiedGroups.end()));
-
-				// Look up for fallback craft slots with 0 min/max.
-				if (isFreeSlotGroup && _craftSlots[j].craft == nullptr &&
-					_craftSlots[j].max == 0 && _craftSlots[j].min == 0)
+				// Look up for fallback craft slots with unset functionality.
+				if (_craftSlots[j].craft == nullptr && _craftSlots[j].func.none())
 				{
 					_craftSlots[j].craft = _crafts[i];
-					if (_craftSlots[j].group > 0)
-						occupiedGroups.push_back(_craftSlots[j].group);
 					_craftSlots[j].parent->setCraftForDrawing(_crafts[i]);
 					gotPlace = true;
 					break;
@@ -1290,18 +1244,10 @@ void Base::syncCraftSlots()
 			// No fall-back slot either? Just ram it into any slot.
 			for (size_t j = 0; j < _craftSlots.size(); ++j)
 			{
-				// We need to ensure that slot isn't in used group.
-				const bool isFreeSlotGroup = (_craftSlots[j].group == 0 ||
-					!(std::find(occupiedGroups.begin(), occupiedGroups.end(),
-						_craftSlots[j].group) != occupiedGroups.end()));
-
 				// Any unoccupied slot (even if multi-class one) is fine.
-				if (isFreeSlotGroup && _craftSlots[j].craft == nullptr)
+				if (_craftSlots[j].craft == nullptr)
 				{
 					_craftSlots[j].craft = _crafts[i];
-					if (_craftSlots[j].group > 0)
-						occupiedGroups.push_back(_craftSlots[j].group);
-					_craftSlots[j].parent->setCraftForDrawing(_crafts[i]);
 					gotPlace = true;
 					break;
 				}
@@ -1324,10 +1270,17 @@ void Base::syncCraftSlots()
 		{
 			if (_craftSlots[i].craft != nullptr)
 			{
+				std::ostringstream funcStr;
+				const std::vector<std::string> funcList = _mod->getCraftFunctionNames(_craftSlots[i].func);
+				for (const auto& func : funcList)
+				{
+					if (!funcStr.str().empty()) funcStr << ", ";
+					funcStr << func;
+				}
 				Log(LOG_DEBUG) << "Base: " << _name << ", " << _craftSlots[i].parent->getRules()->getType()
-					<< ", Slot #" << (i+1) << ", Offset: [" << _craftSlots[i].x << "," << _craftSlots[i].y << "], Group: "
-					<< _craftSlots[i].group << ", Size: " << _craftSlots[i].min << "~" << _craftSlots[i].max
-					<< ", Craft: " << _craftSlots[i].craft->getType() << "-" << _craftSlots[i].craft->getId();
+					<< " Slot #" << (i+1) << ", Offset: [" << _craftSlots[i].x << "," << _craftSlots[i].y
+					<< "], Functionalities: [" << funcStr.str().c_str() << "]" << ", Craft: "
+					<< _craftSlots[i].craft->getType() << "-" << _craftSlots[i].craft->getId();
 			}
 		}
 	}
@@ -1347,47 +1300,49 @@ void Base::syncCraftChanges()
  * @param Craft size to look for slots of relevant size.
  * @return Number of suitable free hangar slots.
  */
-int Base::getFreeCraftSlots(int craftSize) const
+int Base::getFreeCraftSlots(const RuleCraftFunctions& craftFunc) const
 {
 	// Reservation of incompatible slots.
 	int spacePenalty = 0;
 
 	// Lets hope that they're empty, when initialized.
-	std::vector<int> occupiedGroups;
-	std::vector<int> virtualCrafts;
+	std::vector<RuleCraftFunctions> virtualCrafts;
 
-	// We have to handle it via Virtual Slots, because
-	// productions don't have Crafts, only RuleCrafts.
+	// We have to handle it via Virtual Slots for speed.
 	std::vector<VirtualSlot> virtualSlots;
 
 	// Collect existing craft slots in base.
 	for (auto& craftSlot : _craftSlots)
-		virtualSlots.push_back(VirtualSlot(nullptr,
-			craftSlot.group, craftSlot.min, craftSlot.max));
+		virtualSlots.push_back(VirtualSlot(nullptr, craftSlot.func));
 
-	// Collect sizes of existing crafts in base.
+	// Collect functionalities of existing crafts in base.
 	for (auto craftPtr : _crafts)
-		virtualCrafts.push_back(craftPtr->getCraftSize());
+		virtualCrafts.push_back(craftPtr->getRules()->getRequiresCraftSlotFunc());
 
-	// Collect sizes of crafts from transfers.
+	// Collect functionalities of crafts from transfers.
 	for (const auto* transfer : _transfers)
 		if (transfer->getType() == TRANSFER_CRAFT)
 			for (int i = 0; i < transfer->getQuantity(); ++i)
-				virtualCrafts.push_back(transfer->getCraft()->getCraftSize());
+				virtualCrafts.push_back(transfer->getCraft()->getRules()->getRequiresCraftSlotFunc());
 
-	// Collect sizes of crafts from productions.
+	// Collect functionalities of crafts from productions.
 	for (const auto* prod : _productions)
 		if (prod->getRules()->getProducedCraft())
 			for (int i = 0; i < (prod->getAmountTotal() - prod->getAmountProduced()); ++i)
-				virtualCrafts.push_back(prod->getRules()->getProducedCraft()->getCraftSize());
+				virtualCrafts.push_back(prod->getRules()->getProducedCraft()->getRequiresCraftSlotFunc());
 
-	// Start from bigger crafts first.
+	// Start from bigger functionality sets first.
 	std::sort(virtualCrafts.begin(), virtualCrafts.end(),
-		std::greater<int>());
+		[](const RuleCraftFunctions& a, const RuleCraftFunctions& b)
+		{
+			return a.count() > b.count();
+		}
+	);
 
 	// Allocate virtual crafts to virtual slots.
-	for (int& virtualCraft : virtualCrafts)
+	for (RuleCraftFunctions& virtualCraft : virtualCrafts)
 	{
+		// Used to find most suitable virtual slot.
 		bool gotPlace = false;
 		int bestCost = INT_MAX;
 		VirtualSlot* bestSlot = nullptr;
@@ -1395,9 +1350,14 @@ int Base::getFreeCraftSlots(int craftSize) const
 		// Checking all virtual slots in list.
 		for (size_t j = 0; j < virtualSlots.size(); ++j)
 		{
-			int slotUseCost = getCraftVirtualCost(
-				virtualCraft, virtualSlots[j],
-				occupiedGroups, virtualSlots);
+			// Calculate cost of craft using new virtual slot.
+			int slotUseCost = getCraftVirtualCost(virtualCraft, virtualSlots[j]);
+
+			// To avoid repeats for default values.
+			if (virtualCraft.none() && virtualSlots[j].func.none())
+				slotUseCost = 1;
+
+			// Checking, if new virtual slot is more suitable.
 			if (slotUseCost < INT_MAX && slotUseCost < bestCost)
 			{
 				bestSlot = &virtualSlots[j];
@@ -1405,30 +1365,23 @@ int Base::getFreeCraftSlots(int craftSize) const
 			}
 		}
 
-		// Housing craft and registering group.
+		// Housing craft in the virtual slot for good.
 		if (bestCost < INT_MAX && bestSlot)
 		{
-			bestSlot->size = &virtualCraft;
-			if (bestSlot->group > 0)
-				occupiedGroups.push_back(bestSlot->group);
+			bestSlot->funcPtr = &virtualCraft;
 			gotPlace = true;
 		}
 
 		// If housed, proceed to the next craft size.
 		if (gotPlace) continue;
 
-		// No suitable slot size? Look for fall-back slot.
+		// No suitable v-slot size? Look for a fall-back v-slot.
 		for (size_t j = 0; j < virtualSlots.size(); ++j)
 		{
-			const bool isFreeSlotGroup = (virtualSlots[j].group == 0 ||
-				!(std::find(occupiedGroups.begin(), occupiedGroups.end(),
-					virtualSlots[j].group) != occupiedGroups.end()));
-			if (isFreeSlotGroup && virtualSlots[j].size == nullptr &&
-				virtualSlots[j].max == 0 && virtualSlots[j].min == 0) // Zeros are fall-back slots.
+			// Look up for fallback virtual slots with unset functionality.
+			if (virtualSlots[j].funcPtr == nullptr && virtualSlots[j].func.none())
 			{
-				virtualSlots[j].size = &virtualCraft;
-				if (virtualSlots[j].group > 0)
-					occupiedGroups.push_back(virtualSlots[j].group);
+				virtualSlots[j].funcPtr = &virtualCraft;
 				gotPlace = true;
 				break;
 			}
@@ -1439,81 +1392,35 @@ int Base::getFreeCraftSlots(int craftSize) const
 	}
 
 	// Finally, count all available virtual slots.
-	int freeSlots = std::count_if(virtualSlots.begin(),
-		virtualSlots.end(), [craftSize, occupiedGroups](const VirtualSlot& vSlot)
-	{
-		return (vSlot.size == nullptr && ((craftSize >= vSlot.min &&
-			craftSize <= vSlot.max) || (vSlot.min == 0 && vSlot.max == 0))
-			&& !(std::find(occupiedGroups.begin(), occupiedGroups.end(),
-				vSlot.group) != occupiedGroups.end()));
-	});
+	int freeSlots = std::count_if(
+		virtualSlots.begin(),
+		virtualSlots.end(),
+		[craftFunc](const VirtualSlot& vSlot)
+		{
+			return vSlot.funcPtr == nullptr &&
+				((vSlot.func & craftFunc) == craftFunc);
+		}
+	);
 
 	// Apply craft slot reservation penalty.
 	freeSlots -= spacePenalty;
 
 	// Show the results of counting free compatible craft slots in debug mode.
-	Log(LOG_DEBUG) << "Base: " << _name << " requested number of free slots for size "
-		<< craftSize << ". Response: " << freeSlots;
+	if (Options::debug)
+	{
+		std::ostringstream funcStr;
+		const std::vector<std::string> funcList = _mod->getCraftFunctionNames(craftFunc);
+		for (const auto& func : funcList)
+		{
+			if (!funcStr.str().empty()) funcStr << ", ";
+			funcStr << func;
+		}
+		Log(LOG_DEBUG) << "Base: " << _name << " requested number of free slots for functionalities: "
+			<< funcStr.str().c_str() << ". Response: " << freeSlots;
+	}
 
 	// Return the number of suitable free hangar slots.
 	return freeSlots;
-}
-
-/**
- * Checks if there are suitable slots for craft, if it changes size.
- * @param Reference pointer to the craft object.
- * @param Integer of craft size after refit.
- * @return True, if size change is allowed.
- */
-bool Base::allowCraftRefit(const Craft* refCraft, int newCraftSize) const
-{
-	// Find relevant craft slot, where craft is housed.
-	auto craftSlotPtr = std::find_if(getCraftSlots()->begin(),
-		getCraftSlots()->end(), [refCraft](const CraftSlot& refSlot)
-	{
-		return refSlot.craft == refCraft;
-	});
-
-	// You can't refit crafts that aren't allocated to craft slots.
-	if (craftSlotPtr == getCraftSlots()->end())
-		return false;
-
-	// Approve, if current slot can house craft after refit.
-	if ((craftSlotPtr->min == 0 && craftSlotPtr->max == 0) ||
-		(newCraftSize >= craftSlotPtr->min &&
-			newCraftSize <= craftSlotPtr->max))
-		return true;
-
-	// Approve, if any slot in group can house craft after refit.
-	if (craftSlotPtr->group > 0)
-	{
-		std::vector<VirtualSlot> virtualSlotsGroup;
-		for (const auto& craftSlot : *getCraftSlots())
-		{
-			if (craftSlot.group == craftSlotPtr->group)
-				virtualSlotsGroup.push_back(VirtualSlot(nullptr,
-					craftSlot.group, craftSlot.min, craftSlot.max));
-		}
-		if (virtualSlotsGroup.size() > 0)
-		{
-			auto virtSlotPtr = std::find_if(virtualSlotsGroup.begin(),
-				virtualSlotsGroup.end(), [newCraftSize](const VirtualSlot& vSlot)
-			{
-				return ((vSlot.min == 0 && vSlot.max == 0) ||
-					(newCraftSize >= vSlot.min &&
-						newCraftSize <= vSlot.max));
-			});
-			if (virtSlotPtr != virtualSlotsGroup.end())
-				return true;
-		}
-	}
-
-	// Approve, if any other slot or group can house craft after refit.
-	if (getFreeCraftSlots(newCraftSize) > 0) return true;
-
-	// We only checking if we have suitable slot or not.
-	// Allocation itself will be handled by syncCraftSlots().
-	return false;
 }
 
 /**
@@ -2256,9 +2163,12 @@ int Base::damageFacility(BaseFacility *toBeDamaged)
 				{
 					if (newOptionIt != newOptions.end())
 					{
-						// if craft slots aren't compatible, you'll lose housed crafts.
-						if (craftSlot.max <= newOptionIt->max &&
-							craftSlot.min >= newOptionIt->min)
+						// fetch craft slot functionalities only once
+						const RuleCraftFunctions& craftFunc =
+							craftSlot.craft->getRules()->getRequiresCraftSlotFunc();
+
+						// if craft slots aren't compatible, you'll lose housed crafts
+						if ((newOptionIt->func & craftFunc) == craftFunc)
 							craftSlot.parent = fac;
 					}
 					else break;

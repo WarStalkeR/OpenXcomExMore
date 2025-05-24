@@ -889,7 +889,7 @@ void TransferItemsState::increaseByValue(int change)
 		break;
 	case TRANSFER_CRAFT:
 		craft = (Craft*)getRow().rule;
-		if (_cQty + 1 > _baseTo->getFreeCraftSlots(craft->getCraftSize()))
+		if (_cQty + 1 > _baseTo->getFreeCraftSlots(craft->getRules()->getRequiresCraftSlotFunc()))
 		{
 			errorMessage = tr("STR_NO_FREE_HANGARS_FOR_TRANSFER");
 		}

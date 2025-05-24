@@ -109,26 +109,20 @@ struct CraftSlot
 	Craft* craft = nullptr;
 	/// Is craft hidden or rendered in the base in the slot.
 	bool hidden = false;
-	/// Group identifier which allows treat multiple slots as one.
-	int group = 0;
-	/// Minimum size of craft that can be housed in the slot.
-	int min = 0;
-	/// Maximum size of craft that can be housed in the slot.
-	int max = 0;
+	/// List of compatible craft functionalities that slot provides.
+	RuleCraftFunctions func = 0;
 	/// Horizontal offset for rendering craft in the facility.
 	int x = 0;
 	/// Vertical offset for rendering craft in the facility.
 	int y = 0;
 	/// Constructor that allows to create new craft slots.
 	CraftSlot(BaseFacility* facPtr, Craft* craftPtr, bool isCraftHidden,
-		int slotGroup, int minSize, int maxSize, int xOffset, int yOffset)
+		RuleCraftFunctions slotFunc, int xOffset, int yOffset)
 	{
 		parent = facPtr;
 		craft = craftPtr;
 		hidden = isCraftHidden;
-		group = slotGroup;
-		min = minSize;
-		max = maxSize;
+		func = slotFunc;
 		x = xOffset;
 		y = yOffset;
 	}
@@ -136,21 +130,15 @@ struct CraftSlot
 
 struct VirtualSlot
 {
-	/// Simplified pointer to the size of the craft.
-	int* size;
-	/// Group identifier which allows treat multiple slots as one.
-	int group;
-	/// Minimum size of craft that can be housed in the slot.
-	int min;
-	/// Maximum size of craft that can be housed in the slot.
-	int max;
+	/// Simplified pointer to the list of craft's functionalities.
+	RuleCraftFunctions* funcPtr;
+	/// List of compatible craft functionalities that slot provides.
+	RuleCraftFunctions func = 0;
 	/// Constructor that allows to create new virtual slots.
-	VirtualSlot(int* sizePtr, int slotGroup, int minSize, int maxSize)
+	VirtualSlot(RuleCraftFunctions* craftFuncPtr, RuleCraftFunctions slotFunc)
 	{
-		size = sizePtr;
-		group = slotGroup;
-		min = minSize;
-		max = maxSize;
+		funcPtr = craftFuncPtr;
+		func = slotFunc;
 	}
 };
 
@@ -278,11 +266,9 @@ public:
 	/// Gets the base's available hangars.
 	int getAvailableHangars() const;
 	/// Returns heuristic cost of the craft for specified craft slot.
-	int getCraftSlotCost(const int& craftSize, const CraftSlot& rSlot,
-		const std::vector<int>& rGroup) const;
+	int getCraftSlotCost(const RuleCraftFunctions& craftFunc, const CraftSlot& rSlot) const;
 	/// Returns heuristic cost of the craft for specified virtual craft slot.
-	int getCraftVirtualCost(const int& craftSize, const VirtualSlot& rSlot,
-		const std::vector<int>& rGroup, const std::vector<VirtualSlot>& vSlots) const;
+	int getCraftVirtualCost(const RuleCraftFunctions& craftFunc, const VirtualSlot& rSlot) const;
 	/// Updates list of all existing craft slots.
 	void updateCraftSlots();
 	/// Updates list of occupied craft slots.
@@ -290,9 +276,7 @@ public:
 	/// Runs two functions above in sequential manner.
 	void syncCraftChanges();
 	/// Gets number of unoccupied hangar slots for specific craft size.
-	int getFreeCraftSlots(int craftSize = 0) const;
-	/// Checks if there are suitable slots for craft, if it changes size.
-	bool allowCraftRefit(const Craft* refCraft, int newCraftSize) const;
+	int getFreeCraftSlots(const RuleCraftFunctions& craftFunc = 0) const;
 	/// Get the number of available space lab (not used by a ResearchProject)
 	int getFreeLaboratories() const;
 	/// Get the number of available space lab (not used by a Production)

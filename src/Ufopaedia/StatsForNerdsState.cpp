@@ -3173,47 +3173,28 @@ void StatsForNerdsState::initFacilityList()
 
 	if (facilityRule->getCraftOptions().size() > 0)
 	{
-		std::vector<std::string> craftSlotSizes;
-		if (facilityRule->getOptionGroups().size() > 0 &&
-			(size_t)facilityRule->getCraftGroupSum() == facilityRule->getCraftOptions().size())
-		{
-			int optionIt = 0;
-			auto optionGroupsIt = facilityRule->getOptionGroups().begin();
-			while (optionGroupsIt != facilityRule->getOptionGroups().end())
-			{
-				std::ostringstream groupEntry;
-				for (int i = 0; i < *optionGroupsIt; ++i)
-				{
-					if (i > 0) groupEntry << "/";
-					else groupEntry << "[";
-					const int& minSize = facilityRule->getCraftOptions().at(optionIt).min;
-					const int& maxSize = facilityRule->getCraftOptions().at(optionIt).max;
-					if (minSize == maxSize) groupEntry << maxSize;
-					else groupEntry << minSize << "~" << maxSize;
-					if (i >= (*optionGroupsIt - 1)) groupEntry << "]";
-					optionIt++;
-				}
-				if ((size_t)optionIt >= facilityRule->getCraftOptions().size())
-					optionIt = facilityRule->getCraftOptions().size() - 1;
-				craftSlotSizes.push_back(groupEntry.str());
-				++optionGroupsIt;
-			}
-		}
-		else
+		std::vector<std::string> craftSlotList;
+		if (facilityRule->getCraftOptions().size() == (size_t)facilityRule->getCrafts())
 		{
 			for (size_t i = 0; i < facilityRule->getCraftOptions().size(); ++i)
 			{
-				if ((int)i >(facilityRule->getCrafts() - 1)) break;
+				bool firstEntry = true;
 				std::ostringstream slotEntry;
-				const int& minSize = facilityRule->getCraftOptions().at(i).min;
-				const int& maxSize = facilityRule->getCraftOptions().at(i).max;
-				if (minSize == maxSize) slotEntry << "[" << maxSize << "]";
-				else slotEntry << "[" << minSize << "~" << maxSize << "]";
-				craftSlotSizes.push_back(slotEntry.str());
+				const std::vector<std::string> funcList =
+					mod->getCraftFunctionNames(facilityRule->getCraftOptions().at(i).func);
+				slotEntry << "[";
+				for (const auto& func : funcList)
+				{
+					if (!firstEntry) slotEntry << ", ";
+					else firstEntry = false;
+					addTranslation(slotEntry, func);
+				}
+				slotEntry << "]";
+				craftSlotList.push_back(slotEntry.str());
 			}
 		}
-		std::sort(craftSlotSizes.begin(), craftSlotSizes.end());
-		addVectorOfStrings(ss, craftSlotSizes, "craftSlotSizes", false);
+		addVectorOfStrings(ss, craftSlotList, "craftSlotList", false);
+		addVectorOfStrings(ss, facilityRule->getOptionStrings(), "craftSlotNames");
 	}
 
 	addInteger(ss, facilityRule->getLaboratories(), "labs");
@@ -3326,6 +3307,7 @@ void StatsForNerdsState::initCraftList()
 	addVectorOfStrings(ss, craftRule->getRequirements(), "requires");
 	addVectorOfStrings(ss, mod->getBaseFunctionNames(craftRule->getRequiresBuyBaseFunc()), "requiresBuyBaseFunc");
 	addSingleString(ss, craftRule->getRequiresBuyCountry(), "requiresBuyCountry");
+	addVectorOfStrings(ss, mod->getCraftFunctionNames(craftRule->getRequiresCraftSlotFunc()), "requiresCraftSlotFunc");
 
 	addInteger(ss, craftRule->getBuyCost(), "costBuy", 0, true);
 	addInteger(ss, craftRule->getMonthlyBuyLimit(), "monthlyBuyLimit");

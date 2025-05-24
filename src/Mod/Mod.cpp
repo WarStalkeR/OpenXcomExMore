@@ -1989,6 +1989,71 @@ RuleBaseFacilityFunctions Mod::getBaseFunctionsRule(const std::string &name) con
 }
 
 /**
+ * Load craft functions to bit set.
+ */
+void Mod::loadCraftFunction(const std::string& parent, RuleCraftFunctions& f, const YAML::YamlNodeReader& reader)
+{
+	if (reader)
+	{
+		try
+		{
+			if (isListHelper(reader))
+			{
+				f.reset();
+				for (const auto& n : reader.children())
+				{
+					f.set(_craftFunctionNames.addName(n.readVal<std::string>(), f.size()));
+				}
+			}
+			else if (isListAddTagHelper(reader))
+			{
+				for (const auto& n : reader.children())
+				{
+					f.set(_craftFunctionNames.addName(n.readVal<std::string>(), f.size()));
+				}
+			}
+			else if (isListRemoveTagHelper(reader))
+			{
+				for (const auto& n : reader.children())
+				{
+					f.set(_craftFunctionNames.addName(n.readVal<std::string>(), f.size()), false);
+				}
+			}
+			else
+			{
+				throwOnBadListHelper(parent, reader);
+			}
+		}
+		catch (LoadRuleException& ex)
+		{
+			//context is already included in exception, no need add more
+			throw;
+		}
+		catch (Exception& ex)
+		{
+			throw LoadRuleException(parent, reader, ex.what());
+		}
+	}
+}
+
+/**
+ * Get list of function names in craft bitset.
+ */
+std::vector<std::string> Mod::getCraftFunctionNames(RuleCraftFunctions f) const
+{
+	std::vector<std::string> vec;
+	vec.reserve(f.count());
+	for (size_t i = 0; i < f.size(); ++i)
+	{
+		if (f.test(i))
+		{
+			vec.push_back(_craftFunctionNames.getName(i));
+		}
+	}
+	return vec;
+}
+
+/**
  * Loads a list of ints.
  * Another mod can only override the whole list, no partial edits allowed.
  */
@@ -2122,6 +2187,73 @@ void Mod::loadKillCriteria(const std::string &parent, std::vector<std::vector<st
 			for (const auto& n : reader.children())
 			{
 				loadInner(v.emplace_back(), n);
+			}
+		}
+		else
+		{
+			throwOnBadListHelper(parent, reader);
+		}
+	}
+}
+
+/**
+ * Loads data for kill criteria from Commendations.
+ */
+void Mod::loadCraftOptions(const std::string& parent, std::vector<CraftOption>& options, const YAML::YamlNodeReader& reader)
+{
+	if (reader)
+	{
+		auto loadInner = [&](CraftOption& option, const YAML::YamlNodeReader& node)
+		{
+			showInfo(parent, node);
+
+			if (isMapHelper(node))
+			{
+				node.tryRead("x", option.x);
+				node.tryRead("y", option.y);
+				node.tryRead("hide", option.hide);
+				loadCraftFunction(parent, option.func, node["func"]);
+			}
+			else
+			{
+				throwOnBadListHelper(parent, node);
+			}
+		};
+
+		showInfo(parent, reader, AddTag, RemoveTag);
+
+		if (isListHelper(reader))
+		{
+			options.clear();
+			options.reserve(reader.childrenCount());
+			for (const auto& node : reader.children())
+			{
+				loadInner(options.emplace_back(), node);
+			}
+		}
+		else if (isListAddTagHelper(reader))
+		{
+			options.reserve(options.size() + reader.childrenCount());
+			for (const auto& node : reader.children())
+			{
+				loadInner(options.emplace_back(), node);
+			}
+		}
+		else if (isListRemoveTagHelper(reader))
+		{
+			for (const auto& node : reader.children())
+			{
+				CraftOption lookup;
+				loadInner(lookup, node);
+				options.erase(std::remove_if(
+					options.begin(), options.end(),
+					[&](const CraftOption& option)
+					{
+						return option.x == lookup.x
+							&& option.y == lookup.y;
+					}),
+					options.end()
+				);
 			}
 		}
 		else

@@ -264,6 +264,7 @@ en-US:
   requiresBuy: "Tech required to buy"
   requiresBuyBaseFunc: "Services needed to buy"
   requiresBuyCountry: "Allied country required"
+  requiresCraftSlotFunc: "Required slot services"
   categories: "Categories"
   supportedInventorySections: "Inventory slots"
 #
@@ -375,7 +376,8 @@ en-US:
   personnel: "Living space"
   aliens: "Prison space"
   crafts: "Hangar space"
-  craftSlotSizes: "Hangar slot sizes"
+  craftSlotList: "Hangar slots"
+  craftSlotNames: "Slots names"
   labs: "Laboratory space"
   workshops: "Workshop space"
   psiLabs: "Psi-lab space"

@@ -34,6 +34,11 @@ template<typename Tag, typename DataType> struct AreaSubset;
 using RuleBaseFacilityFunctions = std::bitset<128>;
 
 /**
+ * Fixed collection of craft functionalities
+ */
+using RuleCraftFunctions = std::bitset<64>;
+
+/**
  * Subset area of base.
  */
 using BaseAreaSubset = AreaSubset<Base, Sint8>;
