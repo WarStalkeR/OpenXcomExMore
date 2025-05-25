@@ -22,6 +22,7 @@
 #include <unordered_map>
 #include <algorithm>
 #include "Exception.h"
+#include "Logger.h"
 
 namespace OpenXcom
 {
@@ -580,6 +581,7 @@ public:
 			}
 			ref = _last++;
 			_usedNames[ref] = name;
+			Log(LOG_DEBUG) << "Collections::NamesToIndex, Assigned: " << name;
 			return ref;
 		}
 
