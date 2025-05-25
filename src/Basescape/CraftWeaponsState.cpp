@@ -179,9 +179,9 @@ void CraftWeaponsState::lstWeaponsClick(Action *)
 		if (diffCraftSize)
 		{
 			// Check, if game rules allow craft to change its classification
-			if ((_game->getMod()->getCraftClassFromSize(_craft->getCraftSize() + diffCraftSize) !=
-				_game->getMod()->getCraftClassFromSize(_craft->getCraftSize()))
-				&& !_game->getMod()->getCraftAllowClassChange())
+			if ((_game->getMod()->getCraftSizeStr(_craft->getCraftSize() + diffCraftSize) !=
+				_game->getMod()->getCraftSizeStr(_craft->getCraftSize()))
+				&& Mod::CRAFT_SIZE_ALLOW_RECLASS)
 			{
 				_game->popState();
 				_game->pushState(new ErrorMessageState(

@@ -159,29 +159,42 @@ namespace OpenXcom
 				row++;
 			}
 
-			if (!lockedStats || (lockedStats && row < maxRows))
+			if (Mod::CRAFT_PEDIA_SHOW_SLOTS)
 			{
-				ts.str(""); ts.clear(); ss.str(""); ss.clear();
-				ts << tr("STR_HANGAR_CRAFT_SLOTS");
-				for (int i = 0; i < facility->getCrafts(); ++i)
+				if (!lockedStats || (lockedStats && row < maxRows))
 				{
-					std::string slotStr = "";
-					// Get proper slot string, if it exists
-					if (facility->getOptionStrings().size() > (size_t)i)
-						slotStr = facility->getOptionStrings().at(i);
-					// Or get fallback string from function names
-					else if (facility->getCraftOptions().size() > (size_t)i)
-						slotStr = _game->getMod()->getCraftFunctionNames(
-							facility->getCraftOptions().at(i).func).back() + "_UC";
-					// Broken slot entry is hidden in ufopaedia, but shown in analysis
-					if (!slotStr.empty())
+					ts.str(""); ts.clear(); ss.str(""); ss.clear();
+					ts << tr("STR_HANGAR_CRAFT_SLOTS");
+					const auto* slotMap = _game->getMod()->getCraftSlotMap();
+					for (int i = 0; i < facility->getCrafts(); ++i)
 					{
-						if (!ss.str().empty()) ss << ", ";
-						ss << tr(slotStr).c_str();
+						std::string slotStr = "STR_HANGAR_SLOT_NA";
+
+						if (facility->getCraftOptions().size() > (size_t)i)
+						{
+							RuleCraftFunctions slotFunc = facility->getCraftOptions().at(i).func;
+
+							// Only if slot functionality is defined
+							if (slotFunc.any())
+							{
+								auto funcIt = slotMap->find(slotFunc);
+								// Get slot string from map, if defined
+								if (funcIt != slotMap->end()) slotStr = funcIt->second;
+								// Or get fallback string from function names
+								else slotStr = _game->getMod()->getCraftFunctionNames(slotFunc).back();
+							}
+						}
+
+						// Broken slot entry is hidden in ufopaedia, but shown in analysis
+						if (!slotStr.empty())
+						{
+							if (!ss.str().empty()) ss << ", ";
+							ss << tr(slotStr).c_str();
+						}
 					}
+					addToStatList(&ts, &ss, colStat, colValue, row);
+					row++;
 				}
-				addToStatList(&ts, &ss, colStat, colValue, row);
-				row++;
 			}
 		}
 

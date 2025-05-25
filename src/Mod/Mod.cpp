@@ -192,12 +192,17 @@ int Mod::UNIT_RESPONSE_SOUNDS_FREQUENCY[4];
 int Mod::PEDIA_FACILITY_RENDER_PARAMETERS[4];
 int Mod::ACCELERATION_PENALTY[4];
 std::pair<int, int> Mod::ACCELERATION_COEFF[4];
-bool Mod::CRAFT_LIST_SHOW_CLASS;
-bool Mod::CRAFT_LIST_CLASS_SHORT;
 bool Mod::BASE_SHORT_HANGAR_LINKS;
 bool Mod::PEDIA_FACILITY_LOCKED_STATS;
 int Mod::PEDIA_FACILITY_ROWS_CUTOFF;
 int Mod::PEDIA_FACILITY_COL_OFFSET;
+bool Mod::CRAFT_SORT_BIT_COUNT;
+bool Mod::CRAFT_PEDIA_SHOW_CLASS;
+bool Mod::CRAFT_PEDIA_SHOW_SLOTS;
+bool Mod::CRAFT_LIST_SHOW_CLASS;
+bool Mod::CRAFT_LIST_CLASS_SHORT;
+bool Mod::CRAFT_SIZE_USE_SIZE_CLASS;
+bool Mod::CRAFT_SIZE_ALLOW_RECLASS;
 bool Mod::GEO_SHOW_TARGET_COURSE_RANGE;
 double Mod::GEO_TARGET_COURSE_RANGE_MULT;
 int Mod::GEO_TARGET_RANGE_COL_OFFSET;
@@ -326,13 +331,19 @@ void Mod::resetGlobalStatics()
 	ACCELERATION_COEFF[2] = { 20, 50 }; // combat +/- acceleration coefficient
 	ACCELERATION_COEFF[3] = { 25, 70 }; // maneuver +/- acceleration coefficient
 
-	CRAFT_LIST_SHOW_CLASS = false; // show class column in base craft list
-	CRAFT_LIST_CLASS_SHORT = false; // show short class name in class column
-
 	BASE_SHORT_HANGAR_LINKS = false; // base short hangar to craft links
 	PEDIA_FACILITY_LOCKED_STATS = true; // scrollbar lock for facility stats
 	PEDIA_FACILITY_ROWS_CUTOFF = 5; // pedia facility stat rows cutoff
 	PEDIA_FACILITY_COL_OFFSET = 0; // pedia facility stats column offset
+
+	CRAFT_SORT_BIT_COUNT = true; // sort crafts via func bitset count
+	CRAFT_PEDIA_SHOW_CLASS = false; // show craft's class in craft pedia
+	CRAFT_PEDIA_SHOW_SLOTS = false; // show hangar slots in facility pedia
+	CRAFT_LIST_SHOW_CLASS = false; // show class column in base craft list
+	CRAFT_LIST_CLASS_SHORT = false; // show short class name in class column
+
+	CRAFT_SIZE_USE_SIZE_CLASS = false; // show short class name in class column
+	CRAFT_SIZE_ALLOW_RECLASS = false; // show short class name in class column
 
 	GEO_SHOW_TARGET_COURSE_RANGE = false; // show range to target in set course
 	GEO_TARGET_COURSE_RANGE_MULT = 1.0; // multiplier for distance conversion
@@ -2000,8 +2011,24 @@ void Mod::loadCraftFunction(const std::string& parent, RuleCraftFunctions& f, co
 			if (isListHelper(reader))
 			{
 				f.reset();
+				bool isFirst = true;
 				for (const auto& n : reader.children())
 				{
+					if (isFirst)
+					{
+						// allows to reset Collections::NamesToIndex
+						// use it if you really-really need to reset it
+						// exists in case you've decided to compare
+						// bitset and require strict index order for it
+						if (n.readVal<std::string>() == "RESET_COLLECTION")
+						{
+							_craftFunctionNames.~NamesToIndex();
+							new (&_craftFunctionNames) Collections::NamesToIndex();
+							Log(LOG_DEBUG) << "Collections::NamesToIndex has been reset for '"
+								<< parent << "' in '" << reader.key() << ", node!";
+						}
+						isFirst = false;
+					}
 					f.set(_craftFunctionNames.addName(n.readVal<std::string>(), f.size()));
 				}
 			}
@@ -2026,7 +2053,6 @@ void Mod::loadCraftFunction(const std::string& parent, RuleCraftFunctions& f, co
 		}
 		catch (LoadRuleException& ex)
 		{
-			//context is already included in exception, no need add more
 			throw;
 		}
 		catch (Exception& ex)
@@ -2197,7 +2223,7 @@ void Mod::loadKillCriteria(const std::string &parent, std::vector<std::vector<st
 }
 
 /**
- * Loads data for kill criteria from Commendations.
+ * Loads facility craft slot options data for future use.
  */
 void Mod::loadCraftOptions(const std::string& parent, std::vector<CraftOption>& options, const YAML::YamlNodeReader& reader)
 {
@@ -2254,6 +2280,67 @@ void Mod::loadCraftOptions(const std::string& parent, std::vector<CraftOption>& 
 					}),
 					options.end()
 				);
+			}
+		}
+		else
+		{
+			throwOnBadListHelper(parent, reader);
+		}
+	}
+}
+
+/**
+ * Loads craft functionality-to-string map.
+ */
+void Mod::loadCraftFuncMap(const std::string& parent, std::unordered_map<RuleCraftFunctions, std::string>& map, const YAML::YamlNodeReader& reader)
+{
+	if (reader)
+	{
+		showInfo(parent, reader, AddTag, RemoveTag);
+
+		if (isListHelper(reader))
+		{
+			map.clear();
+			for (const auto& node : reader.children())
+			{
+				std::string tmpStr;
+				RuleCraftFunctions tmpFunc;
+				node.tryRead("id", tmpStr);
+				loadCraftFunction(parent, tmpFunc, node["func"]);
+				if (!tmpStr.empty() && tmpFunc.any())
+				{
+					map.try_emplace(tmpFunc, tmpStr);
+				}
+			}
+		}
+		else if (isListAddTagHelper(reader))
+		{
+			for (const auto& node : reader.children())
+			{
+				std::string tmpStr;
+				RuleCraftFunctions tmpFunc;
+				node.tryRead("id", tmpStr);
+				loadCraftFunction(parent, tmpFunc, node["func"]);
+				if (!tmpStr.empty() && tmpFunc.any())
+				{
+					map.try_emplace(tmpFunc, tmpStr);
+				}
+			}
+		}
+		else if (isListRemoveTagHelper(reader))
+		{
+			for (const auto& node : reader.children())
+			{
+				std::string tmpStr;
+				node.tryRead("id", tmpStr);
+				if (!tmpStr.empty())
+				{
+					for (auto it = map.begin(); it != map.end(); )
+					{
+						if (it->second == tmpStr) it = map.erase(it);
+						else ++it;
+					}
+				}
 			}
 		}
 		else
@@ -2907,8 +2994,6 @@ void Mod::loadConstants(const YAML::YamlNodeReader &reader)
 	if (const auto& arrayReader = reader["accelerationCoefficient"])
 		for (size_t j = 0; j < std::size(ACCELERATION_COEFF); j++)
 			arrayReader[j].tryReadVal(ACCELERATION_COEFF[j]);
-	reader.tryRead("baseCraftListShowClass", CRAFT_LIST_SHOW_CLASS);
-	reader.tryRead("baseCraftListClassShort", CRAFT_LIST_CLASS_SHORT);
 	reader.tryRead("baseShortHangarLinks", BASE_SHORT_HANGAR_LINKS);
 	reader.tryRead("pediaFacilityLockedStats", PEDIA_FACILITY_LOCKED_STATS);
 	reader.tryRead("pediaFacilityRowsCutoff", PEDIA_FACILITY_ROWS_CUTOFF);
@@ -3787,11 +3872,24 @@ void Mod::loadFile(const FileMap::FileRecord &filerec, ModScript &parsers)
 		lighting.tryRead("enhanced", _enhancedLighting);
 	}
 
-	// craft classification variables
-	if (const auto& craftClasses = loadDocInfoHelper("craftClasses"))
+	// craft functionality settings
+	if (const auto& craftFuncSettings = loadDocInfoHelper("craftFuncSettings"))
 	{
-		craftClasses.tryRead("sizeClassMap", _craftSizeClassMap);
-		craftClasses.tryRead("allowClassChange", _craftAllowClassChange);
+		loadCraftFuncMap("craftFuncSettings", _craftClassMap, craftFuncSettings["craftClassMap"]);
+		loadCraftFuncMap("craftFuncSettings", _craftSlotMap, craftFuncSettings["craftSlotMap"]);
+		craftFuncSettings.tryRead("craftSortBitCount", CRAFT_SORT_BIT_COUNT);
+		craftFuncSettings.tryRead("craftPediaShowClass", CRAFT_PEDIA_SHOW_CLASS);
+		craftFuncSettings.tryRead("craftPediaShowSlots", CRAFT_PEDIA_SHOW_SLOTS);
+		craftFuncSettings.tryRead("craftListShowClass", CRAFT_LIST_SHOW_CLASS);
+		craftFuncSettings.tryRead("craftListClassShort", CRAFT_LIST_CLASS_SHORT);
+	}
+
+	// craft size-class settings
+	if (const auto& craftSizeSettings = loadDocInfoHelper("craftSizeSettings"))
+	{
+		craftSizeSettings.tryRead("craftSizeMap", _craftSizeMap);
+		craftSizeSettings.tryRead("useSizeClassMap", CRAFT_SIZE_USE_SIZE_CLASS);
+		craftSizeSettings.tryRead("allowClassChange", CRAFT_SIZE_ALLOW_RECLASS);
 	}
 }
 
@@ -5571,19 +5669,29 @@ const std::vector<int> &Mod::getFlagByKills() const
 	return _flagByKills;
 }
 
-const std::map<int, std::string> *Mod::getCraftSizeClassMap() const
+const std::unordered_map<RuleCraftFunctions, std::string> *Mod::getCraftClassMap() const
 {
-	return &_craftSizeClassMap;
+	return &_craftClassMap;
 }
 
-const std::string Mod::getCraftClassFromSize(const int& craftSize) const
+const std::unordered_map<RuleCraftFunctions, std::string> *Mod::getCraftSlotMap() const
 {
-	if (getCraftSizeClassMap()->empty())
+	return &_craftSlotMap;
+}
+
+const std::map<int, std::string> *Mod::getCraftSizeMap() const
+{
+	return &_craftSizeMap;
+}
+
+const std::string Mod::getCraftSizeStr(const int& craftSize) const
+{
+	if (getCraftSizeMap()->empty())
 		return "";
 
 	int temp = INT_MIN;
 	std::string craftClass = "";
-	const auto* craftClassMap = getCraftSizeClassMap();
+	const auto* craftClassMap = getCraftSizeMap();
 	for (const auto& [intSize, strClass] : *craftClassMap)
 	{
 		if (intSize > temp && craftSize >= intSize)

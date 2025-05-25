@@ -82,7 +82,6 @@ private:
 	int _storage, _personnel, _aliens, _crafts, _labs, _workshops, _psiLabs;
 	bool _spriteEnabled, _altBuildSprite, _craftsHidden;
 	std::vector<CraftOption> _craftOptions;
-	std::vector<std::string> _optionStrings;
 	int _sightRange, _sightChance;
 	int _radarRange, _radarChance, _defense, _hitRatio, _fireSound, _hitSound, _placeSound;
 	int _ammoMax, _rearmRate;
@@ -189,8 +188,6 @@ public:
 	bool getCraftsHidden() const;
 	/// Gets the facility's list of craft slot options.
 	const std::vector<CraftOption>& getCraftOptions() const;
-	/// Gets the facility's list of slot slot names.
-	const std::vector<std::string>& getOptionStrings() const;
 	/// Gets the facility's sight range.
 	int getSightRange() const { return _sightRange; }
 	/// Gets the facility's alien base detection chance.

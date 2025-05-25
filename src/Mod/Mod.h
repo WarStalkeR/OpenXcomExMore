@@ -290,10 +290,13 @@ private:
 	Collections::NamesToIndex _baseFunctionNames;
 	Collections::NamesToIndex _craftFunctionNames;
 
+	std::unordered_map<RuleCraftFunctions, std::string> _craftClassMap;
+	std::unordered_map<RuleCraftFunctions, std::string> _craftSlotMap;
+
 	GameTime _startingTime;
 	int _startingDifficulty;
 	int _baseDefenseMapFromLocation;
-	std::map<int, std::string> _missionRatings, _monthlyRatings, _craftSizeClassMap;
+	std::map<int, std::string> _missionRatings, _monthlyRatings, _craftSizeMap;
 	std::map<std::string, std::string> _fixedUserOptions, _recommendedUserOptions;
 	std::vector<std::string> _hiddenMovementBackgrounds;
 	std::vector<std::string> _baseNamesFirst, _baseNamesMiddle, _baseNamesLast;
@@ -446,12 +449,17 @@ public:
 	static int PEDIA_FACILITY_RENDER_PARAMETERS[4];
 	static int ACCELERATION_PENALTY[4];
 	static std::pair<int, int> ACCELERATION_COEFF[4];
-	static bool CRAFT_LIST_SHOW_CLASS;
-	static bool CRAFT_LIST_CLASS_SHORT;
 	static bool BASE_SHORT_HANGAR_LINKS;
 	static bool PEDIA_FACILITY_LOCKED_STATS;
 	static int PEDIA_FACILITY_ROWS_CUTOFF;
 	static int PEDIA_FACILITY_COL_OFFSET;
+	static bool CRAFT_SORT_BIT_COUNT;
+	static bool CRAFT_PEDIA_SHOW_CLASS;
+	static bool CRAFT_PEDIA_SHOW_SLOTS;
+	static bool CRAFT_LIST_SHOW_CLASS;
+	static bool CRAFT_LIST_CLASS_SHORT;
+	static bool CRAFT_SIZE_USE_SIZE_CLASS;
+	static bool CRAFT_SIZE_ALLOW_RECLASS;
 	static bool GEO_SHOW_TARGET_COURSE_RANGE;
 	static double GEO_TARGET_COURSE_RANGE_MULT;
 	static int GEO_TARGET_RANGE_COL_OFFSET;
@@ -466,7 +474,6 @@ public:
 	static int EXTENDED_UNDERWATER_THROW_FACTOR;
 	static bool EXTENDED_EXPERIENCE_AWARD_SYSTEM;
 	static bool EXTENDED_FORCE_SPAWN;
-
 
 	/// Return `true` when given string is empty or pseudo null value.
 	static bool isEmptyRuleName(const std::string& s)
@@ -594,6 +601,8 @@ public:
 
 	/// Loads craft options facility data.
 	void loadCraftOptions(const std::string& parent, std::vector<CraftOption>& options, const YAML::YamlNodeReader& reader);
+	/// Loads craft functionality-to-string map.
+	void loadCraftFuncMap(const std::string& parent, std::unordered_map<RuleCraftFunctions, std::string>& map, const YAML::YamlNodeReader& reader);
 
 
 	/// Convert names to correct rule objects
@@ -1157,12 +1166,15 @@ public:
 	const std::vector<int>& getRetaliationBaseRegionOdds() { return _retaliationBaseRegionOdds; }
 	const std::vector<int>& getAliensFacingCraftOdds() { return _aliensFacingCraftOdds; }
 
+	/// Gets the list of all mapped craft class functionalities.
+	const std::unordered_map<RuleCraftFunctions, std::string> *getCraftClassMap() const;
+	/// Gets the list of all mapped craft slot functionalities.
+	const std::unordered_map<RuleCraftFunctions, std::string> *getCraftSlotMap() const;
+
 	/// Gets the list of all defined craft classes.
-	const std::map<int, std::string> *getCraftSizeClassMap() const;
+	const std::map<int, std::string> *getCraftSizeMap() const;
 	/// Receives craft size as integer and returns relevant craft class string.
-	const std::string getCraftClassFromSize(const int& craftSize) const;
-	/// Crafts can change their class due to change in their size (through systems/weapons)?
-	bool getCraftAllowClassChange() const { return _craftAllowClassChange; }
+	const std::string getCraftSizeStr(const int& craftSize) const;
 
 };
 

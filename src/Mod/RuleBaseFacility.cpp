@@ -112,7 +112,6 @@ void RuleBaseFacility::load(const YAML::YamlNodeReader& node, Mod *mod)
 	reader.tryRead("altBuildSprite", _altBuildSprite);
 	reader.tryRead("craftsHidden", _craftsHidden);
 	mod->loadCraftOptions(_type, _craftOptions, reader["craftOptions"]);
-	mod->loadUnorderedNames(_type, _optionStrings, reader["optionStrings"]);
 
 	reader.tryRead("sightRange", _sightRange);
 	reader.tryRead("sightChance", _sightChance);
@@ -494,15 +493,6 @@ bool RuleBaseFacility::getCraftsHidden() const
 const std::vector<CraftOption> &RuleBaseFacility::getCraftOptions() const
 {
 	return _craftOptions;
-}
-
-/**
- * Gets the facility's list of craft slot strings.
- * @return the list of string entries.
- */
-const std::vector<std::string> &RuleBaseFacility::getOptionStrings() const
-{
-	return _optionStrings;
 }
 
 /**

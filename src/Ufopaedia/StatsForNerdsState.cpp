@@ -3194,7 +3194,6 @@ void StatsForNerdsState::initFacilityList()
 			}
 		}
 		addVectorOfStrings(ss, craftSlotList, "craftSlotList", false);
-		addVectorOfStrings(ss, facilityRule->getOptionStrings(), "craftSlotNames");
 	}
 
 	addInteger(ss, facilityRule->getLaboratories(), "labs");

@@ -117,7 +117,7 @@ CraftsState::CraftsState(Base *base) : _base(base)
 		ss << tr("STR_CREW") << ",\n" << tr("STR_HWPS");
 		_txtCrew->setText(ss.str().c_str());
 		_txtCrew->setWordWrap(true);
-		_txtHwp->setText(tr("STR_CRAFT_CLASS"));
+		_txtHwp->setText(tr("STR_CRAFT_CLASS_UC"));
 		_lstCrafts->setColumns(5, 94, 68, 40, 40, 54);
 		_lstCrafts->setMargin(8);
 	}
@@ -168,9 +168,17 @@ void CraftsState::initList(size_t scrl)
 		if (Mod::CRAFT_LIST_SHOW_CLASS)
 		{
 			ss2 << craft->getNumTotalSoldiers() << ", " << craft->getNumTotalVehicles();
-			if (Mod::CRAFT_LIST_CLASS_SHORT)
-				ss3 << tr(_game->getMod()->getCraftClassFromSize(craft->getCraftSize()) + "_UC");
-			else ss3 << tr(_game->getMod()->getCraftClassFromSize(craft->getCraftSize()));
+			std::string craftStr = "STR_CRAFT_CLASS_NA";
+			const RuleCraftFunctions craftFunc = craft->getRules()->getRequiresCraftSlotFunc();
+			if (craftFunc.any())
+			{
+				const auto* classMap = _game->getMod()->getCraftClassMap();
+				auto funcIt = classMap->find(craftFunc);
+				if (funcIt != classMap->end()) craftStr = funcIt->second;
+				else craftStr = _game->getMod()->getCraftFunctionNames(craftFunc).back();
+				if (Mod::CRAFT_LIST_CLASS_SHORT) craftStr += "_UC";
+			}
+			ss3 << tr(craftStr);
 		}
 		else
 		{
