@@ -84,6 +84,19 @@ namespace OpenXcom
 		_txtStats->setSecondaryColor(Palette::blockOffset(15)+4);
 
 		std::ostringstream ss;
+		if (Mod::CRAFT_PEDIA_SHOW_CLASS)
+		{
+			std::string craftStr = "STR_CRAFT_CLASS_NA";
+			const RuleCraftFunctions craftFunc = craft->getRequiresCraftSlotFunc();
+			if (craftFunc.any())
+			{
+				const auto* classMap = _game->getMod()->getCraftClassMap();
+				auto funcIt = classMap->find(craftFunc);
+				if (funcIt != classMap->end()) craftStr = funcIt->second;
+				else craftStr = _game->getMod()->getCraftFunctionNames(craftFunc).back();
+			}
+			ss << tr("STR_CRAFT_CLASS").arg(tr(craftStr)) << '\n';
+		}
 		ss << tr("STR_MAXIMUM_SPEED_UC").arg(Unicode::formatNumber(craft->getMaxSpeed())) << '\n';
 		ss << tr("STR_ACCELERATION").arg(craft->getAcceleration()) << '\n';
 		int range;

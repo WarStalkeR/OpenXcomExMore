@@ -264,6 +264,7 @@ ru:
   requiresBuy: "Исследование, необх. для покупки"
   requiresBuyBaseFunc: "Функции, необх. для покупки"
   requiresBuyCountry: "Необходима страна-союзник"
+  requiresCraftSlotFunc: "Необх. функции места"
   categories: "Категории"
   supportedInventorySections: "Ячейки инвентаря"
 #
@@ -375,6 +376,8 @@ ru:
   personnel: "Жилая площадь"
   aliens: "Мест в камерах"
   crafts: "Мест в ангаре"
+  craftSlotList: "Места в ангаре"
+  craftSlotNames: "Наименования мест"
   labs: "Рабочих мест в лаборатории"
   workshops: "Рабочих мест в мастерских"
   psiLabs: "Мест в пси-лаборатории"

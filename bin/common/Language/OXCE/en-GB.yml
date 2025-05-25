@@ -59,6 +59,8 @@ en-GB:
   STR_CRAFT_DEPLOYMENT_PREVIEW_BRIEFING: "This feature allows you to preview and customise the deployment of your units at the beginning of a battle. You have unlimited movement. Press and hold 'Alt' to highlight valid unit positions. Click on the 'Abort Mission' icon to save a custom deployment. Click on the 'End Turn' icon to exit the preview.{NEWLINE}Note that adding any new soldiers or vehicles to the craft automatically invalidates the saved custom deployment. Presence of a custom deployment is indicated by an asterisk on the 'Preview' button."
   STR_CRAFT_DEPLOYMENT_PREVIEW_BRIEFING_DUMMY: "This feature allows you to preview and modify the deployment table of this craft type. Any changes will apply to all your current craft and also to any craft you buy or manufacture later in the campaign. You start with the maximum number of soldiers. Each soldier represents one row in the deployment table. Soldier names correspond to row numbers. To provide space for a 2x2 unit, place 4 soldiers in a 2x2 square. If space is not provided, the 2x2 unit will be missing in a real battle."
   STR_BASE_DEFENSE_BRIEFING_PREVIEW: "This feature allows you to preview your base.{NEWLINE}Have fun!{NEWLINE}{NEWLINE}Click on the 'End Turn' icon to exit the preview."
+#CraftsState.cpp
+  STR_CRAFT_CLASS_UC: "CLASS"
 #CraftWeaponsState.cpp
   STR_NOT_ENOUGH_CARGO_SPACE: "NOT ENOUGH CARGO SPACE AVAILABLE!{SMALLLINE}Use a different module or reduce the assigned crew."
   STR_NOT_ENOUGH_STORAGE_SPACE_1: "NOT ENOUGH STORAGE SPACE AVAILABLE!{SMALLLINE}Too many items! Use a different module or reduce the assigned equipment."
@@ -501,6 +503,8 @@ en-GB:
   STR_AUTO_PATROL: "AUTO-PATROL"
   STR_ETA: "ETA>{ALT}{0}"
 #GeoscapeState.cpp
+  STR_NO_FREE_HANGARS: "HANGAR CAPACITY EXCEEDED!{SMALLLINE}The amount of crafts we have in {0} exceeds hangar capacity. Transfer or sell the excess crafts!"
+  STR_NO_FREE_HANGARS_AFTER_STRIKE: "HANGAR CAPACITY EXCEEDED!{SMALLLINE}After missile strike, the amount of crafts we have in {0} exceeds hangar capacity. Transfer or sell the excess crafts to avoid losing them!"
   STR_NOT_ENOUGH_ITEM_TO_REARM_FACILITY_AT_BASE: "Not enough {0} to rearm {1} at {2}"
   STR_UFO_STARTED_HUNTING: "{0} is on an intercept course with {1}"
   STR_CRAFT_IS_READY: "{0} at {1} is ready."
@@ -587,11 +591,17 @@ en-GB:
 #ArticleState.cpp
   STR_DAMAGE_NONE: "NONE"
   STR_INFO_UFOPEDIA: "INFO"
+#ArticleStateBaseFacility.cpp
+  STR_HANGAR_CRAFT_CAP: "Craft Capacity"
+  STR_HANGAR_CRAFT_SLOTS: "Craft Slots"
+  STR_HANGAR_SLOT_NA: "Any"
 #ArticleStateCraft.cpp
+  STR_CRAFT_CLASS: "CLASS>{ALT}{0}{ALT}"
   STR_COCKPIT_CAPACITY: "PILOTS>{ALT}{0}{ALT}"
   STR_MAXIMUM_RANGE: "MAX RANGE>{ALT}{0}{ALT}"
   STR_MINIMUM_RANGE: "MIN RANGE>{ALT}{0}{ALT}"
   STR_INFINITE_RANGE: "N/A"
+  STR_CRAFT_CLASS_NA: "N/A"
 #ArticleStateCraftWeapon.cpp
   STR_TRACTOR_BEAM_POWER: "Power"
 #ArticleStateItem.cpp

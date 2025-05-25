@@ -170,6 +170,8 @@ void CraftWeaponsState::lstWeaponsClick(Action *)
 
 	const RuleCraftWeapon* refWeapon = _weapons[_lstWeapons->getSelectedRow()];
 	const RuleCraftWeapon* currWeapon = current ? current->getRules() : nullptr;
+
+    // Validate soldier capacity after refit
 	{
 		int refCapBonus1 = refWeapon ? refWeapon->getBonusStats().soldiers : 0;
 		int currCapBonus1 = currWeapon ? currWeapon->getBonusStats().soldiers : 0;
@@ -190,6 +192,8 @@ void CraftWeaponsState::lstWeaponsClick(Action *)
 			}
 		}
 	}
+
+	// Validate vehicle capacity after refit
 	{
 		int refCapBonus2 = refWeapon ? refWeapon->getBonusStats().vehicles : 0;
 		int currCapBonus2 = currWeapon ? currWeapon->getBonusStats().vehicles : 0;
@@ -210,6 +214,8 @@ void CraftWeaponsState::lstWeaponsClick(Action *)
 			}
 		}
 	}
+
+	// Validate max item capacity after refit
 	{
 		int refCapBonus3 = refWeapon ? refWeapon->getBonusStats().maxItems : 0;
 		int currCapBonus3 = currWeapon ? currWeapon->getBonusStats().maxItems : 0;
