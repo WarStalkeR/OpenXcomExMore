@@ -200,6 +200,8 @@ bool Mod::CRAFT_PEDIA_SHOW_CLASS;
 bool Mod::CRAFT_PEDIA_SHOW_SLOTS;
 bool Mod::CRAFT_LIST_SHOW_CLASS;
 bool Mod::CRAFT_LIST_CLASS_SHORT;
+bool Mod::CRAFT_SIZE_USE_SIZE_CLASS;
+bool Mod::CRAFT_SIZE_ALLOW_RECLASS;
 bool Mod::EXTENDED_ITEM_RELOAD_COST;
 bool Mod::EXTENDED_INVENTORY_SLOT_SORTING;
 bool Mod::EXTENDED_RUNNING_COST;
@@ -335,6 +337,9 @@ void Mod::resetGlobalStatics()
 	CRAFT_PEDIA_SHOW_SLOTS = false; // show hangar slots in facility pedia
 	CRAFT_LIST_SHOW_CLASS = false; // show class column in base craft list
 	CRAFT_LIST_CLASS_SHORT = false; // show short class name in class column
+
+	CRAFT_SIZE_USE_SIZE_CLASS = false; // use size-based classification instead
+	CRAFT_SIZE_ALLOW_RECLASS = false; // allow crafts size changes beyond class
 
 	EXTENDED_ITEM_RELOAD_COST = false;
 	EXTENDED_INVENTORY_SLOT_SORTING = false;
@@ -3822,6 +3827,14 @@ void Mod::loadFile(const FileMap::FileRecord &filerec, ModScript &parsers)
 		craftFuncSettings.tryRead("craftListShowClass", CRAFT_LIST_SHOW_CLASS);
 		craftFuncSettings.tryRead("craftListClassShort", CRAFT_LIST_CLASS_SHORT);
 	}
+
+	// craft size-class settings
+	if (const auto& craftSizeSettings = loadDocInfoHelper("craftSizeSettings"))
+	{
+		craftSizeSettings.tryRead("craftSizeMap", _craftSizeMap);
+		craftSizeSettings.tryRead("useSizeClassMap", CRAFT_SIZE_USE_SIZE_CLASS);
+		craftSizeSettings.tryRead("allowClassChange", CRAFT_SIZE_ALLOW_RECLASS);
+	}
 }
 
 /**
@@ -5541,6 +5554,30 @@ const std::unordered_map<RuleCraftFunctions, std::string> *Mod::getCraftClassMap
 const std::unordered_map<RuleCraftFunctions, std::string> *Mod::getCraftSlotMap() const
 {
 	return &_craftSlotMap;
+}
+
+const std::map<int, std::string> *Mod::getCraftSizeMap() const
+{
+	return &_craftSizeMap;
+}
+
+const std::string Mod::getCraftSizeStr(const int& craftSize) const
+{
+	if (getCraftSizeMap()->empty())
+		return "";
+
+	int temp = INT_MIN;
+	std::string craftClass = "";
+	const auto* craftClassMap = getCraftSizeMap();
+	for (const auto& [intSize, strClass] : *craftClassMap)
+	{
+		if (intSize > temp && craftSize >= intSize)
+		{
+			craftClass = strClass;
+			temp = intSize;
+		}
+	}
+	return craftClass;
 }
 
 namespace
