@@ -1023,16 +1023,41 @@ int Base::getCraftSlotCost(const RuleCraftFunctions& craftFunc, const CraftSlot&
 		return INT_MAX;
 	}
 
-	// Show only unused functionalities bits.
-	// ~ inverts all bits in the bitset.
-	// & selects only enabled (1) bits.
-	RuleCraftFunctions unusedFunc = rSlot.func & ~craftFunc;
+	// Integer will be used regardless of the method.
+	int slotUseCost = 0;
 
-	// Wasted slot space. Avoid zeros just in case.
-	int slotUseCost = 1 + (int)unusedFunc.count();
+	// Calculation mode switch based on settings.
+	if (Mod::CRAFT_SORT_BIT_COUNT)
+	{
+		// Show only unused functionalities bits.
+		// ~ inverts all bits in the bitset.
+		// & selects only enabled (1) bits.
+		RuleCraftFunctions unusedFunc = rSlot.func & ~craftFunc;
 
-	// Increase the weight, since 65*65 is the worst case.
-	slotUseCost = slotUseCost * slotUseCost;
+		// Wasted slot space. Avoid zeros just in case.
+		slotUseCost = 1 + (int)unusedFunc.count();
+
+		// Increase the weight, since 65*65 is the worst case.
+		slotUseCost = slotUseCost * slotUseCost;
+	}
+	else
+	{
+		// Creating ULLONG divisor for conversion to int.
+		constexpr unsigned long long divisor =
+			std::numeric_limits<unsigned long long>::max() /
+			std::numeric_limits<int>::max();
+
+		// Calculating UULONG difference between bitsets.
+		unsigned long long func_value =
+			rSlot.func.to_ullong() - craftFunc.to_ullong();
+
+		// Safely converting result to integer value.
+		func_value = (func_value + divisor / 2) / divisor;
+		slotUseCost = 1 + static_cast<int>(func_value);
+
+		// Ensure that the value is always at least 1.
+		if (slotUseCost < INT_MAX) ++slotUseCost;
+	}
 
 	// Return the calculated slot usage cost.
 	return slotUseCost;
@@ -1053,16 +1078,41 @@ int Base::getCraftVirtualCost(const RuleCraftFunctions& craftFunc, const Virtual
 		return INT_MAX;
 	}
 
-	// Show only unused functionalities bits.
-	// ~ inverts all bits in the bitset.
-	// & selects only enabled (1) bits.
-	RuleCraftFunctions unusedFunc = rSlot.func & ~craftFunc;
+	// Integer will be used regardless of the method.
+	int slotUseCost = 0;
 
-	// Wasted slot space. Avoid zeros just in case.
-	int slotUseCost = 1 + (int)unusedFunc.count();
+	// Calculation mode switch based on settings.
+	if (Mod::CRAFT_SORT_BIT_COUNT)
+	{
+		// Show only unused functionalities bits.
+		// ~ inverts all bits in the bitset.
+		// & selects only enabled (1) bits.
+		RuleCraftFunctions unusedFunc = rSlot.func & ~craftFunc;
 
-	// Increase the weight, since 65*65 is the worst case.
-	slotUseCost = slotUseCost * slotUseCost;
+		// Wasted slot space. Avoid zeros just in case.
+		slotUseCost = 1 + (int)unusedFunc.count();
+
+		// Increase the weight, since 65*65 is the worst case.
+		slotUseCost = slotUseCost * slotUseCost;
+	}
+	else
+	{
+		// Creating ULLONG divisor for conversion to int.
+		constexpr unsigned long long divisor =
+			std::numeric_limits<unsigned long long>::max() /
+			std::numeric_limits<int>::max();
+
+		// Calculating UULONG difference between bitsets.
+		unsigned long long func_value =
+			rSlot.func.to_ullong() - craftFunc.to_ullong();
+
+		// Safely converting result to integer value.
+		func_value = (func_value + divisor / 2) / divisor;
+		slotUseCost = static_cast<int>(func_value);
+
+		// Ensure that the value is always at least 1.
+		if (slotUseCost < INT_MAX) ++slotUseCost;
+	}
 
 	// Return the calculated slot usage cost.
 	return slotUseCost;
