@@ -39,7 +39,7 @@ class ScriptParserBase;
  */
 struct RuleCraftStats
 {
-	int fuelMax, damageMax, speedMax, accel;
+	int craftSize, fuelMax, damageMax, speedMax, accel;
 	int radarRange, radarChance, sightRange;
 	int hitBonus, avoidBonus, avoidBonus2, powerBonus, armor;
 	int shieldCapacity, shieldRecharge, shieldRechargeInGeoscape, shieldBleedThrough;
@@ -49,7 +49,7 @@ struct RuleCraftStats
 
 	/// Default constructor.
 	RuleCraftStats() :
-		fuelMax(0), damageMax(0), speedMax(0), accel(0),
+		craftSize(0), fuelMax(0), damageMax(0), speedMax(0), accel(0),
 		radarRange(0), radarChance(0), sightRange(0),
 		hitBonus(0), avoidBonus(0), avoidBonus2(0), powerBonus(0), armor(0),
 		shieldCapacity(0), shieldRecharge(0), shieldRechargeInGeoscape(0), shieldBleedThrough(0),
@@ -61,6 +61,7 @@ struct RuleCraftStats
 	/// Add different stats.
 	RuleCraftStats& operator+=(const RuleCraftStats& r)
 	{
+		craftSize += r.craftSize;
 		fuelMax += r.fuelMax;
 		damageMax += r.damageMax;
 		speedMax += r.speedMax;
@@ -86,6 +87,7 @@ struct RuleCraftStats
 	/// Subtract different stats.
 	RuleCraftStats& operator-=(const RuleCraftStats& r)
 	{
+		craftSize -= r.craftSize;
 		fuelMax -= r.fuelMax;
 		damageMax -= r.damageMax;
 		speedMax -= r.speedMax;
@@ -119,6 +121,7 @@ struct RuleCraftStats
 	void load(const YAML::YamlNodeReader& reader)
 	{
 		//const auto& reader = r.useIndex();
+		reader.tryRead("craftSize", craftSize);
 		reader.tryRead("fuelMax", fuelMax);
 		reader.tryRead("damageMax", damageMax);
 		reader.tryRead("speedMax", speedMax);
@@ -144,6 +147,7 @@ struct RuleCraftStats
 	template<auto Stat, typename TBind>
 	static void addGetStatsScript(TBind& b, std::string prefix)
 	{
+		b.template addField<Stat, &RuleCraftStats::craftSize>(prefix + "getCraftSize");
 		b.template addField<Stat, &RuleCraftStats::fuelMax>(prefix + "getFuelMax");
 		b.template addField<Stat, &RuleCraftStats::damageMax>(prefix + "getDamageMax");
 		b.template addField<Stat, &RuleCraftStats::speedMax>(prefix + "getSpeedMax");
@@ -264,6 +268,8 @@ public:
 	int getSizeOffsetY() const;
 	/// Gets the craft's globe marker.
 	int getMarker() const;
+	/// Gets the craft's hull size.
+	int getCraftSize() const;
 	/// Gets the craft's maximum fuel.
 	int getMaxFuel() const;
 	/// Gets the craft's maximum damage.

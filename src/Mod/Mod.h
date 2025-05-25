@@ -295,7 +295,7 @@ private:
 	GameTime _startingTime;
 	int _startingDifficulty;
 	int _baseDefenseMapFromLocation;
-	std::map<int, std::string> _missionRatings, _monthlyRatings;
+	std::map<int, std::string> _missionRatings, _monthlyRatings, _craftSizeMap;
 	std::map<std::string, std::string> _fixedUserOptions, _recommendedUserOptions;
 	std::vector<std::string> _hiddenMovementBackgrounds;
 	std::vector<std::string> _baseNamesFirst, _baseNamesMiddle, _baseNamesLast;
@@ -455,6 +455,8 @@ public:
 	static bool CRAFT_PEDIA_SHOW_SLOTS;
 	static bool CRAFT_LIST_SHOW_CLASS;
 	static bool CRAFT_LIST_CLASS_SHORT;
+	static bool CRAFT_SIZE_USE_SIZE_CLASS;
+	static bool CRAFT_SIZE_ALLOW_RECLASS;
 	static bool EXTENDED_ITEM_RELOAD_COST;
 	static bool EXTENDED_INVENTORY_SLOT_SORTING;
 	static bool EXTENDED_RUNNING_COST;
@@ -1156,6 +1158,11 @@ public:
 	const std::unordered_map<RuleCraftFunctions, std::string> *getCraftClassMap() const;
 	/// Gets the list of all mapped craft slot functionalities.
 	const std::unordered_map<RuleCraftFunctions, std::string> *getCraftSlotMap() const;
+
+	/// Gets the list of all defined craft classes.
+	const std::map<int, std::string> *getCraftSizeMap() const;
+	/// Receives craft size as integer and returns relevant craft class string.
+	const std::string getCraftSizeStr(const int& craftSize) const;
 
 };
 

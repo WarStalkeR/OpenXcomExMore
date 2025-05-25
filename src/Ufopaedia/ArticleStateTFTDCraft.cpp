@@ -48,13 +48,21 @@ namespace OpenXcom
 		if (Mod::CRAFT_PEDIA_SHOW_CLASS)
 		{
 			std::string craftStr = "STR_CRAFT_CLASS_NA";
-			const RuleCraftFunctions craftFunc = craft->getRequiresCraftSlotFunc();
-			if (craftFunc.any())
+			if (Mod::CRAFT_SIZE_USE_SIZE_CLASS)
 			{
-				const auto* classMap = _game->getMod()->getCraftClassMap();
-				auto funcIt = classMap->find(craftFunc);
-				if (funcIt != classMap->end()) craftStr = funcIt->second;
-				else craftStr = _game->getMod()->getCraftFunctionNames(craftFunc).back();
+				craftStr = _game->getMod()->getCraftSizeStr(craft->getCraftSize());
+				if (craftStr.empty()) craftStr = "STR_CRAFT_CLASS_NA";
+			}
+			else
+			{
+				const RuleCraftFunctions craftFunc = craft->getRequiresCraftSlotFunc();
+				if (craftFunc.any())
+				{
+					const auto* classMap = _game->getMod()->getCraftClassMap();
+					auto funcIt = classMap->find(craftFunc);
+					if (funcIt != classMap->end()) craftStr = funcIt->second;
+					else craftStr = _game->getMod()->getCraftFunctionNames(craftFunc).back();
+				}
 			}
 			ss << tr("STR_CRAFT_CLASS").arg(tr(craftStr)) << '\n';
 		}
