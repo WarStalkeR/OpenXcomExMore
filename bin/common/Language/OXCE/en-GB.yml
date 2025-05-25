@@ -64,6 +64,7 @@ en-GB:
 #CraftsState.cpp
   STR_CRAFT_CLASS_UC: "CLASS"
 #CraftWeaponsState.cpp
+  STR_NO_CRAFT_CLASS_CHANGE: "CRAFT CAN'T CHANGE CLASS!{SMALLLINE}After refitting craft with selected module, its size will change beyond the limits defined by the classification."
   STR_NOT_ENOUGH_CARGO_SPACE: "NOT ENOUGH CARGO SPACE AVAILABLE!{SMALLLINE}Use a different module or reduce the assigned crew."
   STR_NOT_ENOUGH_STORAGE_SPACE_1: "NOT ENOUGH STORAGE SPACE AVAILABLE!{SMALLLINE}Too many items! Use a different module or reduce the assigned equipment."
   STR_NOT_ENOUGH_STORAGE_SPACE_2: "NOT ENOUGH STORAGE SPACE AVAILABLE!{SMALLLINE}The items take up too much space! Use a different module or reduce the size of assigned equipment."
