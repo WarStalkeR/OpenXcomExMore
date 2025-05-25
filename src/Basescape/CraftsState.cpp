@@ -169,14 +169,23 @@ void CraftsState::initList(size_t scrl)
 		{
 			ss2 << craft->getNumTotalSoldiers() << ", " << craft->getNumTotalVehicles();
 			std::string craftStr = "STR_CRAFT_CLASS_NA";
-			const RuleCraftFunctions craftFunc = craft->getRules()->getRequiresCraftSlotFunc();
-			if (craftFunc.any())
+			if (Mod::CRAFT_SIZE_USE_SIZE_CLASS)
 			{
-				const auto* classMap = _game->getMod()->getCraftClassMap();
-				auto funcIt = classMap->find(craftFunc);
-				if (funcIt != classMap->end()) craftStr = funcIt->second;
-				else craftStr = _game->getMod()->getCraftFunctionNames(craftFunc).back();
-				if (Mod::CRAFT_LIST_CLASS_SHORT) craftStr += "_UC";
+				craftStr = _game->getMod()->getCraftSizeStr(craft->getCraftSize());
+				if (craftStr.empty()) craftStr = "STR_CRAFT_CLASS_NA";
+				else if (Mod::CRAFT_LIST_CLASS_SHORT) craftStr += "_UC";
+			}
+			else
+			{
+				const RuleCraftFunctions craftFunc = craft->getRules()->getRequiresCraftSlotFunc();
+				if (craftFunc.any())
+				{
+					const auto* classMap = _game->getMod()->getCraftClassMap();
+					auto funcIt = classMap->find(craftFunc);
+					if (funcIt != classMap->end()) craftStr = funcIt->second;
+					else craftStr = _game->getMod()->getCraftFunctionNames(craftFunc).back();
+					if (Mod::CRAFT_LIST_CLASS_SHORT) craftStr += "_UC";
+				}
 			}
 			ss3 << tr(craftStr);
 		}

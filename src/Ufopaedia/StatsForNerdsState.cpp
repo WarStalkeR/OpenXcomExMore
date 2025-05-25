@@ -3313,6 +3313,7 @@ void StatsForNerdsState::initCraftList()
 	addInteger(ss, craftRule->getSellCost(), "costSell", 0, true);
 	addInteger(ss, craftRule->getTransferTime(), "transferTime", 24);
 
+	addInteger(ss, craftRule->getCraftSize(), "craftSize");
 	addInteger(ss, craftRule->getMaxUnits(), "soldiers");
 	addInteger(ss, craftRule->getMaxUnitsLimit(), "maxUnitsLimit", craftRule->getMaxUnits());
 	addInteger(ss, craftRule->getPilots(), "pilots");
@@ -3841,6 +3842,7 @@ void StatsForNerdsState::initCraftWeaponList()
 
 	addHeading("stats");
 	{
+		addInteger(ss, craftWeaponRule->getBonusStats().craftSize, "craftSize");
 		addInteger(ss, craftWeaponRule->getBonusStats().damageMax, "damageMax");
 		addInteger(ss, craftWeaponRule->getBonusStats().armor, "armor");
 		addIntegerPercent(ss, craftWeaponRule->getBonusStats().avoidBonus, "avoidBonus");
