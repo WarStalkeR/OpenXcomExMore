@@ -54,6 +54,7 @@ class Soldier;
 class RuleCountry;
 class RuleRegion;
 class RuleBaseFacility;
+struct CraftOption;
 class RuleCraft;
 class RuleCraftWeapon;
 class RuleItemCategory;
@@ -286,6 +287,7 @@ private:
 	std::string _destroyedFacility;
 	YAML::YamlString _startingBaseDefault, _startingBaseBeginner, _startingBaseExperienced, _startingBaseVeteran, _startingBaseGenius, _startingBaseSuperhuman;
 	Collections::NamesToIndex _baseFunctionNames;
+	Collections::NamesToIndex _craftFunctionNames;
 
 	GameTime _startingTime;
 	int _startingDifficulty;
@@ -441,6 +443,7 @@ public:
 	static int PEDIA_FACILITY_RENDER_PARAMETERS[4];
 	static int ACCELERATION_PENALTY[4];
 	static std::pair<int, int> ACCELERATION_COEFF[4];
+	static bool CRAFT_SORT_BIT_COUNT;
 	static bool EXTENDED_ITEM_RELOAD_COST;
 	static bool EXTENDED_INVENTORY_SLOT_SORTING;
 	static bool EXTENDED_RUNNING_COST;
@@ -543,6 +546,11 @@ public:
 	/// Get names of function names in given bitset.
 	std::vector<std::string> getBaseFunctionNames(RuleBaseFacilityFunctions f) const;
 
+	/// Gets craft functions from string array in yaml.
+	void loadCraftFunction(const std::string& parent, RuleCraftFunctions& f, const YAML::YamlNodeReader& reader);
+	/// Get list of function names in craft bitset.
+	std::vector<std::string> getCraftFunctionNames(RuleCraftFunctions f) const;
+
 	/// Loads a list of ints.
 	void loadInts(const std::string& parent, std::vector<int>& ints, const YAML::YamlNodeReader& reader) const;
 	/// Loads a list of ints where order of items does not matter.
@@ -570,6 +578,9 @@ public:
 
 	/// Loads data for kill criteria from Commendations.
 	void loadKillCriteria(const std::string& parent, std::vector<std::vector<std::pair<int, std::vector<std::string> > > >& names, const YAML::YamlNodeReader& reader) const;
+
+	/// Loads craft options facility data.
+	void loadCraftOptions(const std::string& parent, std::vector<CraftOption>& options, const YAML::YamlNodeReader& reader);
 
 
 	/// Convert names to correct rule objects

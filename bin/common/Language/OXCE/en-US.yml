@@ -507,6 +507,8 @@ en-US:
   STR_AUTO_PATROL: "AUTO-PATROL"
   STR_ETA: "ETA>{ALT}{0}"
 #GeoscapeState.cpp
+  STR_NO_FREE_HANGARS: "HANGAR CAPACITY EXCEEDED!{SMALLLINE}The amount of crafts we have in {0} exceeds hangar capacity. Transfer or sell the excess crafts!"
+  STR_NO_FREE_HANGARS_AFTER_STRIKE: "HANGAR CAPACITY EXCEEDED!{SMALLLINE}After missile strike, the amount of crafts we have in {0} exceeds hangar capacity. Transfer or sell the excess crafts to avoid losing them!"
   STR_NOT_ENOUGH_ITEM_TO_REARM_FACILITY_AT_BASE: "Not enough {0} to rearm {1} at {2}"
   STR_UFO_STARTED_HUNTING: "{0} is on an intercept course with {1}"
   STR_CRAFT_IS_READY: "{0} at {1} is ready."

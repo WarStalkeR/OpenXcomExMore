@@ -86,6 +86,7 @@ void RuleCraft::load(const YAML::YamlNodeReader& node, Mod *mod, const ModScript
 	mod->loadUnorderedNames(_type, _requires, reader["requires"]);
 	mod->loadBaseFunction(_type, _requiresBuyBaseFunc, reader["requiresBuyBaseFunc"]);
 	reader.tryRead("requiresBuyCountry", _requiresBuyCountry);
+	mod->loadCraftFunction(_type, _requiresCraftSlotFunc, reader["requiresCraftSlotFunc"]);
 
 	if (reader["sprite"])
 	{

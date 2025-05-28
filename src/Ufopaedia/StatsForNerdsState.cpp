@@ -3177,6 +3177,32 @@ void StatsForNerdsState::initFacilityList()
 	addInteger(ss, facilityRule->getAliens(), "aliens");
 	addInteger(ss, facilityRule->getPrisonType(), "prisonType");
 	addInteger(ss, facilityRule->getCrafts(), "crafts");
+
+	if (facilityRule->getCraftOptions().size() > 0)
+	{
+		std::vector<std::string> craftSlotList;
+		if (facilityRule->getCraftOptions().size() == (size_t)facilityRule->getCrafts())
+		{
+			for (size_t i = 0; i < facilityRule->getCraftOptions().size(); ++i)
+			{
+				bool firstEntry = true;
+				std::ostringstream slotEntry;
+				const std::vector<std::string> funcList =
+					mod->getCraftFunctionNames(facilityRule->getCraftOptions().at(i).func);
+				slotEntry << "[";
+				for (const auto& func : funcList)
+				{
+					if (!firstEntry) slotEntry << ", ";
+					else firstEntry = false;
+					addTranslation(slotEntry, func);
+				}
+				slotEntry << "]";
+				craftSlotList.push_back(slotEntry.str());
+			}
+		}
+		addVectorOfStrings(ss, craftSlotList, "craftSlotList", false);
+	}
+
 	addInteger(ss, facilityRule->getLaboratories(), "labs");
 	addInteger(ss, facilityRule->getWorkshops(), "workshops");
 	addInteger(ss, facilityRule->getPsiLaboratories(), "psiLabs");
@@ -3311,6 +3337,7 @@ void StatsForNerdsState::initCraftList()
 	addVectorOfStrings(ss, craftRule->getRequirements(), "requires");
 	addVectorOfStrings(ss, mod->getBaseFunctionNames(craftRule->getRequiresBuyBaseFunc()), "requiresBuyBaseFunc");
 	addSingleString(ss, craftRule->getRequiresBuyCountry(), "requiresBuyCountry");
+	addVectorOfStrings(ss, mod->getCraftFunctionNames(craftRule->getRequiresCraftSlotFunc()), "requiresCraftSlotFunc");
 
 	addInteger(ss, craftRule->getBuyCost(), "costBuy", 0, true);
 	addInteger(ss, craftRule->getMonthlyBuyLimit(), "monthlyBuyLimit");

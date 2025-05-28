@@ -34,6 +34,28 @@ class RuleItem;
 struct VerticalLevel;
 enum BasePlacementErrors : int;
 
+struct CraftOption
+{
+	/// Horizontal offset for rendering craft in the facility.
+	int x = 2;
+	/// Vertical offset for rendering craft in the facility.
+	int y = -4;
+	/// Bitset of craft functions that define slot compatibility.
+	RuleCraftFunctions func = 0;
+	/// Is craft hidden or rendered in the base in the slot.
+	bool hide = false;
+	/// Constructor with default parameters. Needed for YAML.
+	CraftOption() = default;
+	/// Constructor that allows to define facility craft slots.
+	CraftOption(int xOffset, int yOffset, RuleCraftFunctions craftFunctions, bool isHidden)
+	{
+		x = xOffset;
+		y = yOffset;
+		func = craftFunctions;
+		hide = isHidden;
+	}
+};
+
 /**
  * Represents a specific type of base facility.
  * Contains constant info about a facility like
@@ -58,7 +80,8 @@ private:
 	int _buildCost, _refundValue, _buildTime, _monthlyCost;
 	std::map<std::string, std::pair<int, int> > _buildCostItems;
 	int _storage, _personnel, _aliens, _crafts, _labs, _workshops, _psiLabs;
-	bool _spriteEnabled;
+	bool _spriteEnabled, _craftsHidden;
+	std::vector<CraftOption> _craftOptions;
 	int _sightRange, _sightChance;
 	int _radarRange, _radarChance, _defense, _hitRatio, _fireSound, _hitSound, _placeSound;
 	int _ammoMax, _rearmRate;
@@ -161,6 +184,10 @@ public:
 	int getWorkshops() const;
 	/// Gets the facility's psi-training capacity.
 	int getPsiLaboratories() const;
+	/// Gets if facility's crafts are hidden or not.
+	bool getCraftsHidden() const;
+	/// Gets the facility's list of craft slot options.
+	const std::vector<CraftOption>& getCraftOptions() const;
 	/// Gets the facility's sight range.
 	int getSightRange() const { return _sightRange; }
 	/// Gets the facility's alien base detection chance.
