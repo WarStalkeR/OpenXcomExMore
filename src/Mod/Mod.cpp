@@ -191,7 +191,15 @@ int Mod::UNIT_RESPONSE_SOUNDS_FREQUENCY[4];
 int Mod::PEDIA_FACILITY_RENDER_PARAMETERS[4];
 int Mod::ACCELERATION_PENALTY[4];
 std::pair<int, int> Mod::ACCELERATION_COEFF[4];
+bool Mod::BASE_SHORT_HANGAR_LINKS;
+bool Mod::PEDIA_FACILITY_LOCKED_STATS;
+int Mod::PEDIA_FACILITY_ROWS_CUTOFF;
+int Mod::PEDIA_FACILITY_COL_OFFSET;
 bool Mod::CRAFT_SORT_BIT_COUNT;
+bool Mod::CRAFT_PEDIA_SHOW_CLASS;
+bool Mod::CRAFT_PEDIA_SHOW_SLOTS;
+bool Mod::CRAFT_LIST_SHOW_CLASS;
+bool Mod::CRAFT_LIST_CLASS_SHORT;
 bool Mod::EXTENDED_ITEM_RELOAD_COST;
 bool Mod::EXTENDED_INVENTORY_SLOT_SORTING;
 bool Mod::EXTENDED_RUNNING_COST;
@@ -317,7 +325,16 @@ void Mod::resetGlobalStatics()
 	ACCELERATION_COEFF[2] = { 20, 50 }; // combat +/- acceleration coefficient
 	ACCELERATION_COEFF[3] = { 25, 70 }; // maneuver +/- acceleration coefficient
 
+	BASE_SHORT_HANGAR_LINKS = false; // base short hangar to craft links
+	PEDIA_FACILITY_LOCKED_STATS = true; // scrollbar lock for facility stats
+	PEDIA_FACILITY_ROWS_CUTOFF = 5; // pedia facility stat rows cutoff
+	PEDIA_FACILITY_COL_OFFSET = 0; // pedia facility stats column offset
+
 	CRAFT_SORT_BIT_COUNT = true; // sort crafts via func bitset count
+	CRAFT_PEDIA_SHOW_CLASS = false; // show craft's class in craft pedia
+	CRAFT_PEDIA_SHOW_SLOTS = false; // show hangar slots in facility pedia
+	CRAFT_LIST_SHOW_CLASS = false; // show class column in base craft list
+	CRAFT_LIST_CLASS_SHORT = false; // show short class name in class column
 
 	EXTENDED_ITEM_RELOAD_COST = false;
 	EXTENDED_INVENTORY_SLOT_SORTING = false;
@@ -2245,6 +2262,67 @@ void Mod::loadCraftOptions(const std::string& parent, std::vector<CraftOption>& 
 	}
 }
 
+/**
+ * Loads craft functionality-to-string map.
+ */
+void Mod::loadCraftFuncMap(const std::string& parent, std::unordered_map<RuleCraftFunctions, std::string>& map, const YAML::YamlNodeReader& reader)
+{
+	if (reader)
+	{
+		showInfo(parent, reader, AddTag, RemoveTag);
+
+		if (isListHelper(reader))
+		{
+			map.clear();
+			for (const auto& node : reader.children())
+			{
+				std::string tmpStr;
+				RuleCraftFunctions tmpFunc;
+				node.tryRead("id", tmpStr);
+				loadCraftFunction(parent, tmpFunc, node["func"]);
+				if (!tmpStr.empty() && tmpFunc.any())
+				{
+					map.try_emplace(tmpFunc, tmpStr);
+				}
+			}
+		}
+		else if (isListAddTagHelper(reader))
+		{
+			for (const auto& node : reader.children())
+			{
+				std::string tmpStr;
+				RuleCraftFunctions tmpFunc;
+				node.tryRead("id", tmpStr);
+				loadCraftFunction(parent, tmpFunc, node["func"]);
+				if (!tmpStr.empty() && tmpFunc.any())
+				{
+					map.try_emplace(tmpFunc, tmpStr);
+				}
+			}
+		}
+		else if (isListRemoveTagHelper(reader))
+		{
+			for (const auto& node : reader.children())
+			{
+				std::string tmpStr;
+				node.tryRead("id", tmpStr);
+				if (!tmpStr.empty())
+				{
+					for (auto it = map.begin(); it != map.end(); )
+					{
+						if (it->second == tmpStr) it = map.erase(it);
+						else ++it;
+					}
+				}
+			}
+		}
+		else
+		{
+			throwOnBadListHelper(parent, reader);
+		}
+	}
+}
+
 
 
 
@@ -2869,7 +2947,10 @@ void Mod::loadConstants(const YAML::YamlNodeReader &reader)
 	if (const auto& arrayReader = reader["accelerationCoefficient"])
 		for (size_t j = 0; j < std::size(ACCELERATION_COEFF); j++)
 			arrayReader[j].tryReadVal(ACCELERATION_COEFF[j]);
-	reader.tryRead("craftSortBitCount", CRAFT_SORT_BIT_COUNT);
+	reader.tryRead("baseShortHangarLinks", BASE_SHORT_HANGAR_LINKS);
+	reader.tryRead("pediaFacilityLockedStats", PEDIA_FACILITY_LOCKED_STATS);
+	reader.tryRead("pediaFacilityRowsCutoff", PEDIA_FACILITY_ROWS_CUTOFF);
+	reader.tryRead("pediaFacilityColOffset", PEDIA_FACILITY_COL_OFFSET);
 	reader.tryRead("extendedItemReloadCost", EXTENDED_ITEM_RELOAD_COST);
 	reader.tryRead("extendedInventorySlotSorting", EXTENDED_INVENTORY_SLOT_SORTING);
 	reader.tryRead("extendedRunningCost", EXTENDED_RUNNING_COST);
@@ -3734,6 +3815,18 @@ void Mod::loadFile(const FileMap::FileRecord &filerec, ModScript &parsers)
 		lighting.tryRead("maxStatic", _maxStaticLightDistance);
 		lighting.tryRead("maxDynamic", _maxDynamicLightDistance);
 		lighting.tryRead("enhanced", _enhancedLighting);
+	}
+
+	// craft functionality settings
+	if (const auto& craftFuncSettings = loadDocInfoHelper("craftFuncSettings"))
+	{
+		loadCraftFuncMap("craftFuncSettings", _craftClassMap, craftFuncSettings["craftClassMap"]);
+		loadCraftFuncMap("craftFuncSettings", _craftSlotMap, craftFuncSettings["craftSlotMap"]);
+		craftFuncSettings.tryRead("craftSortBitCount", CRAFT_SORT_BIT_COUNT);
+		craftFuncSettings.tryRead("craftPediaShowClass", CRAFT_PEDIA_SHOW_CLASS);
+		craftFuncSettings.tryRead("craftPediaShowSlots", CRAFT_PEDIA_SHOW_SLOTS);
+		craftFuncSettings.tryRead("craftListShowClass", CRAFT_LIST_SHOW_CLASS);
+		craftFuncSettings.tryRead("craftListClassShort", CRAFT_LIST_CLASS_SHORT);
 	}
 }
 
@@ -5465,6 +5558,16 @@ const std::vector<std::string> &Mod::getHiddenMovementBackgrounds() const
 const std::vector<int> &Mod::getFlagByKills() const
 {
 	return _flagByKills;
+}
+
+const std::unordered_map<RuleCraftFunctions, std::string> *Mod::getCraftClassMap() const
+{
+	return &_craftClassMap;
+}
+
+const std::unordered_map<RuleCraftFunctions, std::string> *Mod::getCraftSlotMap() const
+{
+	return &_craftSlotMap;
 }
 
 namespace
