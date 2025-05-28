@@ -287,6 +287,9 @@ private:
 	Collections::NamesToIndex _baseFunctionNames;
 	Collections::NamesToIndex _craftFunctionNames;
 
+	std::unordered_map<RuleCraftFunctions, std::string> _craftClassMap;
+	std::unordered_map<RuleCraftFunctions, std::string> _craftSlotMap;
+
 	GameTime _startingTime;
 	int _startingDifficulty;
 	int _baseDefenseMapFromLocation;
@@ -441,7 +444,15 @@ public:
 	static int PEDIA_FACILITY_RENDER_PARAMETERS[4];
 	static int ACCELERATION_PENALTY[4];
 	static std::pair<int, int> ACCELERATION_COEFF[4];
+	static bool BASE_SHORT_HANGAR_LINKS;
+	static bool PEDIA_FACILITY_LOCKED_STATS;
+	static int PEDIA_FACILITY_ROWS_CUTOFF;
+	static int PEDIA_FACILITY_COL_OFFSET;
 	static bool CRAFT_SORT_BIT_COUNT;
+	static bool CRAFT_PEDIA_SHOW_CLASS;
+	static bool CRAFT_PEDIA_SHOW_SLOTS;
+	static bool CRAFT_LIST_SHOW_CLASS;
+	static bool CRAFT_LIST_CLASS_SHORT;
 	static bool EXTENDED_ITEM_RELOAD_COST;
 	static bool EXTENDED_INVENTORY_SLOT_SORTING;
 	static bool EXTENDED_RUNNING_COST;
@@ -579,6 +590,8 @@ public:
 
 	/// Loads craft options facility data.
 	void loadCraftOptions(const std::string& parent, std::vector<CraftOption>& options, const YAML::YamlNodeReader& reader);
+	/// Loads craft functionality-to-string map.
+	void loadCraftFuncMap(const std::string& parent, std::unordered_map<RuleCraftFunctions, std::string>& map, const YAML::YamlNodeReader& reader);
 
 
 	/// Convert names to correct rule objects
@@ -1132,6 +1145,11 @@ public:
 	const std::vector<int>& getRetaliationTriggerOdds() { return _retaliationTriggerOdds; }
 	const std::vector<int>& getRetaliationBaseRegionOdds() { return _retaliationBaseRegionOdds; }
 	const std::vector<int>& getAliensFacingCraftOdds() { return _aliensFacingCraftOdds; }
+
+	/// Gets the list of all mapped craft class functionalities.
+	const std::unordered_map<RuleCraftFunctions, std::string> *getCraftClassMap() const;
+	/// Gets the list of all mapped craft slot functionalities.
+	const std::unordered_map<RuleCraftFunctions, std::string> *getCraftSlotMap() const;
 
 };
 
