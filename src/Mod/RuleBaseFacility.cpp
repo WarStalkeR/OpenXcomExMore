@@ -41,7 +41,7 @@ RuleBaseFacility::RuleBaseFacility(const std::string &type, int listOrder) :
 	_lift(false), _hyper(false), _mind(false), _grav(false), _mindPower(1),
 	_sizeX(1), _sizeY(1), _buildCost(0), _refundValue(0), _buildTime(0), _monthlyCost(0),
 	_storage(0), _personnel(0), _aliens(0), _crafts(0), _labs(0), _workshops(0), _psiLabs(0),
-	_spriteEnabled(false),
+	_spriteEnabled(false), _craftsHidden(false), _craftOptions(),
 	_sightRange(0), _sightChance(0), _radarRange(0), _radarChance(0),
 	_defense(0), _hitRatio(0), _fireSound(0), _hitSound(0), _placeSound(-1), _ammoMax(0), _rearmRate(1), _ammoNeeded(1), _listOrder(listOrder),
 	_trainingRooms(0), _maxAllowedPerBase(0), _sickBayAbsoluteBonus(0.0f), _sickBayRelativeBonus(0.0f),
@@ -108,6 +108,8 @@ void RuleBaseFacility::load(const YAML::YamlNodeReader& node, Mod *mod)
 	reader.tryRead("psiLabs", _psiLabs);
 
 	reader.tryRead("spriteEnabled", _spriteEnabled);
+	reader.tryRead("craftsHidden", _craftsHidden);
+	mod->loadCraftOptions(_type, _craftOptions, reader["craftOptions"]);
 
 	reader.tryRead("sightRange", _sightRange);
 	reader.tryRead("sightChance", _sightChance);
@@ -471,6 +473,24 @@ int RuleBaseFacility::getAliens() const
 int RuleBaseFacility::getCrafts() const
 {
 	return _crafts;
+}
+
+/**
+ * Gets if facility's crafts are hidden or not.
+ * @return do we hide crafts?
+ */
+bool RuleBaseFacility::getCraftsHidden() const
+{
+	return _craftsHidden;
+}
+
+/**
+ * Gets the facility's list of craft slot options.
+ * @return the list of CraftOption entries.
+ */
+const std::vector<CraftOption> &RuleBaseFacility::getCraftOptions() const
+{
+	return _craftOptions;
 }
 
 /**
