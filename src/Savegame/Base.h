@@ -101,6 +101,47 @@ struct BaseSumDailyRecovery
 	float SickBayAbsoluteBonus = 0.0f;
 };
 
+struct CraftSlot
+{
+	/// Pointer to the parent facility, where the slot belongs.
+	BaseFacility* parent = nullptr;
+	/// Pointer to the craft which is housed in the slot.
+	Craft* craft = nullptr;
+	/// Is craft hidden or rendered in the base in the slot.
+	bool hidden = false;
+	/// List of compatible craft functionalities that slot provides.
+	RuleCraftFunctions func = 0;
+	/// Horizontal offset for rendering craft in the facility.
+	int x = 0;
+	/// Vertical offset for rendering craft in the facility.
+	int y = 0;
+	/// Constructor that allows to create new craft slots.
+	CraftSlot(BaseFacility* facPtr, Craft* craftPtr, bool isCraftHidden,
+		RuleCraftFunctions slotFunc, int xOffset, int yOffset)
+	{
+		parent = facPtr;
+		craft = craftPtr;
+		hidden = isCraftHidden;
+		func = slotFunc;
+		x = xOffset;
+		y = yOffset;
+	}
+};
+
+struct VirtualSlot
+{
+	/// Simplified pointer to the list of craft's functionalities.
+	RuleCraftFunctions* funcPtr;
+	/// List of compatible craft functionalities that slot provides.
+	RuleCraftFunctions func = 0;
+	/// Constructor that allows to create new virtual slots.
+	VirtualSlot(RuleCraftFunctions* craftFuncPtr, RuleCraftFunctions slotFunc)
+	{
+		funcPtr = craftFuncPtr;
+		func = slotFunc;
+	}
+};
+
 /**
  * Represents a player base on the globe.
  * Bases can contain facilities, personnel, crafts and equipment.
@@ -109,10 +150,14 @@ class Base : public Target
 {
 private:
 	static const int BASE_SIZE = 6;
+	static const int GRID_SIZE = 32;
+	static const int HNG_CENTER_X = 2;
+	static const int HNG_CENTER_Y = -4;
 	const Mod *_mod;
 	std::vector<BaseFacility*> _facilities;
 	std::vector<Soldier*> _soldiers;
 	std::vector<Craft*> _crafts;
+	std::vector<CraftSlot> _craftSlots;
 	std::vector<Transfer*> _transfers;
 	ItemContainer *_items;
 	int _scientists, _engineers;
@@ -160,6 +205,10 @@ public:
 	std::vector<Craft*> *getCrafts() {	return &_crafts; }
 	/// Gets the base's crafts.
 	const std::vector<Craft*> *getCrafts() const { return &_crafts; }
+	/// Gets the base's all hangar slots.
+	std::vector<CraftSlot> *getCraftSlots() { return &_craftSlots; }
+	/// Gets the base's all hangar slots.
+	const std::vector<CraftSlot> *getCraftSlots() const { return &_craftSlots; }
 	/// Gets the base's transfers.
 	std::vector<Transfer*> *getTransfers() { return &_transfers; }
 	/// Gets the base's transfers.
@@ -216,6 +265,18 @@ public:
 	int getUsedHangars() const;
 	/// Gets the base's available hangars.
 	int getAvailableHangars() const;
+	/// Returns heuristic cost of the craft for specified craft slot.
+	int getCraftSlotCost(const RuleCraftFunctions& craftFunc, const CraftSlot& rSlot) const;
+	/// Returns heuristic cost of the craft for specified virtual craft slot.
+	int getCraftVirtualCost(const RuleCraftFunctions& craftFunc, const VirtualSlot& rSlot) const;
+	/// Updates list of all existing craft slots.
+	void updateCraftSlots();
+	/// Updates list of occupied craft slots.
+	void syncCraftSlots();
+	/// Runs two functions above in sequential manner.
+	void syncCraftChanges();
+	/// Gets number of unoccupied hangar slots for specific craft size.
+	int getFreeCraftSlots(const RuleCraftFunctions& craftFunc = 0) const;
 	/// Get the number of available space lab (not used by a ResearchProject)
 	int getFreeLaboratories() const;
 	/// Get the number of available space lab (not used by a Production)
