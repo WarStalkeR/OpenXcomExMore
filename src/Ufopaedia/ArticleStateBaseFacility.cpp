@@ -166,23 +166,25 @@ namespace OpenXcom
 					ts.str(""); ts.clear(); ss.str(""); ss.clear();
 					ts << tr("STR_HANGAR_CRAFT_SLOTS");
 					const auto* slotMap = _game->getMod()->getCraftSlotMap();
+					std::unordered_map<RuleCraftFunctions, int> slotList;
 					for (int i = 0; i < facility->getCrafts(); ++i)
+					{
+						if (facility->getCraftOptions().size() > (size_t)i)
+							++slotList[facility->getCraftOptions().at(i).func];
+						else ++slotList[RuleCraftFunctions(0)];
+					}
+					for (const auto& slotEntry : slotList)
 					{
 						std::string slotStr = "STR_HANGAR_SLOT_NA";
 
-						if (facility->getCraftOptions().size() > (size_t)i)
+						// Only if slot functionality is defined
+						if (slotEntry.first.any())
 						{
-							RuleCraftFunctions slotFunc = facility->getCraftOptions().at(i).func;
-
-							// Only if slot functionality is defined
-							if (slotFunc.any())
-							{
-								auto funcIt = slotMap->find(slotFunc);
-								// Get slot string from map, if defined
-								if (funcIt != slotMap->end()) slotStr = funcIt->second;
-								// Or get fallback string from function names
-								else slotStr = _game->getMod()->getCraftFunctionNames(slotFunc).back();
-							}
+							auto funcIt = slotMap->find(slotEntry.first);
+							// Get slot string from map, if defined
+							if (funcIt != slotMap->end()) slotStr = funcIt->second;
+							// Or get fallback string from function names
+							else slotStr = _game->getMod()->getCraftFunctionNames(slotEntry.first).back();
 						}
 
 						// Broken slot entry is hidden in ufopaedia, but shown in analysis
@@ -190,6 +192,7 @@ namespace OpenXcom
 						{
 							if (!ss.str().empty()) ss << ", ";
 							ss << tr(slotStr).c_str();
+							if (slotEntry.second > 1) ss << "*" << slotEntry.second;
 						}
 					}
 					addToStatList(&ts, &ss, colStat, colValue, row);
