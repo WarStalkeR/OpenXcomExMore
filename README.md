@@ -25,18 +25,20 @@ OXCE ruleset reference is available [here](https://www.ufopaedia.org/index.php/R
 Uses modified code from SDL\_gfx (LGPL) with permission from author.
 
 # OpenXcom Extended More Features
-1\. Advanced craft/HK and missile dogfight behavior.  
-2\. Modifiable craft size stat and craft classifications.  
-3\. Multi-craft hangar mechanics implementation.  
-4\. Bigger craft sprites support for basescape/hangar.  
-5\. Base attacks and missile strikes debug trigger.  
-6\. Option to show distance to target, when selecting crafts.  
-7\. Base sets and New Game starting base selection.  
-8\. Rule flag to hide ufopaedia articles by default.  
-9\. Facility rule flag to use alternative sprite for construction.  
-10\. Base function triggers for arc/event/mission scripts.  
-11\. Active pause for Geoscape and UFO context interactions.  
-12\. Game Data Viewer option switch for Tech Tree Viewer.  
+1\. Enforceable 32-bit color mode (multi-palette support).  
+2\. Advanced craft/HK and missile dogfight behavior.  
+3\. Bigger craft sprites support for basescape/hangar.  
+4\. Multi-craft hangar mechanics implementation.  
+5\. Modifiable craft size stat and craft classifications.  
+6\. Base attacks and missile strikes debug trigger.  
+7\. Option to show distance to target, when selecting crafts.  
+8\. Base sets and New Game starting base selection.  
+9\. Rule flag to hide ufopaedia articles by default.  
+10\. Facility rule flag to use alternative sprite for construction.  
+11\. Base function triggers for arc/event/mission scripts.  
+12\. Active pause for Geoscape and UFO context interactions.  
+13\. Ufopaedia craft articles optional basescape preview.  
+14\. Game Data Viewer option switch for Tech Tree Viewer.  
 
 # Features Migrated to the Main Branch
 1\. Configurable Ufopaedia facilities preview.  
@@ -47,6 +49,28 @@ Uses modified code from SDL\_gfx (LGPL) with permission from author.
 
 **Note**: to use features that already migrated to the main branch,
 please refer to the [official OXCE documentation](https://www.ufopaedia.org/index.php/Ruleset_Reference_Nightly_(OpenXcom)).  
+
+## Enforceable 32-bit Color Mode (Multi-Palette Support)
+For now this feature is only used to ensure that basescape preview of crafts
+for ufopaedia craft articles renders them with correct palette and not tries
+to shift color to match current 8-bit palette that is currently available.
+
+This feature is mostly for those, who intend to modify game's engine itself
+and not write ruleset-based mods. Great part about this feature is that no
+change was done to original `blitNshade` functions - all shading and color
+shifting functionality works in exactly same manner as before.
+
+Just by calling `Surface::setPalette()` for a specific surface, you override
+palette it is going to use for `blitNshade`, whilst all other surfaces will
+still inherit palette set via `State::setStandardPalette()`.
+
+If you're to try to use such approach, whilst in 8-bit mode, the engine will
+render them in closest available colors. However, in 32-bit mode there are
+no such limits - as long as everything is configured.
+
+The 32-bit mode can enabled via `OXCEM` options tab and can be enforced via
+`fixedUserOptions` and `oxceForce32bitMode: true`. Important to note that
+such behavior already exists in engine, when using OpenGL or specific scalers.
 
 ## Advanced Craft vs Hunter Killer Dogfight
 **Constants values for script files (with example below):**  
@@ -113,6 +137,93 @@ same manner, as they affect crafts.
 effect might be even more random than you think. During dogfight game tracks
 how much distance missile have traveled in each mode and uses these numbers
 to select final damage effect against UFO on impact.
+
+## Bigger Craft Spites (for Base View and Refit Screen)
+**Craft values for script files (with example below):**  
+`crafts:`  
+`  - type: BIG_SPRITE_CRAFT`  
+`    spriteSize: [54, 72]`  
+
+Now it is possible to define new sprite size for crafts with bigger sprites
+in order to still keep them centered at original coordinates. The `spriteSize`
+values should be exactly as as vertical and horizontal size of your image in
+pixels. Any change to the sprite size should be even: i.e. you can't use 35x45
+pixels sprite.
+
+## Multi-Craft Hangars Implementation + Auxiliary Features
+Allocation of crafts to slot relies on functionalities required by the craft
+and functionalities are available in the slot. In its nature, functionalities
+parameter is an `std::bitset<64>`, i.e. there can be up to 64 different flags.
+There are two methods of prioritizing craft allocation (`craftSortBitCount`
+defines which it will use): by number of flags and by flag order (i.e. later
+flags are given priority) - this option is implemented to let modder decide,
+which approach is more suitable in the mod.
+
+Allocation by flag order requires modder to define somewhere in the ruleset
+dummy facility or dummy craft that will use flags in order of intended sorting:
+`TYPE_CREW`, `TYPE_VEH`, `TYPE_SUB`, `TYPE_AIR`, `SIZE_S`, `SIZE_M`, `SIZE_L`
+& etc. - i.e. `TYPE_AIR` is more prioritized than `TYPE_VEH` and the `SIZE_L`
+is more prioritized than `SIZE_S`. Allocation by number of flags disregards
+the flag order, but requires modder to set additional flags for sorting order.
+
+In addition, for sake of moddability functionalities collection can be reset
+by submods via `RESET_COLLECTION` (in functionalities array), but doing so
+requires modder to re-declare all functionality flags for ruleset entries
+that already had them prior. Do remember that game loads ruleset files in a
+reverse order, i.e. from Z to A and not from A to Z.
+
+When game tries to allocate craft into hangar slot, it verifies if hangar slot
+has all the functionality flags that craft has, if any of them is missing it
+blocks allocation. In addition, for sake of backwards compatibility, hangars
+with default slot (i.e. no functionality flags) can house any craft, but crafts
+with no functionality flags can be housed only in default hangar slots.
+
+To ensure that hangar slot allocation works in any scenarios, even in worst
+case ones, it does 3 rounds of allocation in total (2nd and 3rd, only if
+previous attempts have failed). First - find most compatible slot, second -
+find any slot with no functionality flags and third - just any empty slot. Do
+note that 3rd method incurs penalties, when attempting to transfer or produce
+new crafts to the base (counts it towards used up slots): for example, when
+you have 5 slots, 2 allocated crafts and one of them is misplaced, it will
+be counted as 2 free slots and not 3.
+
+**Facility values for script files (with example below):**  
+`facilities:`  
+`  - type: STR_BAY_HYBRID_GARAGE`  
+`    crafts: 1`  
+`    craftsHidden: false`  
+`    craftOptions:`  
+`      - {x: 1, y: -3, func: [TYPE_VEH, TYPE_SUB, SIZE_SMALL], hide: false}`  
+`  - type: STR_BAY_HYBRID_HANGAR`  
+`    crafts: 1`  
+`    craftsHidden: false`  
+`    craftOptions:`  
+`      - {x: 1, y: -3, func: [TYPE_AIR, TYPE_SUB, SIZE_SMALL, SIZE_MEDIUM]}`  
+`      - {x: 8, y: 2, func: [TYPE_CREW, SIZE_SMALL], hide: true}`
+
+The `crafts` parameter now also defines number of slots that hangar has. If
+any hangar slot isn't defined in `craftOptions`, it will get assigned default
+properties `{x: 2, y: -4, func: [], hide: false}` (exact properties of default
+hangar slot). `craftsHidden` defines if all crafts are hidden in the hangar
+slots in the basescape - suitable if you create damaged or sealed variant of
+facility via refs. The `craftOptions` defines what properties slots will have:
+`x` - horizontal offset of the craft in slot, `y` - vertical offset, `func` -
+functionality flags that slot provides/supports, `hide` - defines if craft in
+this slot will be hidden in the basescape.
+
+**Craft values for script files (with example below):**  
+`crafts:`  
+`  - type: STR_YOUR_VEHICLE`  
+`    requiresCraftSlotFunc: [TYPE_VEH, SIZE_SMALL]`  
+`  - type: STR_YOUR_SUBMARINE`  
+`    requiresCraftSlotFunc: [TYPE_SUB, SIZE_MEDIUM]`  
+`  - type: STR_YOUR_AIRCRAFT`  
+`    requiresCraftSlotFunc: [TYPE_AIR, SIZE_MEDIUM]`
+
+The `requiresCraftSlotFunc` defines which functionality flags slots must have
+in order to house the craft. In order to house the craft, hangar slot at very
+least needs to have all the flags that craft has. Hangar slot can have more
+functionality flags than the craft has, but never less.
 
 ## Multi-Craft Hangars, Craft Sizes and Craft Classifications
 **Facility values for script files (with example below):**  
@@ -224,18 +335,6 @@ standard and short.
 
 Standard version will be seen in Craft's Ufopaedia entry. Short will be seen
 in Facility's Ufopaedia entry (hangars only).  
-
-## Bigger Craft Spites (for Base View and Refit Screen)
-**Craft values for script files (with example below):**  
-`crafts:`  
-`  - type: BIG_SPRITE_CRAFT`  
-`    spriteSize: [54, 72]`  
-
-Now it is possible to define new sprite size for crafts with bigger sprites
-in order to still keep them centered at original coordinates. The `spriteSize`
-values should be exactly as as vertical and horizontal size of your image in
-pixels. Any change to the sprite size should be even: i.e. you can't use 35x45
-pixels sprite.
 
 ## Base Attack/Missile Strikes Debug Triggers
 Only works when in `options.cfg` the option `debug: true` is set. In
