@@ -29,7 +29,7 @@ Uses modified code from SDL\_gfx (LGPL) with permission from author.
 2\. Advanced craft/HK and missile dogfight behavior.  
 3\. Bigger craft sprites support for basescape/hangar.  
 4\. Multi-craft hangar mechanics implementation.  
-5\. Modifiable craft size stat and craft classifications.  
+5\. Modifiable craft size stat and size classifications.  
 6\. Base attacks and missile strikes debug trigger.  
 7\. Option to show distance to target, when selecting crafts.  
 8\. Base sets and New Game starting base selection.  
@@ -225,47 +225,64 @@ in order to house the craft. In order to house the craft, hangar slot at very
 least needs to have all the flags that craft has. Hangar slot can have more
 functionality flags than the craft has, but never less.
 
-## Multi-Craft Hangars, Craft Sizes and Craft Classifications
-**Facility values for script files (with example below):**  
-`facilities:`  
-`  - type: NEW_FANCY_HANGAR`  
-`    crafts: 3` Original code for sake of max backwards compatibility.  
-`    craftsHidden: false` Flag to render or not render housed crafts in
-base view.  
-`    craftOptions:` More explanations below in **Usage** section.  
-`      - {x: 2, y: -4, min: 30, max: 49, hide: false}` Rendered in base view.  
-`      - {x: 2, y: -4, min: 1, max: 9, hide: true}` Always hidden in base view.  
-`      - {x: 8, y: 2, min: 30, max: 49, hide: false}` Rendered in base view.  
-`      - {x: 8, y: 2, min: 1, max: 9, hide: true}` Always hidden in base view.  
-`      - {x: 2, y: -4, min: 0, max: 0, hide: false}` Default hangar values.  
-`    optionGroups: [2, 2, 1]` Allows disconnected craft size ranges.  
+**Global values for script files (with example below):**  
+`craftFuncSettings:`  
+`  craftClassMap:`  
+`    - {id: STR_SMALL_VEHICLE, func: [TYPE_VEH, SIZE_SMALL]}`  
+`    - {id: STR_MEDIUM_SUBMARINE, func: [TYPE_SUB, SIZE_MEDIUM]}`  
+`    - {id: STR_MEDIUM_AIRCRAFT, func: [TYPE_AIR, SIZE_MEDIUM]}`  
+`  craftSlotMap:`  
+`    - {id: STR_SLOT_SMALL_VEH_SUB, func: [TYPE_VEH, TYPE_SUB, SIZE_SMALL]}`  
+`    - {id: STR_SLOT_MEDIUM_AIR_SUB, func: [TYPE_AIR, TYPE_SUB, SIZE_SMALL, SIZE_MEDIUM]}`
+`  craftSortBitCount: false`  
+`  craftPediaShowClass: true`  
+`  craftPediaShowSlots: true`  
+`  craftListShowClass: true`  
+`  craftListClassShort: false`
 
-**Usage**: Now it is possible to define positions of crafts in hangar (when in
-base view mode) and if they are permanently hidden. Each **craftOptions** entry
-consists from 5 variables: *Horizontal Offset*, *Vertical Offset*, *Craft
-Minimum Size*, *Craft Maximum Size*, *Hide Craft Flag*. Or: `x, y, min, max,
-hide`, where `x, y, min, max` are `int` value (with range from -2\^31 to 2\^31)
-and `hide` is `bool` that be `true` or `false`. The `x, y` define render offset
-in base view from facility's center. The `min, max` define which craft can be
-housed in slot. The `hide` defines if craft in that specific slot will be
-rendered in base view. The `0, 0` for `min, max` is backwards compatibility
-option to ignore craft sizes and use classic hangar defaults. All undefined
-craft slots have `0, 0` set for their `min, max`. The **optionGroups** allow
-to combine into 'single' slot for multiple craft size ranges (such as in
-example above: 5 slots can be only used by 3 crafts). Slot priority is always
-given to the bigger crafts first.
+The `craftFuncSettings` contains all auxiliary configurations that are related
+to the craft functionalities. The `craftClassMap` allows to map functionality
+sets to a strings (for craft ufopaedia articles), `craftSlotMap` allows to do
+same for hangar slots (for facility ufopaedia articles), `craftSortBitCount`
+defines sorting/priority method, `craftPediaShowClass` defines if craft's
+class will be shown in craft ufopaedia articles, `craftPediaShowSlots` defines
+if facility's hangar slots will be shown facility ufopaedia articles, the
+`craftListShowClass` defines if craft class will be shown in craft list and
+`craftListClassShort` defines if shown class (in the craft list) will use
+minimized `_UC` strings. Do note if you've enabled `craftPediaShowClass` or
+`craftPediaShowSlots` but didn't map functionality sets to strings, as a
+fallback, game will show one of the functionality flags.
+
+**Constant values for script files (with example below):**    
+`constants:`  
+`  baseCraftListShowClass: true` defines if class column is shown in vessel
+list menu that is accessible from the base view. Default value is `false`.  
+`  baseCraftListClassShort: false` defines if class column uses short class
+abbreviation instead of full classification name. Default value is `false`.  
+`  baseShortHangarLinks: true` defines if additional 'CRAFT>' text is
+hidden in the basescape, while mouse is over hangar facility with craft.
+Default value is `false`.  
+`  pediaFacilityLockedStats: true` defines, if amount of shown stat rows in
+in Facility's Ufopaedia entries is limited via this option. Default value
+is `false`, because vanilla never had more than 5 parameters.  
+`  pediaFacilityRowsCutoff: 5` limits how much stat rows will be shown in
+Facility's Ufopaedia entries, if option `oxcePediaFacilityLockedStats`
+is enabled.  
+`  pediaFacilityColOffset: 10` adjusts column in Facility's Ufopaedia entries.
+Useful, if you have hangars with many types of slots. Number indicates by how
+much column will be moved to the left.  
+
+## Modifiable Craft Size Stat and Size Classifications
+To simulate virtual craft inventory and give modders option to add variants of
+modules with various drawbacks, the `craftSize` stats was implemented.
 
 **Craft values for script files (with example below):**  
 `crafts:`  
 `  - type: NEW_FANCY_CRAFT`  
 `    craftSize: 12`  
 
-This craft with size `12` can't be placed into size 11 hangar slots. But if it
-uses value of `0` (default value for all craft), it can be placed into any
-hangar slot. The `craftSize` variable has no bounds beside being an `int` (i.e.
-from -2\^31 to 2\^31). Modders can define for themselves what craft size ranges
-belongs to what craft classes. Class granulation (below) allows modders to
-classify what size ranges belong to what classes.
+By default, `craftSize` of a craft is 0. Just as any other stats can be set to
+override default `0`, so is the `craftSize` stat.  
 
 **Craft Weapon values for script files (with example below):**  
 `craftWeapons:`  
@@ -275,8 +292,7 @@ classify what size ranges belong to what classes.
 
 In this example `craftSize` of `6` means that once this weapon is equipped,
 craft's size will be increased by 6. If crafts aren't allowed to change class
-(via option) or has no suitable hangar slot after such change, player will
-get notification that it can't be equipped.
+(via option) player will get notification that it can't be equipped.
 
 **Craft Class values for script files (with example below):**  
 `craftClasses:` is a new global value for craft class settings.  
@@ -306,25 +322,6 @@ equipment which size stat increases size of modified craft for example from
 Small Submarine-class into Small Aircraft-class). By default this enforcement
 is enabled, in order to disable it, set value to `true`. If `sizeClassMap`
 value isn't defined/declared, the option will be ignored.
-
-**Constants values for script files (with example below):**    
-`constants:`  
-`  baseCraftListShowClass: true` defines if class column is shown in vessel
-list menu that is accessible from the base view. Default value is `false`.  
-`  baseCraftListClassShort: false` defines if class column uses short class
-abbreviation instead of full classification name. Default value is `false`.  
-`  baseShortHangarLinks: true` defines if additional 'CRAFT>' text is
-hidden in the basescape, while mouse is over hangar facility with craft.
-Default value is `false`.  
-`  pediaFacilityLockedStats: true` defines, if amount of shown stat rows in
-in Facility's Ufopaedia entries is limited via this option. Default value
-is `false`, because vanilla never had more than 5 parameters.  
-`  pediaFacilityRowsCutoff: 5` limits how much stat rows will be shown in
-Facility's Ufopaedia entries, if option `oxcePediaFacilityLockedStats`
-is enabled.  
-`  pediaFacilityColOffset: 10` adjusts column in Facility's Ufopaedia entries.
-Useful, if you have hangars with many types of slots. Number indicates by how
-much column will be moved to the left.  
 
 **Strings Localization Guide (with references below):**  
 For each string, in localization files you need to define two entries: 
