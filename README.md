@@ -253,12 +253,8 @@ minimized `_UC` strings. Do note if you've enabled `craftPediaShowClass` or
 `craftPediaShowSlots` but didn't map functionality sets to strings, as a
 fallback, game will show one of the functionality flags.
 
-**Constant values for script files (with example below):**    
+**Additional constant values for script files (with example below):**    
 `constants:`  
-`  baseCraftListShowClass: true` defines if class column is shown in vessel
-list menu that is accessible from the base view. Default value is `false`.  
-`  baseCraftListClassShort: false` defines if class column uses short class
-abbreviation instead of full classification name. Default value is `false`.  
 `  baseShortHangarLinks: true` defines if additional 'CRAFT>' text is
 hidden in the basescape, while mouse is over hangar facility with craft.
 Default value is `false`.  
@@ -270,7 +266,18 @@ Facility's Ufopaedia entries, if option `oxcePediaFacilityLockedStats`
 is enabled.  
 `  pediaFacilityColOffset: 10` adjusts column in Facility's Ufopaedia entries.
 Useful, if you have hangars with many types of slots. Number indicates by how
-much column will be moved to the left.  
+much column will be moved to the left.
+
+**Strings Localization Guide (with references below):**  
+For each string, in localization files you need to define two entries: 
+standard and short.  
+`en-US:`  
+`  STR_SMALL_VEHICLE: "Small Vehicle"`  
+`  STR_SMALL_VEHICLE_UC: "SV"`  
+
+Standard version will be seen in craft's Ufopaedia entry. Short will be seen
+in facility's Ufopaedia entry (hangars only). In addition, short version also
+will be shown if `craftListShowClass` and `craftListClassShort` are enabled.
 
 ## Modifiable Craft Size Stat and Size Classifications
 To simulate virtual craft inventory and give modders option to add variants of
@@ -291,47 +298,54 @@ override default `0`, so is the `craftSize` stat.
 `      craftSize: 6`  
 
 In this example `craftSize` of `6` means that once this weapon is equipped,
-craft's size will be increased by 6. If crafts aren't allowed to change class
-(via option) player will get notification that it can't be equipped.
+craft's size will be increased by 6. If after equipping `craftSize` will go
+beyond defined size classification boundaries (if they are defined) and if
+crafts aren't allowed to change class (via `allowClassChange`) player will
+get notification that it can't be equipped.
 
 **Craft Class values for script files (with example below):**  
 `craftClasses:` is a new global value for craft class settings.  
 `  sizeClassMap:`  
-`    250: STR_CLASS_MAX` Size range `250` and above.  Custom upper limit.  
-`    190: STR_CLASS_AIR_LARGE` Size range `190 ~ 249` for large aircrafts.  
-`    130: STR_CLASS_SUB_LARGE` Size range `130 ~ 189` for large submarines.  
-`    70: STR_CLASS_CAR_LARGE` Size range `70 ~ 129` for large vehicles.  
-`    50: STR_CLASS_AIR_SMALL` Size range `50 ~ 69` for small aircrafts.  
-`    30: STR_CLASS_SUB_SMALL` Size range `30 ~ 49` for small submarines.  
-`    10: STR_CLASS_CAR_SMALL` Size range `10 ~ 29` for small vehicles.  
-`    1: STR_CLASS_TEAM` Size range `1 ~ 9` for human teams.  
+`    500: STR_CLASS_MAX` Size range `500` and above.  Custom upper limit.  
+`    250: STR_CLASS_MASSIVE` Size range `250 ~ 499` for massive crafts.  
+`    130: STR_CLASS_HUGE` Size range `130 ~ 249` for huge crafts.  
+`    70: STR_CLASS_LARGE` Size range `70 ~ 129` for large crafts.  
+`    30: STR_CLASS_MEDIUM` Size range `30 ~ 69` for medium crafts.  
+`    10: STR_CLASS_SMALL` Size range `10 ~ 29` for small crafts.  
+`    1: STR_CLASS_TINY` Size range `1 ~ 9` for tiny crafts.  
 `    0: STR_CLASS_NA` Size `0` is compatibility value. Always leave it as is.  
-`    -1: STR_CLASS_NO` Size range `-1` and below. Custom bottom limit.  
+`    -1: STR_CLASS_NO` Size range `-1` and below. Custom bottom limit.
+`  allowClassChange: false`
+`  useSizeClassMap: true`
 
-This feature allows to assigns custom strings to selected craft size ranges.
-Last entry in the list, i.e. `STR_CLASS_NO` will not be rendered or shown in
-Ufopaedia (Analysis will show it anyway in numerical format). In conjunction
-with **optionGroups** it is possible to create hangar that can house for
-example only small sub or large aircraft. The `0` value is reserved for
-backwards compatibility, since all aircrafts with undefined craft size have
-their `craftSize` set to `0`, but you can assign any string to it.
+This feature allows to assigns custom strings to the craft size ranges, as
+well as define the size classification boundaries. Last entry in the list,
+i.e. `STR_CLASS_NO` will not be rendered or shown in Ufopaedia (Analysis will
+show it anyway in numerical format). The `0` value is reserved for backwards
+compatibility, since all aircrafts with undefined craft size have their
+`craftSize` set to `0`, but you can assign any string to it.
 
-`  allowClassChange: false` Allows to enforce craft size changes to be within
+`allowClassChange: false` Allows to enforce craft size changes to be within
 boundaries declared in the `sizeClassMap` (i.e. you won't be able install
 equipment which size stat increases size of modified craft for example from
 Small Submarine-class into Small Aircraft-class). By default this enforcement
 is enabled, in order to disable it, set value to `true`. If `sizeClassMap`
 value isn't defined/declared, the option will be ignored.
 
+`useSizeClassMap: true` Configures Ufopaedia to show size-based classification,
+instead of one defined via `craftClassMap` in `craftFuncSettings`. May be
+preferable, if mod heavily relies on virtual inventory of crafts for balance.
+
 **Strings Localization Guide (with references below):**  
 For each string, in localization files you need to define two entries: 
 standard and short.  
 `en-US:`  
-`  STR_CLASS_CAR_SMALL: "Small Vehicle"`  
-`  STR_CLASS_CAR_SMALL_UC: "SV"`  
+`  STR_CLASS_SMALL: "Small"`  
+`  STR_CLASS_SMALL_UC: "SM"`  
 
-Standard version will be seen in Craft's Ufopaedia entry. Short will be seen
-in Facility's Ufopaedia entry (hangars only).  
+Standard version will be seen in craft's Ufopaedia entry. Short will be seen
+in facility's Ufopaedia entry (hangars only). In addition, short version also
+will be shown if `craftListShowClass` and `craftListClassShort` are enabled.  
 
 ## Base Attack/Missile Strikes Debug Triggers
 Only works when in `options.cfg` the option `debug: true` is set. In
