@@ -3099,8 +3099,8 @@ void GeoscapeState::globeClick(Action *action)
 						// Ignore something from these UFO settings and game will crash.
 						debugUfo->setMissionInfo(debugMission, &baseTrajectory);
 						debugUfo->setAltitude(baseTrajectory.getAltitude(0));
-						debugUfo->setSpeed(baseTrajectory.getSpeedPercentage(0) *
-							debugUfo->getCraftStats().speedMax);
+						debugUfo->setSpeed(baseTrajectory.applySpeedPercentage(0,
+							debugUfo->getCraftStats().speedMax));
 						debugUfo->setLongitude(refBase->getLongitude() + RNG::generate(-0.5f, 0.5f));
 						debugUfo->setLatitude(refBase->getLatitude() + RNG::generate(-0.5f, 0.5f));
 
