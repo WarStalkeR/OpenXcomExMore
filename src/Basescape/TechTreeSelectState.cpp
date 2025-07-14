@@ -171,7 +171,9 @@ void TechTreeSelectState::initLists()
 
 	for (auto& res : _game->getMod()->getResearchList())
 	{
+		std::string ucType = res;
 		std::string projectName = tr(res);
+		Unicode::upperCase(ucType);
 		Unicode::upperCase(projectName);
 		if (searchString == "SHAZAM")
 		{
@@ -180,7 +182,8 @@ void TechTreeSelectState::initLists()
 				continue;
 			}
 		}
-		else if (projectName.find(searchString) == std::string::npos)
+		else if (ucType.find(searchString) == std::string::npos &&
+			projectName.find(searchString) == std::string::npos)
 		{
 			continue;
 		}
@@ -195,7 +198,9 @@ void TechTreeSelectState::initLists()
 
 	for (auto& manuf : _game->getMod()->getManufactureList())
 	{
+		std::string ucType = manuf;
 		std::string projectName = tr(manuf);
+		Unicode::upperCase(ucType);
 		Unicode::upperCase(projectName);
 		if (searchString == "SHAZAM")
 		{
@@ -204,7 +209,8 @@ void TechTreeSelectState::initLists()
 				continue;
 			}
 		}
-		else if (projectName.find(searchString) == std::string::npos)
+		else if (ucType.find(searchString) == std::string::npos &&
+			projectName.find(searchString) == std::string::npos)
 		{
 			continue;
 		}
@@ -225,7 +231,9 @@ void TechTreeSelectState::initLists()
 
 	for (auto& facType : _game->getMod()->getBaseFacilitiesList())
 	{
+		std::string ucType = facType;
 		std::string facilityName = tr(facType);
+		Unicode::upperCase(ucType);
 		Unicode::upperCase(facilityName);
 		if (searchString == "SHAZAM")
 		{
@@ -234,7 +242,8 @@ void TechTreeSelectState::initLists()
 				continue;
 			}
 		}
-		else if (facilityName.find(searchString) == std::string::npos)
+		else if (ucType.find(searchString) == std::string::npos &&
+			facilityName.find(searchString) == std::string::npos)
 		{
 			continue;
 		}
@@ -260,7 +269,9 @@ void TechTreeSelectState::initLists()
 			// items that are not protected at all are irrelevant for the Tech Tree Viewer!
 			continue;
 		}
+		std::string ucType = itemType;
 		std::string itemName = tr(itemType);
+		Unicode::upperCase(ucType);
 		Unicode::upperCase(itemName);
 		if (searchString == "SHAZAM")
 		{
@@ -269,7 +280,8 @@ void TechTreeSelectState::initLists()
 				continue;
 			}
 		}
-		else if (itemName.find(searchString) == std::string::npos)
+		else if (ucType.find(searchString) == std::string::npos &&
+			itemName.find(searchString) == std::string::npos)
 		{
 			continue;
 		}
@@ -290,7 +302,9 @@ void TechTreeSelectState::initLists()
 
 	for (auto& craftType : _game->getMod()->getCraftsList())
 	{
+		std::string ucType = craftType;
 		std::string craftName = tr(craftType);
+		Unicode::upperCase(ucType);
 		Unicode::upperCase(craftName);
 		if (searchString == "SHAZAM")
 		{
@@ -299,7 +313,8 @@ void TechTreeSelectState::initLists()
 				continue;
 			}
 		}
-		else if (craftName.find(searchString) == std::string::npos)
+		else if (ucType.find(searchString) == std::string::npos &&
+			craftName.find(searchString) == std::string::npos)
 		{
 			continue;
 		}
