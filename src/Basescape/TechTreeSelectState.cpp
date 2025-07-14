@@ -149,6 +149,13 @@ void TechTreeSelectState::initLists()
 	_firstFacilitiesTopicIndex = 0;
 	_firstItemTopicIndex = 0;
 	_firstCraftTopicIndex = 0;
+	if (Options::oxceTechTreeDataView)
+	{
+		_firstArcScriptIndex = 0;
+		_firstEventScriptIndex = 0;
+		_firstMissionScriptIndex = 0;
+		_firstAdhocScriptIndex = 0;
+	}
 
 	_availableTopics.clear();
 	_lstTopics->clearList();
@@ -425,6 +432,13 @@ void TechTreeSelectState::initLists()
 		_firstEventScriptIndex = row;
 		_firstMissionScriptIndex = row;
 		_firstAdhocScriptIndex = row;
+		if (Options::oxceTechTreeDataView)
+		{
+			_firstArcScriptIndex = row;
+			_firstEventScriptIndex = row;
+			_firstMissionScriptIndex = row;
+			_firstAdhocScriptIndex = row;
+		}
 	}
 }
 
