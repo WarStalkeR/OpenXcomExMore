@@ -195,7 +195,7 @@ be counted as 2 free slots and not 3.
 `    craftOptions:`  
 `      - {x: 1, y: -3, func: [TYPE_VEH, TYPE_SUB, SIZE_SMALL], hide: false}`  
 `  - type: STR_BAY_HYBRID_HANGAR`  
-`    crafts: 1`  
+`    crafts: 2`  
 `    craftsHidden: false`  
 `    craftOptions:`  
 `      - {x: 1, y: -3, func: [TYPE_AIR, TYPE_SUB, SIZE_SMALL, SIZE_MEDIUM]}`  
