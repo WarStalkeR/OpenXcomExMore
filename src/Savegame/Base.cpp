@@ -1448,8 +1448,8 @@ int Base::getFreeCraftSlots(const RuleCraftFunctions& craftFunc, const std::vect
 				if (!facStr.str().empty()) facStr << ", ";
 				facStr << fac->getRules()->getType();
 			}
-			Log(LOG_DEBUG) << "Base: " << _name << ", Request: number of missing slots, Excluded Facilities: "
-				<< facStr.str().c_str() << ", Response: " << -1 * freeSlots;
+			Log(LOG_DEBUG) << "Base: " << _name << ", Excluded Facilities: ["
+				<< facStr.str().c_str() << "], Missing Craft Slots: " << -1 * freeSlots;
 		}
 		else
 		{
@@ -1461,8 +1461,8 @@ int Base::getFreeCraftSlots(const RuleCraftFunctions& craftFunc, const std::vect
 				funcStr << func;
 			}
 			if (funcStr.str().empty()) funcStr << "N/A";
-			Log(LOG_DEBUG) << "Base: " << _name << ", Request: number of free slots, Functionalities: "
-				<< funcStr.str().c_str() << ", Response: " << freeSlots;
+			Log(LOG_DEBUG) << "Base: " << _name << ", Required Functionalities: ["
+				<< funcStr.str().c_str() << "], Free Craft Slots: " << freeSlots;
 		}
 	}
 
