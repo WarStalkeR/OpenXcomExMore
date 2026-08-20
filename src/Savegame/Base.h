@@ -276,7 +276,7 @@ public:
 	/// Runs two functions above in sequential manner.
 	void syncCraftChanges();
 	/// Gets number of unoccupied hangar slots for specific craft size.
-	int getFreeCraftSlots(const RuleCraftFunctions& craftFunc = 0) const;
+	int getFreeCraftSlots(const RuleCraftFunctions& craftFunc = 0, const std::vector<const BaseFacility*>& excFacs = {}) const;
 	/// Get the number of available space lab (not used by a ResearchProject)
 	int getFreeLaboratories() const;
 	/// Get the number of available space lab (not used by a Production)
